@@ -1,11 +1,16 @@
 #version 330 core
 
 // Input vertex data, different for all executions of this shader.
-layout(location = 0) in vec3 vertexPosition_modelspace;
+layout(location = 0) in vec3 pos;
+//layout(location = 1) in vec3 color;
 
+//out vec3 outColor;
+
+uniform mat4 projection;
+uniform mat4 view;
 void main(){
 
-    gl_Position.xyz = vertexPosition_modelspace;
-    gl_Position.w = 1.0;
-
+    gl_Position = projection * view * vec4(pos,1.0);
+    gl_PointSize = 10;
+    //outColor = color;
 }
