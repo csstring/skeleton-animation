@@ -21,12 +21,6 @@
     <ClCompile Include="shader.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Skeleton.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -39,9 +33,6 @@
     <ClCompile Include="Animation.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="DubugUtil.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Common.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -50,34 +41,28 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="shader.hpp">
+    <ClInclude Include="include\Animation.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Common.h">
+    <ClInclude Include="include\Bone.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Window.h">
+    <ClInclude Include="include\CmuFileParser.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
+    <ClInclude Include="include\Common.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
+    <ClInclude Include="include\shader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Skeleton.h">
+    <ClInclude Include="include\Simulator.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="CmuFileParser.h">
+    <ClInclude Include="include\Skeleton.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="Bone.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Simulator.h">
+    <ClInclude Include="include\Window.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
