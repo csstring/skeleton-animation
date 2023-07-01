@@ -1,7 +1,7 @@
-#include "CmuFileParser.h"
-#include "Skeleton.h"
-#include "Animation.h"
-#include "Bone.h"
+#include "include/CmuFileParser.h"
+#include "include/Skeleton.h"
+#include "include/Animation.h"
+#include "include/Bone.h"
 #include "fstream"
 #include <iostream>
 #include <cctype>

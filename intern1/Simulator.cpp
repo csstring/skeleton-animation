@@ -1,6 +1,6 @@
-#include "Simulator.h"
-#include "Animation.h"
-#include "Skeleton.h"
+#include "include/Simulator.h"
+#include "include/Animation.h"
+#include "include/Skeleton.h"
 
 void Simulator::setPoseDfs(std::vector<Bone>& boneVector, const AnimationData& node)
 {

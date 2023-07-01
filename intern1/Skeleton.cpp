@@ -1,5 +1,5 @@
-#include "Skeleton.h"
-#include "Bone.h"
+#include "include/Skeleton.h"
+#include "include/Bone.h"
 
 void Skeleton::draw(void) const 
 {

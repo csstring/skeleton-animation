@@ -3,7 +3,7 @@
 #include "include/GLM/glm.hpp"
 #include "include/GLM/ext.hpp"
 #include <iostream>
-
+#include <direct.h> // _getcwd
 #pragma comment(lib, "OpenGL32.lib")
 #pragma comment(lib, "lib/glew32.lib")
 #pragma comment(lib, "lib/glfw3.lib")
@@ -14,14 +14,13 @@
 #include <fstream>
 #include <algorithm>
 #include <sstream>
-#include "shader.hpp"
-#include "Skeleton.h"
-#include "Animation.h"
-#include "CmuFileParser.h"
-#include "Simulator.h"
+#include "include/shader.h"
+#include "include/Skeleton.h"
+#include "include/Animation.h"
+#include "include/CmuFileParser.h"
+#include "include/Simulator.h"
 
 GLFWwindow* window;
-GLuint vertexbuffer;
 glm::mat4 view = glm::mat4(1.0f);
 const int WINDOW_WITH = 1024;
 const int WINDOW_HEIGHT = 728;
@@ -87,8 +86,13 @@ int main() {
     CmuFileParser parser("./test.asf",&skeleton, &animation);
     Simulator simulator(&skeleton, &animation);
 
+    std::string VertexShader(_getcwd(NULL,0));
+    std::string FragmentShader(_getcwd(NULL, 0));
+
+    VertexShader.append("/shaderSource/VertexShader");
+    FragmentShader.append("/shaderSource/FragmentShader");
     parser.loadCmuFile();
-    shader.LoadShaders("C:/Users/schoe/Desktop/project_git/intern1/shaderSource/VertexShader", "C:/Users/schoe/Desktop/project_git/intern1/shaderSource/FragmentShader");
+    shader.LoadShaders(VertexShader.c_str(), FragmentShader.c_str());
     glEnable(GL_PROGRAM_POINT_SIZE); 
     simulator.setInitPose();
     
