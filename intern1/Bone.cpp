@@ -2,6 +2,7 @@
 #include "include/GL/glew.h"
 
 #include <iostream>
+
 void Bone::draw(void) const 
 {
     glBindVertexArray(VAO);

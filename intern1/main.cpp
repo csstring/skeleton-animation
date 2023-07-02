@@ -94,7 +94,8 @@ int main() {
     parser.loadCmuFile();
     shader.LoadShaders(VertexShader.c_str(), FragmentShader.c_str());
     glEnable(GL_PROGRAM_POINT_SIZE); 
-    simulator.setInitPose();
+    simulator.setupModelMatrix();
+    simulator.animationDataMaping();
     
     while (glfwWindowShouldClose(window) == 0)
     {
@@ -105,7 +106,7 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, -0.01f, 15.0f);
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        skeleton.draw();
+        simulator.draw();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
