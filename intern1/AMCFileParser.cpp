@@ -2,8 +2,8 @@
 #include "include/Skeleton.h"
 #include "include/Animation.h"
 #include "include/Bone.h"
-#include "AnimationDataResize.h"
-#include "AnimationDataMatrixSetup.h"
+#include "include/AnimationDataResize.h"
+#include "include/AnimationDataMatrixSetup.h"
 #include "include/GLM/glm.hpp"
 #include "include/GLM/gtc/matrix_transform.hpp"
 #include "fstream"
@@ -43,7 +43,7 @@ bool AMCFileParser::loadAMCFile(void)
 
         if (animationData == NULL)
         {
-            Index = std::stoi(buffer);
+            Index = std::stoi(buffer)-1;
             continue;
         }
         
@@ -67,4 +67,5 @@ bool AMCFileParser::loadAMCFile(void)
                 animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(0.0f, 0.0f, val));
         }
     }
+    return true;
 }

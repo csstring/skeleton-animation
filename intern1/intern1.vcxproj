@@ -140,7 +140,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AMCFileParser.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationDataMatrixSetup.cpp" />
+    <ClCompile Include="AnimationDataResize.cpp" />
     <ClCompile Include="Bone.cpp" />
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
@@ -150,7 +153,11 @@
     <ClCompile Include="Skeleton.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AMCFileParser.h" />
     <ClInclude Include="include\Animation.h" />
+    <ClInclude Include="include\AnimationDataMatrixSetup.h" />
+    <ClInclude Include="include\AnimationDataResize.h" />
+    <ClInclude Include="include\AnimationTreeTraversal.h" />
     <ClInclude Include="include\Bone.h" />
     <ClInclude Include="include\CmuFileParser.h" />
     <ClInclude Include="include\Common.h" />

@@ -1,5 +1,5 @@
 #include "include/Animation.h"
-#include "AnimationTreeTraversal.h"
+#include "include/AnimationTreeTraversal.h"
 #include "include/GL/glew.h"
 #include <queue>
 
@@ -27,16 +27,16 @@ AnimationData* Animation::returnAnimationData(const std::string& name)
 
 void Animation::AnimationDataTraver(AnimationTreeTraversal& travel)
 {
-    std::queue<AnimationData&> dataQueue;
+    std::queue<AnimationData* > dataQueue;
 
-    dataQueue.push(_rootNode);
+    dataQueue.push(&_rootNode);
     while (dataQueue.size() != 0)
     {
-        AnimationData& curData = dataQueue.front();
+        AnimationData* curData = dataQueue.front();
         dataQueue.pop();
 
-        travel.processNode(curData);
-        for (AnimationData& child : curData._childrens)
-            dataQueue.push(child);
+        travel.processNode(*curData);//fixme
+        for (int i =0; i < curData->_childrens.size(); ++i)
+            dataQueue.push(&curData->_childrens[i]);
     }
 }

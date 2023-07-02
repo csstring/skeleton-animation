@@ -1,5 +1,5 @@
-#include "AnimationDataMatrixSetup.h"
-#include "Animation.h"
+#include "include/AnimationDataMatrixSetup.h"
+#include "include/Animation.h"
 
 #include "include/GLM/glm.hpp"
 #include "include/GLM/gtc/matrix_inverse.hpp"

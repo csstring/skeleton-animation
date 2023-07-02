@@ -1,8 +1,9 @@
 #pragma once
 #include "Common.h"
-#include "include/GL/glew.h"		
-#include "include/GLFW/glfw3.h"
-#include "include/GLM/ext.hpp"
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
+#include "GLM/glm.hpp"
+#include "GLM/ext.hpp"
 
 class Shader : Noncopyable
 {

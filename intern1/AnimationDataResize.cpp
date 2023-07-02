@@ -1,5 +1,5 @@
-#include "AnimationDataResize.h"
-#include "Animation.h"
+#include "include/AnimationDataResize.h"
+#include "include/Animation.h"
 
 void AnimationDataResize::processNode(AnimationData& data)
 {

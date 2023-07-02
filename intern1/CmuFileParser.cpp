@@ -114,6 +114,9 @@ bool CmuFileParser::parseAsfRoot(std::ifstream& ifs)
         }
         else if (buffer == "axis")
         {
+            bone._orientation.x = 0;
+            bone._orientation.y = 0;
+            bone._orientation.z = 0;
             std::getline(ifs, buffer);//fix me
         }
         else if (buffer == "position")
@@ -140,7 +143,6 @@ bool CmuFileParser::parseAsfRoot(std::ifstream& ifs)
             ft_assert("root parser fail");
         }
     }
-    bone.setupBone();
     _skeleton->getBoneVector().push_back(bone);
     return true;
 }
@@ -201,7 +203,6 @@ bool CmuFileParser::parseAsfBoneData(std::ifstream& ifs)
             }
         }
 
-        //bone.setupBone();
         _skeleton->getBoneVector().push_back(bone);
     }
 

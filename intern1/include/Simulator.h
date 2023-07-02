@@ -2,10 +2,10 @@
 #include "common.h"
 #include "Bone.h"
 #include <vector>
-
+#include "Skeleton.h"
+#include <iostream>
 class Animation;
-class Skeleton;
-class AnimationData;
+struct AnimationData;
 
 class Simulator : Noncopyable
 {
@@ -14,12 +14,13 @@ private:
     Animation*          _animation;
     std::vector<uint32> VAO, VBO;
 
-    void setPoseDfs(std::vector<Bone>& boneVector, const AnimationData& node);
 public:
     Simulator(Skeleton* skeleton, Animation* animation) : _skeleton(skeleton), _animation(animation)
     {
+        //std::cout << skeleton->getBoneVector().size() << std::endl;
         VAO.resize(_skeleton->getBoneVector().size());
         VBO.resize(_skeleton->getBoneVector().size());
+        //std::cout << _skeleton->getBoneVector().size() << std::endl;
     }
     ~Simulator(){}
 

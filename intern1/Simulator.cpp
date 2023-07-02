@@ -2,7 +2,7 @@
 #include "include/Animation.h"
 #include "include/Skeleton.h"
 #include <queue>
-#include "AnimationDataMatrixSetup.h"
+#include "include/AnimationDataMatrixSetup.h"
 #include "include/GL/glew.h"
 
 void Simulator::setupModelMatrix(void)
@@ -13,14 +13,14 @@ void Simulator::setupModelMatrix(void)
 
 void Simulator::animationDataMaping(void)
 {
-    std::queue<AnimationData&> dataQueue;
-    std::vector<Bone> boneVector = _skeleton->getBoneVector();
+    std::queue<AnimationData*> dataQueue;
+    std::vector<Bone>& boneVector = _skeleton->getBoneVector();
     uint32 index = 0;
 
-    dataQueue.push(_animation->_rootNode);
+    dataQueue.push(&_animation->_rootNode);
     while (dataQueue.size() != 0)
     {
-        AnimationData& curData = dataQueue.front();
+        AnimationData* curData = dataQueue.front();
         dataQueue.pop();
 
         glGenVertexArrays(1, &VAO[index]);
@@ -34,8 +34,8 @@ void Simulator::animationDataMaping(void)
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
         glBindVertexArray(0);
-        for (AnimationData& child : curData._childrens)
-            dataQueue.push(child);
+        for (int i =0; i < curData->_childrens.size(); ++i)
+            dataQueue.push(&curData->_childrens[i]);
         index++;
     }
 }

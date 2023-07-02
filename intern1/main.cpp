@@ -19,6 +19,7 @@
 #include "include/Animation.h"
 #include "include/CmuFileParser.h"
 #include "include/Simulator.h"
+#include "include/AMCFileParser.h"
 
 GLFWwindow* window;
 glm::mat4 view = glm::mat4(1.0f);
@@ -84,16 +85,21 @@ int main() {
     Skeleton skeleton;
     Animation animation;
     CmuFileParser parser("./test.asf",&skeleton, &animation);
-    Simulator simulator(&skeleton, &animation);
+    AMCFileParser amcParser("./amc/01_01.amc", &skeleton, &animation);
+    
+    parser.loadCmuFile();
+    amcParser.loadAMCFile();
 
     std::string VertexShader(_getcwd(NULL,0));
     std::string FragmentShader(_getcwd(NULL, 0));
 
     VertexShader.append("/shaderSource/VertexShader");
     FragmentShader.append("/shaderSource/FragmentShader");
-    parser.loadCmuFile();
     shader.LoadShaders(VertexShader.c_str(), FragmentShader.c_str());
+
+
     glEnable(GL_PROGRAM_POINT_SIZE); 
+    Simulator simulator(&skeleton, &animation);
     simulator.setupModelMatrix();
     simulator.animationDataMaping();
     
