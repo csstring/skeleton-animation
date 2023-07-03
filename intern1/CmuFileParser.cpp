@@ -44,7 +44,7 @@ bool CmuFileParser::loadCmuFile(void)
         {
             std::getline(ifs, buffer);
             std::getline(ifs, buffer);
-            continue;
+            std::getline(ifs, buffer);
         }
         else if (buffer == "root")
             assert(parseAsfRoot(ifs));
@@ -59,6 +59,7 @@ bool CmuFileParser::loadCmuFile(void)
         }
     }
     ifs.close();
+    return true;
 }
 
 bool CmuFileParser::parseAsfUnits(std::ifstream& ifs)
@@ -257,7 +258,7 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
         animationData->_childrens.resize(v.size());
         //animationData->_boneIndex = boneIndex;
         for (int i =0; i < v.size(); ++i)
-        {
+        {//tlqkf root __c
             animationData->_childrens[i]._name = v[i];
             animationData->_childrens[i]._boneIndex = _skeleton->findBoneIndex(v[i]);
             animationData->_childrens[i]._parentPointer = animationData;
@@ -269,7 +270,7 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
             animationData->_childrens[i].__c = glm::rotate(animationData->_childrens[i].__c, glm::radians(axis[2]), glm::vec3(0.0f,0.0f,1.0f));
 
             glm::vec3 dir = bone._direction * _skeleton->getGBL() * bone._length;
-            animationData->__b = glm::translate(glm::mat4(1.0f), dir);
+            animationData->_childrens[i].__b = glm::translate(glm::mat4(1.0f), dir);
         }
     }
     return true;

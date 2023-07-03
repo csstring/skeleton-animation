@@ -12,19 +12,20 @@ class Simulator : Noncopyable
 private:
     Skeleton*           _skeleton;
     Animation*          _animation;
-    std::vector<uint32> VAO, VBO;
-
+    std::vector<uint32> VAO, VBO, VEO;
+    uint32              _total;
 public:
     Simulator(Skeleton* skeleton, Animation* animation) : _skeleton(skeleton), _animation(animation)
     {
-        //std::cout << skeleton->getBoneVector().size() << std::endl;
         VAO.resize(_skeleton->getBoneVector().size());
         VBO.resize(_skeleton->getBoneVector().size());
-        //std::cout << _skeleton->getBoneVector().size() << std::endl;
+        VEO.resize(_skeleton->getBoneVector().size());
+        _total = _animation->_rootNode._matrix.size();
     }
     ~Simulator(){}
 
+    uint32 getTotalData(void){return _total;};
     void setupModelMatrix(void);
     void animationDataMaping(void);
-    void draw(void) const;
+    void draw(uint32 animationTime,uint32 shaderPrograms);
 };

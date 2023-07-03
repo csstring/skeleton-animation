@@ -8,6 +8,7 @@ struct AnimationData
 {
         std::string _name;
         std::vector<glm::mat4> _matrix;
+        std::vector<glm::vec4> _pos;
         glm::mat4 __c;//fix
         glm::mat4 __b;//fix
         int32      _boneIndex;

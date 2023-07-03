@@ -40,7 +40,7 @@ bool AMCFileParser::loadAMCFile(void)
     while (ifs >> buffer)
     {
         AnimationData* animationData = _animation->returnAnimationData(buffer);
-
+        
         if (animationData == NULL)
         {
             Index = std::stoi(buffer)-1;

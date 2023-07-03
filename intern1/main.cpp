@@ -84,17 +84,17 @@ int main() {
     Shader shader;
     Skeleton skeleton;
     Animation animation;
-    CmuFileParser parser("./test.asf",&skeleton, &animation);
-    AMCFileParser amcParser("./amc/01_01.amc", &skeleton, &animation);
+    CmuFileParser parser("./asf/131-dance.asf",&skeleton, &animation);
+    AMCFileParser amcParser("./amc/131_04-dance.amc", &skeleton, &animation);
     
-    parser.loadCmuFile();
-    amcParser.loadAMCFile();
+    assert(parser.loadCmuFile());
+    assert(amcParser.loadAMCFile());
 
     std::string VertexShader(_getcwd(NULL,0));
     std::string FragmentShader(_getcwd(NULL, 0));
 
-    VertexShader.append("/shaderSource/VertexShader");
-    FragmentShader.append("/shaderSource/FragmentShader");
+    VertexShader.append("/shaderSource/VertexShader.glsl");
+    FragmentShader.append("/shaderSource/FragmentShader.glsl");
     shader.LoadShaders(VertexShader.c_str(), FragmentShader.c_str());
 
 
@@ -103,7 +103,10 @@ int main() {
     simulator.setupModelMatrix();
     simulator.animationDataMaping();
     
-    while (glfwWindowShouldClose(window) == 0)
+    uint32 animationDataIndex = 0;
+    uint32 maxIndex = simulator.getTotalData();
+
+    while (glfwWindowShouldClose(window) == 0 && animationDataIndex < maxIndex)
     {
         processInput(window);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -112,7 +115,9 @@ int main() {
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, -0.01f, 15.0f);
         shader.setMat4("projection", projection);
         shader.setMat4("view", view);
-        simulator.draw();
+        //shader.setUint("index", animationDataIndex++);
+        simulator.draw(animationDataIndex++, shader._programId);
+        //std::cout << animationDataIndex << '\n';
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
