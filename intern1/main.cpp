@@ -2,6 +2,8 @@
 #include "include/GLFW/glfw3.h"
 #include "include/GLM/glm.hpp"
 #include "include/GLM/ext.hpp"
+#include "include/GLM/gtc/matrix_transform.hpp"
+#include "include/GLM/gtx/transform.hpp"
 #include <iostream>
 #include <direct.h> // _getcwd
 #pragma comment(lib, "OpenGL32.lib")
@@ -23,6 +25,7 @@
 
 GLFWwindow* window;
 glm::mat4 view = glm::mat4(1.0f);
+//glm::mat4 view = glm::rotate(glm::radians(-90.0f), glm::vec3(1.0f,0.0f,0.0f));
 const int WINDOW_WITH = 1024;
 const int WINDOW_HEIGHT = 728;
 
@@ -63,6 +66,10 @@ void processInput(GLFWwindow *window)
         view = glm::translate(view, glm::vec3(1.0f, 0.0f, 0.0f));
     if (glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS)
         view = glm::translate(view, glm::vec3(-1.0f, 0.0f, 0.0f));
+    if (glfwGetKey(window, GLFW_KEY_W ) == GLFW_PRESS)
+        view = glm::translate(view, glm::vec3(0.0f, 1.0f, 0.0f));
+    if (glfwGetKey(window, GLFW_KEY_S ) == GLFW_PRESS)
+        view = glm::translate(view, glm::vec3(0.0f, -1.0f, 0.0f));
 }
 
 #include "include/GLM/gtx/string_cast.hpp"
@@ -74,6 +81,9 @@ int main() {
         glfwWindowInit();
         ft_glewInit();
         glfwSwapInterval(1);
+        glEnable(GL_DEPTH_TEST);
+        // Accept fragment if it closer to the camera than the former one
+        glDepthFunc(GL_LESS);
     }
     catch (const std::exception& e)
     {
@@ -109,7 +119,7 @@ int main() {
     while (glfwWindowShouldClose(window) == 0 && animationDataIndex < maxIndex)
     {
         processInput(window);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         shader.use();
         
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, -0.01f, 15.0f);

@@ -63,7 +63,7 @@ void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
 
         glBindVertexArray(VAO[index]);
         glBindBuffer(GL_ARRAY_BUFFER, VBO[index]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(curData->_pos[animationTime]), &curData->_pos[animationTime], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(curData->_pos[animationTime]), &curData->_pos[animationTime], GL_STREAM_DRAW);
         glDrawArrays(GL_POINTS,0,1);
         glBindVertexArray(0);
         //std::cout << glm::to_string(curData->_pos[animationTime])  << std::endl;

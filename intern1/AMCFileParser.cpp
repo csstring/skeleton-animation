@@ -59,12 +59,12 @@ bool AMCFileParser::loadAMCFile(void)
                 animationData->_matrix[Index] = glm::rotate(animationData->_matrix[Index], glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)); 
             else if (dof == DOF::RZ)
                 animationData->_matrix[Index] = glm::rotate(animationData->_matrix[Index], glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)); 
-            else if (dof == DOF::TX)
-                animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(val, 0.0f, 0.0f));
-            else if (dof == DOF::TY)
-                animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(0.0f, val, 0.0f));
-            else if (dof == DOF::TZ)
-                animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(0.0f, 0.0f, val));
+            else if (dof == DOF::TX){}
+                //animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(val, 0.0f, 0.0f));
+            else if (dof == DOF::TY){}
+                //animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(0.0f, val, 0.0f));
+            else if (dof == DOF::TZ){}
+                //animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(0.0f, 0.0f, val));
         }
     }
     return true;

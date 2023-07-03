@@ -9,16 +9,21 @@ void AnimationDataMatrixSetup::processNode(AnimationData& data)
     {
         for (int i =0; i <data._matrix.size(); ++i)
         {
-            data._pos[i] = data._matrix[i] * data._pos[i];
+            //data._pos[i] = data._matrix[i] * data._pos[i];
+            //data._matrix[i] = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
+            data._pos[i] = data._matrix[i]*glm::vec4(0.0f,0.0f,0.0f,1.0f);
         }
         return;
     }
     
     glm::mat4 invC = glm::inverse(data.__c);
     for (int i =0; i <data._matrix.size(); ++i)
-    {
-        //data._matrix[i] = data.__b * data.__c * data._matrix[i] * invC;
-        data._matrix[i] = invC * data._matrix[i] * data.__c * data.__b;
+    {/*
+        data._matrix[i] = data.__b * data.__c * data._matrix[i] * invC;
+        data._matrix[i] = data._parentPointer->_matrix[i] * data._matrix[i];
+        data._pos[i] = data._matrix[i]*glm::vec4(0.0f,0.0f,0.0f,1.0f);
+        */
+        data._matrix[i] = data.__b;
         data._matrix[i] = data._parentPointer->_matrix[i] * data._matrix[i];
         data._pos[i] = data._matrix[i]*glm::vec4(0.0f,0.0f,0.0f,1.0f);
     }

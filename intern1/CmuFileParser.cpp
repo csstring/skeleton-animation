@@ -4,6 +4,7 @@
 #include "include/Bone.h"
 #include "fstream"
 #include "include/GLM/glm.hpp"
+#include "include/GLM/gtx/transform.hpp"
 #include "include/GLM/gtc/matrix_transform.hpp"
 #include <algorithm>
 #include <iostream>
@@ -258,17 +259,19 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
         animationData->_childrens.resize(v.size());
         //animationData->_boneIndex = boneIndex;
         for (int i =0; i < v.size(); ++i)
-        {//tlqkf root __c
+        {
             animationData->_childrens[i]._name = v[i];
             animationData->_childrens[i]._boneIndex = _skeleton->findBoneIndex(v[i]);
             animationData->_childrens[i]._parentPointer = animationData;
 
             Bone& bone = _skeleton->getBoneVector()[animationData->_childrens[i]._boneIndex];
             glm::vec3 axis = bone._orientation;
-            animationData->_childrens[i].__c = glm::rotate(glm::mat4(1.0f), glm::radians(axis[0]), glm::vec3(1.0f,0.0f,0.0f));
-            animationData->_childrens[i].__c = glm::rotate(animationData->_childrens[i].__c, glm::radians(axis[1]), glm::vec3(0.0f,1.0f,0.0f));
-            animationData->_childrens[i].__c = glm::rotate(animationData->_childrens[i].__c, glm::radians(axis[2]), glm::vec3(0.0f,0.0f,1.0f));
 
+            glm::mat4 rotX = glm::rotate(glm::radians(axis[0]), glm::vec3(1.0f,0.0f,0.0f));
+            glm::mat4 rotY = glm::rotate(glm::radians(axis[1]), glm::vec3(0.0f,1.0f,0.0f));
+            glm::mat4 rotZ = glm::rotate(glm::radians(axis[2]), glm::vec3(0.0f,0.0f,1.0f));
+            animationData->_childrens[i].__c = rotZ * rotY * rotX;
+            
             glm::vec3 dir = bone._direction * _skeleton->getGBL() * bone._length;
             animationData->_childrens[i].__b = glm::translate(glm::mat4(1.0f), dir);
         }
