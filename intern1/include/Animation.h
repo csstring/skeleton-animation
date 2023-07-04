@@ -10,7 +10,7 @@ struct AnimationData
         std::vector<glm::mat4> _matrix;
         std::vector<glm::vec4> _pos;
         glm::mat4 __c;//fix
-        glm::mat4 __b;//fix
+        glm::vec4 __b;//fix
         int32      _boneIndex;
         AnimationData*      _parentPointer;
         std::vector<AnimationData> _childrens;

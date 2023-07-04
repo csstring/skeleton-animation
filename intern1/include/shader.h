@@ -6,19 +6,16 @@
 #include "GLM/ext.hpp"
 
 class Shader : Noncopyable
-{
+{   
     public :
-        uint32 _programId;
-        void use(void);
-        void LoadShaders(const char* vertex_file_path, const char* fragment_file_path);
-        
-    void setMat4(const std::string &name, glm::mat4 mat4) const
-    {
-        glUniformMatrix4fv(glGetUniformLocation(_programId, name.c_str()),1, false, glm::value_ptr(mat4));
-    }
+        explicit    Shader(const char* vertexRelativePath,const char* fragmentRelativePath);
+        void        initialize(void);
+        void        use(void);
+        void        setMat4(const std::string &name, glm::mat4 mat4) const;
+        void        setUint(const std::string &name, unsigned int index) const;
 
-    void setUint(const std::string &name, unsigned int index) const
-    {
-        glUniform1ui(glGetUniformLocation(_programId, name.c_str()), index);
-    }
+    private:
+        uint32      _programId;
+        std::string _vertexFullPath;
+        std::string _fragmentFullPath;
 };

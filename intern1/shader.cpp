@@ -5,15 +5,24 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-using namespace std;
 
 #include <stdlib.h>
 #include <string.h>
 
 #include "include/GL/glew.h"
 #include "include/shader.h"
+#include <direct.h>
 
-void Shader::LoadShaders(const char* vertex_file_path, const char* fragment_file_path) {
+Shader::Shader(const char* vertexRelativePath,const char* fragmentRelativePath)
+{
+	_vertexFullPath.assign(_getcwd(NULL,0));
+	_vertexFullPath.append(vertexRelativePath);
+	_fragmentFullPath.assign(_getcwd(NULL,0));
+	_fragmentFullPath.append(fragmentRelativePath);
+}
+
+void Shader::initialize() 
+{
 
 	// Create the shaders
 	uint32 VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
@@ -21,22 +30,20 @@ void Shader::LoadShaders(const char* vertex_file_path, const char* fragment_file
 
 	// Read the Vertex Shader code from the file
 	std::string VertexShaderCode;
-	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-	if (VertexShaderStream.is_open()) {
+	std::ifstream VertexShaderStream(_vertexFullPath, std::ios::in);
+	if (VertexShaderStream.is_open()) 
+	{
 		std::stringstream sstr;
 		sstr << VertexShaderStream.rdbuf();
 		VertexShaderCode = sstr.str();
 		VertexShaderStream.close();
 	}
-	else {
-		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
-		getchar();
-		return ;
-	}
+	else 
+		ft_assert("Impossible to open vertexShader");
 
 	// Read the Fragment Shader code from the file
 	std::string FragmentShaderCode;
-	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
+	std::ifstream FragmentShaderStream(_fragmentFullPath, std::ios::in);
 	if (FragmentShaderStream.is_open()) {
 		std::stringstream sstr;
 		sstr << FragmentShaderStream.rdbuf();
@@ -45,11 +52,10 @@ void Shader::LoadShaders(const char* vertex_file_path, const char* fragment_file
 	}
 
 	int32 Result = GL_FALSE;
-	int InfoLogLength;
-
+	int32 InfoLogLength;
 
 	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", vertex_file_path);
+	printf("Compiling shader : %s\n", _vertexFullPath);
 	char const* VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
 	glCompileShader(VertexShaderID);
@@ -57,14 +63,15 @@ void Shader::LoadShaders(const char* vertex_file_path, const char* fragment_file
 	// Check Vertex Shader
 	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
 	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
+	if (InfoLogLength > 0) 
+	{
 		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
 		glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
 		printf("%s\n", &VertexShaderErrorMessage[0]);
 	}
 
 	// Compile Fragment Shader
-	printf("Compiling shader : %s\n", fragment_file_path);
+	printf("Compiling shader : %s\n", _fragmentFullPath);
 	char const* FragmentSourcePointer = FragmentShaderCode.c_str();
 	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
 	glCompileShader(FragmentShaderID);
@@ -105,4 +112,14 @@ void Shader::LoadShaders(const char* vertex_file_path, const char* fragment_file
 void Shader::use(void)
 {
 	glUseProgram(_programId);
+}
+
+void Shader::setMat4(const std::string &name, glm::mat4 mat4) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(_programId, name.c_str()),1, false, glm::value_ptr(mat4));
+}
+
+void Shader::setUint(const std::string &name, unsigned int index) const
+{
+    glUniform1ui(glGetUniformLocation(_programId, name.c_str()), index);
 }

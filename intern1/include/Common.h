@@ -10,6 +10,8 @@ typedef unsigned int uint32;
 typedef int int32;
 
 const float PI = 3.141592;
+const int WINDOW_WITH = 1024;
+const int WINDOW_HEIGHT = 728;
 
 class Noncopyable
 {

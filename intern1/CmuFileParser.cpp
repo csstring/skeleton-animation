@@ -267,13 +267,15 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
             Bone& bone = _skeleton->getBoneVector()[animationData->_childrens[i]._boneIndex];
             glm::vec3 axis = bone._orientation;
 
-            glm::mat4 rotX = glm::rotate(glm::radians(axis[0]), glm::vec3(1.0f,0.0f,0.0f));
-            glm::mat4 rotY = glm::rotate(glm::radians(axis[1]), glm::vec3(0.0f,1.0f,0.0f));
-            glm::mat4 rotZ = glm::rotate(glm::radians(axis[2]), glm::vec3(0.0f,0.0f,1.0f));
-            animationData->_childrens[i].__c = rotZ * rotY * rotX;
+            glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));
+            glm::mat4 rotY = glm::rotate(axis[1], glm::vec3(0.0f,1.0f,0.0f));
+            glm::mat4 rotZ = glm::rotate(axis[2], glm::vec3(0.0f,0.0f,1.0f));
+
+            animationData->_childrens[i].__c = rotZ * rotY * rotX * glm::mat4(1.0f);
             
             glm::vec3 dir = bone._direction * _skeleton->getGBL() * bone._length;
-            animationData->_childrens[i].__b = glm::translate(glm::mat4(1.0f), dir);
+            //animationData->_childrens[i].__b = glm::translate(glm::mat4(1.0f), dir);
+            animationData->_childrens[i].__b = glm::vec4(dir, 1.0f);//################??
         }
     }
     return true;

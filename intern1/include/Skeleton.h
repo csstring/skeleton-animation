@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <unordered_map>
 #include "Animation.h"//fixme
 #include "Bone.h"//fixme
 //class Animation;
@@ -31,6 +30,5 @@ public:
 
 
     std::vector<Bone>& getBoneVector(void){return _boneVector;};
-    void draw(void) const;
     int32 findBoneIndex(const std::string& name) const;
 };

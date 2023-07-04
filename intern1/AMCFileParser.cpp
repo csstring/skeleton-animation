@@ -5,6 +5,7 @@
 #include "include/AnimationDataResize.h"
 #include "include/AnimationDataMatrixSetup.h"
 #include "include/GLM/glm.hpp"
+#include "include/GLM/gtx/transform.hpp"
 #include "include/GLM/gtc/matrix_transform.hpp"
 #include "fstream"
 #include <algorithm>
@@ -46,7 +47,6 @@ bool AMCFileParser::loadAMCFile(void)
             Index = std::stoi(buffer)-1;
             continue;
         }
-        
         std::vector<DOF> dofs = _skeleton->getBoneVector()[animationData->_boneIndex]._dof;
         for (DOF dof : dofs)
         {
@@ -54,17 +54,17 @@ bool AMCFileParser::loadAMCFile(void)
             ifs >> val;
 
             if (dof == DOF::RX)
-                animationData->_matrix[Index] = glm::rotate(animationData->_matrix[Index], glm::radians(val), glm::vec3(1.0f,0.0f,0.0f));   
+                animationData->_matrix[Index] = glm::rotate(glm::radians(val), glm::vec3(1.0f,0.0f,0.0f)) * animationData->_matrix[Index];   
             else if (dof == DOF::RY)
-                animationData->_matrix[Index] = glm::rotate(animationData->_matrix[Index], glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)); 
+                animationData->_matrix[Index] = glm::rotate(glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)) * animationData->_matrix[Index]; 
             else if (dof == DOF::RZ)
-                animationData->_matrix[Index] = glm::rotate(animationData->_matrix[Index], glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)); 
-            else if (dof == DOF::TX){}
-                //animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(val, 0.0f, 0.0f));
-            else if (dof == DOF::TY){}
-                //animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(0.0f, val, 0.0f));
-            else if (dof == DOF::TZ){}
-                //animationData->_matrix[Index] = glm::translate(animationData->_matrix[Index], glm::vec3(0.0f, 0.0f, val));
+                animationData->_matrix[Index] = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * animationData->_matrix[Index]; 
+            else if (dof == DOF::TX)
+                animationData->_matrix[Index] = glm::translate(glm::vec3(val, 0.0f, 0.0f)) * animationData->_matrix[Index];
+            else if (dof == DOF::TY)
+                animationData->_matrix[Index] = glm::translate(glm::vec3(0.0f, val, 0.0f)) * animationData->_matrix[Index];
+            else if (dof == DOF::TZ)
+                animationData->_matrix[Index] = glm::translate(glm::vec3(0.0f, 0.0f, val)) * animationData->_matrix[Index];
         }
     }
     return true;
