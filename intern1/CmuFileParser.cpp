@@ -15,13 +15,14 @@ bool CmuFileParser::loadCmuFile(void)
 
     if (ifs.is_open() == false) 
         return false;
+
     while (ifs.good())
     {
         char firstCh = ifs.get();
         std::string buffer;
         
-        //assert(firstCh != '#' && firstCh != ';');
-        if (isspace(firstCh)) continue;
+        if (isspace(firstCh)) 
+            continue;
         if (firstCh == '#')
         {
             std::getline(ifs, buffer);
@@ -40,7 +41,7 @@ bool CmuFileParser::loadCmuFile(void)
             _skeleton->setProgramName(buffer);
         }
         else if (buffer == "units")
-            assert(parseAsfUnits(ifs));
+            parseAsfUnits(ifs);
         else if (buffer == "documentation") //정확한 형식 파악 불가 추후재검토
         {
             std::getline(ifs, buffer);
@@ -48,15 +49,12 @@ bool CmuFileParser::loadCmuFile(void)
             std::getline(ifs, buffer);
         }
         else if (buffer == "root")
-            assert(parseAsfRoot(ifs));
+            parseAsfRoot(ifs);
         else if (buffer == "bonedata") //parsing hierarchy
-        {
-            assert(parseAsfBoneData(ifs));
-        }
+            parseAsfBoneData(ifs);
         else 
         {
             break;
-            assert(false);
         }
     }
     ifs.close();
@@ -106,20 +104,12 @@ bool CmuFileParser::parseAsfRoot(std::ifstream& ifs)
             {
                 if (buffer == "RX") bone._dof.push_back(DOF::RX);
                 else if (buffer == "RY") bone._dof.push_back(DOF::RY);
-                else if (buffer == "RZ") { bone._dof.push_back(DOF::RZ);
-                    break;
-                }
+                else if (buffer == "RZ") bone._dof.push_back(DOF::RZ);
                 else if (buffer == "TX") bone._dof.push_back(DOF::TX);
                 else if (buffer == "TY") bone._dof.push_back(DOF::TY);
                 else if (buffer == "TZ") bone._dof.push_back(DOF::TZ);
+                else break;
             }
-        }
-        else if (buffer == "axis")
-        {
-            bone._orientation.x = 0;
-            bone._orientation.y = 0;
-            bone._orientation.z = 0;
-            std::getline(ifs, buffer);//fix me
         }
         else if (buffer == "position")
         {
@@ -129,20 +119,16 @@ bool CmuFileParser::parseAsfRoot(std::ifstream& ifs)
         }
         else if (buffer == "orientation")
         {
-            ifs >> bone._orientation.x;
-            ifs >> bone._orientation.y;
-            ifs >> bone._orientation.z;
+            ifs >> bone._axis.x;
+            ifs >> bone._axis.y;
+            ifs >> bone._axis.z;
             
             if (_skeleton->getIsDeg())
             {
-                bone._orientation.x *= PI / 180.0;
-                bone._orientation.y *= PI / 180.0;
-                bone._orientation.z *= PI / 180.0;
+                bone._axis.x *= PI / 180.0;
+                bone._axis.y *= PI / 180.0;
+                bone._axis.z *= PI / 180.0;
             }
-        }
-        else 
-        {
-            ft_assert("root parser fail");
         }
     }
     _skeleton->getBoneVector().push_back(bone);
@@ -156,6 +142,7 @@ bool CmuFileParser::parseAsfBoneData(std::ifstream& ifs)
     {
         Bone bone;
         std::string buffer;
+
         while (ifs >> buffer)
         {
             if (buffer == "end")
@@ -167,13 +154,9 @@ bool CmuFileParser::parseAsfBoneData(std::ifstream& ifs)
                return true;
             }
             else if (buffer == "id")
-            {
                 ifs >> bone._boneIndex;
-            }
             else if (buffer == "name")
-            {
                 ifs >> bone._boneName;
-            }
             else if (buffer == "direction")
             {
                 ifs >> bone._direction.x;
@@ -187,24 +170,21 @@ bool CmuFileParser::parseAsfBoneData(std::ifstream& ifs)
             }
             else if (buffer == "axis")
             {
-                ifs >> bone._orientation.x;
-                ifs >> bone._orientation.y;
-                ifs >> bone._orientation.z;
+                ifs >> bone._axis.x;
+                ifs >> bone._axis.y;
+                ifs >> bone._axis.z;
                 
                 if (_skeleton->getIsDeg())
                 {
-                    bone._orientation.x *= PI / 180.0;
-                    bone._orientation.y *= PI / 180.0;
-                    bone._orientation.z *= PI / 180.0;
+                    bone._axis.x *= PI / 180.0;
+                    bone._axis.y *= PI / 180.0;
+                    bone._axis.z *= PI / 180.0;
                 }
                 std::getline(ifs, buffer); //xyz parsing
             }
             else if (buffer == "dof")
-            {
                 parserAsfDof(ifs, bone);
-            }
         }
-
         _skeleton->getBoneVector().push_back(bone);
     }
 
@@ -227,9 +207,8 @@ bool CmuFileParser::parserAsfDof(std::ifstream& ifs, Bone& bone)
         else if (buffer == "ty") bone._dof.push_back(DOF::TY);
         else if (buffer == "tz") bone._dof.push_back(DOF::TZ);
         dofCount++;
-        //fix me 객체안에 저장해야함 임시로 버리는중 
     }
-    while (dofCount--)//fix me 객체안에 저장해야함 임시로 버리는중 
+    while (dofCount--)//thorw limits
         std::getline(ifs, buffer);
     
     return true;
@@ -265,7 +244,7 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
             animationData->_childrens[i]._parentPointer = animationData;
 
             Bone& bone = _skeleton->getBoneVector()[animationData->_childrens[i]._boneIndex];
-            glm::vec3 axis = bone._orientation;
+            glm::vec3 axis = bone._axis;
 
             glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));
             glm::mat4 rotY = glm::rotate(axis[1], glm::vec3(0.0f,1.0f,0.0f));

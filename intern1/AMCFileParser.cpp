@@ -12,6 +12,29 @@
 #include <iostream>
 #include <cctype>
 
+void AMCFileParser::boneDataindexing(std::vector<AnimationData*>& indexVector)
+{
+    std::ifstream ifs(_filePath);
+    std::string buffer;
+    uint32 maxBone = _skeleton->getBoneVector().size();
+    uint32 count = 0;
+
+    while (std::getline(ifs,buffer))
+    {
+        if (buffer[0] !='#' && buffer[0] != ':')
+            break;
+    }
+    while (count < maxBone)
+    {
+        std::getline(ifs,buffer,' ');
+        indexVector.push_back(_animation->returnAnimationData(buffer));
+        std::getline(ifs,buffer);
+        count++;
+    }
+    ifs.close();
+}
+
+//캐싱, resize, capa확보후 pushback
 bool AMCFileParser::loadAMCFile(void)
 {
     std::ifstream ifs(_filePath);
@@ -26,6 +49,9 @@ bool AMCFileParser::loadAMCFile(void)
     }
     ifs.close();
 
+    std::vector<AnimationData*> indexVector;
+    boneDataindexing(indexVector);
+
     AnimationDataResize dataResizer(_total);
     _animation->AnimationDataTraver(dataResizer);
 
@@ -36,17 +62,19 @@ bool AMCFileParser::loadAMCFile(void)
             break;
     }
 
-    int32 Index = 0;
-
+    uint32 Index = 0;
+    uint32 count = 0;
     while (ifs >> buffer)
     {
-        AnimationData* animationData = _animation->returnAnimationData(buffer);
         
-        if (animationData == NULL)
+        if (count == indexVector.size())
         {
+            count = 0;
             Index = std::stoi(buffer)-1;
             continue;
         }
+
+        AnimationData* animationData = indexVector[count];
         std::vector<DOF> dofs = _skeleton->getBoneVector()[animationData->_boneIndex]._dof;
         for (DOF dof : dofs)
         {

@@ -4,6 +4,7 @@
 class Skeleton;
 class Bone;
 class Animation;
+class AnimationData;
 class AMCFileParser : Noncopyable
 {
     private:
@@ -11,6 +12,8 @@ class AMCFileParser : Noncopyable
         Skeleton*         _skeleton;
         Animation*        _animation;
         uint32             _total;
+
+        void boneDataindexing(std::vector<AnimationData*>& indexVector);
     public : 
         explicit AMCFileParser(
             std::string filePath, 

@@ -1,6 +1,6 @@
-#include "include/Window.h"
 #include "include/GL/glew.h"
 #include "include/GLFW/glfw3.h"
+#include "include/Window.h"
 
 void Window::initialize(void)
 {
@@ -24,7 +24,7 @@ void Window::initialize(void)
     if (glewInit() != GLEW_OK) 
         ft_assert("glew init failed");
 
-    this->glClearColor();
+    clearColorSetUp();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
@@ -48,7 +48,7 @@ void Window::processInput(void)
         _view = glm::translate(_view, glm::vec3(0.0f, -1.0f, 0.0f));
 }
 
-void Window::glClearColor(float r = 0, float g = 0, float b = 0, float a = 0)
+void Window::clearColorSetUp(float r, float g, float b, float a)
 {
     glClearColor(a,g,b,a);
 }

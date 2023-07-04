@@ -1,5 +1,3 @@
-#include "include/GL/glew.h"		
-#include "include/GLFW/glfw3.h"
 #include "include/GLM/glm.hpp"
 #include "include/GLM/ext.hpp"
 #include "include/GLM/gtc/matrix_transform.hpp"
@@ -25,6 +23,11 @@
 #include "include/AMCFileParser.h"
 
 #include "include/GLM/gtx/string_cast.hpp"
+
+#include <chrono>
+#include <cmath>
+std::chrono::system_clock::time_point start;
+std::chrono::duration<double>sec;
 int main() 
 {
     Window window;
@@ -38,13 +41,24 @@ int main()
     CmuFileParser parser("./asf/131-dance.asf",&skeleton, &animation);
     AMCFileParser amcParser("./amc/131_04-dance.amc", &skeleton, &animation);
     
-    assert(parser.loadCmuFile());
-    assert(amcParser.loadAMCFile());
+    start = std::chrono::system_clock::now();
+    parser.loadCmuFile();
+    sec = std::chrono::system_clock::now() - start;
+    std::cout << "asf parsing time : " << sec.count() <<"seconds"<< std::endl;
+
+    start = std::chrono::system_clock::now();
+    amcParser.loadAMCFile();
+    sec = std::chrono::system_clock::now() - start;
+    std::cout << "amc parsing time : " << sec.count() <<"seconds"<< std::endl;
 
     Simulator simulator(&skeleton, &animation);
+    sec = std::chrono::system_clock::now() - start;
     simulator.setupModelMatrix();
+    sec = std::chrono::system_clock::now() - start;
+    std::cout << "postion parsing time : " << sec.count() <<"seconds"<< std::endl;
+
     simulator.animationDataMaping();
-    
+
     uint32 animationDataIndex = 0;
     uint32 maxIndex = simulator.getTotalData();
 
@@ -56,7 +70,7 @@ int main()
         shader.use();
         glm::mat4 projection = glm::perspective(glm::radians(70.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, -0.01f, 30.0f);
         shader.setMat4("projection", projection);
-        shader.setMat4("view", view);
+        shader.setMat4("view", window._view);
         simulator.draw(animationDataIndex++, shader._programId);
         window.bufferSwap();
         glfwPollEvents();
