@@ -94,6 +94,7 @@ bool AMCFileParser::loadAMCFile(void)
             else if (dof == DOF::TZ)
                 animationData->_matrix[Index] = glm::translate(glm::vec3(0.0f, 0.0f, val)) * animationData->_matrix[Index];
         }
+        count++;
     }
     return true;
 }
