@@ -7,6 +7,8 @@
 #include "include/GLM/glm.hpp"
 #include "include/GLM/gtx/transform.hpp"
 #include "include/GLM/gtc/matrix_transform.hpp"
+//#include "include/GLM/gtc/quaternion.hpp"
+#include "include/GLM/gtx/quaternion.hpp"
 #include "fstream"
 #include <algorithm>
 #include <iostream>
@@ -16,25 +18,26 @@ void AMCFileParser::boneDataindexing(std::vector<AnimationData*>& indexVector)
 {
     std::ifstream ifs(_filePath);
     std::string buffer;
-    uint32 maxBone = _skeleton->getBoneVector().size();
-    uint32 count = 0;
+    uint32 maxBone = _skeleton->getBoneVector().size()-2;
+    uint32 moveBone = 0;
 
     while (std::getline(ifs,buffer))
     {
         if (buffer[0] !='#' && buffer[0] != ':')
             break;
     }
-    while (count < maxBone)
+    while (moveBone < maxBone)
     {
         std::getline(ifs,buffer,' ');
-        indexVector.push_back(_animation->returnAnimationData(buffer));
+        uint32 boneIndex = _skeleton->findBoneIndex(buffer);
+        indexVector.push_back(_animation->returnAnimationData(boneIndex));
         std::getline(ifs,buffer);
-        count++;
+        moveBone++;
     }
     ifs.close();
 }
 
-//캐싱, resize, capa확보후 pushback
+//캐싱, resize
 bool AMCFileParser::loadAMCFile(void)
 {
     std::ifstream ifs(_filePath);
@@ -49,8 +52,8 @@ bool AMCFileParser::loadAMCFile(void)
     }
     ifs.close();
 
-    std::vector<AnimationData*> indexVector;
-    boneDataindexing(indexVector);
+    std::vector<AnimationData*> boneIndexVector;
+    boneDataindexing(boneIndexVector);
 
     AnimationDataResize dataResizer(_total);
     _animation->AnimationDataTraver(dataResizer);
@@ -62,39 +65,44 @@ bool AMCFileParser::loadAMCFile(void)
             break;
     }
 
-    uint32 Index = 0;
-    uint32 count = 0;
+    uint32 animationFrame = 0;
+    uint32 moveBoneIndex = 0;
     while (ifs >> buffer)
     {
         
-        if (count == indexVector.size())
+        if (moveBoneIndex == boneIndexVector.size())
         {
-            count = 0;
-            Index = std::stoi(buffer)-1;
+            moveBoneIndex = 0;
+            animationFrame = std::stoi(buffer)-1;
             continue;
         }
 
-        AnimationData* animationData = indexVector[count];
+        AnimationData* animationData = boneIndexVector[moveBoneIndex];
         std::vector<DOF> dofs = _skeleton->getBoneVector()[animationData->_boneIndex]._dof;
+
+        glm::mat4 matrix(1.0f);
         for (DOF dof : dofs)
         {
             float val;
             ifs >> val;
 
             if (dof == DOF::RX)
-                animationData->_matrix[Index] = glm::rotate(glm::radians(val), glm::vec3(1.0f,0.0f,0.0f)) * animationData->_matrix[Index];   
+                matrix = glm::rotate(glm::radians(val), glm::vec3(1.0f,0.0f,0.0f)) * matrix;   
             else if (dof == DOF::RY)
-                animationData->_matrix[Index] = glm::rotate(glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)) * animationData->_matrix[Index]; 
+                matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)) * matrix; 
             else if (dof == DOF::RZ)
-                animationData->_matrix[Index] = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * animationData->_matrix[Index]; 
+                matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * matrix; 
             else if (dof == DOF::TX)
-                animationData->_matrix[Index] = glm::translate(glm::vec3(val, 0.0f, 0.0f)) * animationData->_matrix[Index];
+                animationData->_localTrans[animationFrame].x += val;
             else if (dof == DOF::TY)
-                animationData->_matrix[Index] = glm::translate(glm::vec3(0.0f, val, 0.0f)) * animationData->_matrix[Index];
+                animationData->_localTrans[animationFrame].y += val;
             else if (dof == DOF::TZ)
-                animationData->_matrix[Index] = glm::translate(glm::vec3(0.0f, 0.0f, val)) * animationData->_matrix[Index];
+                animationData->_localTrans[animationFrame].z += val;
         }
-        count++;
+        //glm::quat test = unpackQuaternionData(packQuaternionData(glm::quat_cast(matrix)));
+        //animationData->_localRotation[animationFrame] = test;
+        animationData->_localRotation[animationFrame] = glm::quat_cast(matrix);
+        moveBoneIndex++;
     }
     return true;
 }

@@ -6,6 +6,7 @@
 #include "include/GLM/glm.hpp"
 #include "include/GLM/gtx/transform.hpp"
 #include "include/GLM/gtc/matrix_transform.hpp"
+#include "include/GLM/gtc/matrix_inverse.hpp"
 #include <algorithm>
 #include <iostream>
 #include <cctype>
@@ -231,30 +232,47 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
         v = ft_split(buffer);
         
         int32 boneIndex = _skeleton->findBoneIndex(parent);
-        AnimationData* animationData = _animation->returnAnimationData(parent);
+        AnimationData* animationData = _animation->returnAnimationData(boneIndex);
 
         if (boneIndex == -1)
             ft_assert("we can't find bone name");
+
+        //root
+        if (boneIndex == 0)
+        {
+            Bone& bone = _skeleton->getBoneVector()[animationData->_boneIndex];
+            glm::vec3 axis = bone._axis;
+            
+            glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));
+            glm::mat4 rotY = glm::rotate(axis[1], glm::vec3(0.0f,1.0f,0.0f));
+            glm::mat4 rotZ = glm::rotate(axis[2], glm::vec3(0.0f,0.0f,1.0f));
+
+            glm::mat4 c = rotZ * rotY * rotX * glm::mat4(1.0f);
+            animationData->_c = glm::quat_cast(c);
+            animationData->_invC = glm::quat_cast(glm::inverse(c));
+            animationData->_b = glm::vec4(bone._postion.x, bone._postion.y, bone._postion.z, 1.0f);
+        }
+
+        //other
         animationData->_childrens.resize(v.size());
-        //animationData->_boneIndex = boneIndex;
         for (int i =0; i < v.size(); ++i)
         {
-            animationData->_childrens[i]._name = v[i];
             animationData->_childrens[i]._boneIndex = _skeleton->findBoneIndex(v[i]);
             animationData->_childrens[i]._parentPointer = animationData;
 
             Bone& bone = _skeleton->getBoneVector()[animationData->_childrens[i]._boneIndex];
             glm::vec3 axis = bone._axis;
-
+//mat4 fixme
             glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));
             glm::mat4 rotY = glm::rotate(axis[1], glm::vec3(0.0f,1.0f,0.0f));
             glm::mat4 rotZ = glm::rotate(axis[2], glm::vec3(0.0f,0.0f,1.0f));
 
-            animationData->_childrens[i].__c = rotZ * rotY * rotX * glm::mat4(1.0f);
-            
-            glm::vec3 dir = bone._direction * _skeleton->getGBL() * bone._length;
-            //animationData->_childrens[i].__b = glm::translate(glm::mat4(1.0f), dir);
-            animationData->_childrens[i].__b = glm::vec4(dir, 1.0f);//################??
+            glm::mat3 c = rotZ * rotY * rotX;
+            animationData->_childrens[i]._c = glm::quat_cast(c);
+            animationData->_childrens[i]._invC = glm::quat_cast(glm::inverse(c));
+
+            glm::vec3 dir = _skeleton->getGBL() * bone._length * bone._direction;
+            animationData->_childrens[i]._b = glm::vec4(dir, 1.0f);
         }
     }
     return true;

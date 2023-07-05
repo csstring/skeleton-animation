@@ -148,6 +148,7 @@
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Quantization.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="Skeleton.cpp" />

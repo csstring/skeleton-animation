@@ -4,10 +4,15 @@
 #include <string>
 #include <vector>
 #include "include/GLM/gtx/string_cast.hpp"
-typedef unsigned long long uint64;
-typedef long long int64;
-typedef unsigned int uint32;
-typedef int int32;
+typedef signed char         int8;
+typedef signed short        int16;
+typedef signed int          int32;
+typedef signed long         int64;
+typedef unsigned char       uint8;
+typedef unsigned short      uint16;
+typedef unsigned int        uint32;
+typedef unsigned long       uint64;
+typedef uint16*             compressedQuat;          
 
 const float PI = 3.141592;
 const int WINDOW_WITH = 1024;
@@ -29,3 +34,7 @@ private:
 //debug
 void ft_assert(const std::string& exec);
 std::vector<std::string> ft_split(const std::string& str);
+
+//quat
+compressedQuat packQuaternionData(glm::quat quat);
+glm::quat unpackQuaternionData(compressedQuat packData);

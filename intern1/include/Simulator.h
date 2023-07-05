@@ -20,7 +20,7 @@ public:
         VAO.resize(_skeleton->getBoneVector().size());
         VBO.resize(_skeleton->getBoneVector().size());
         VEO.resize(_skeleton->getBoneVector().size());
-        _total = _animation->_rootNode._matrix.size();
+        _total = _animation->_rootNode._localRotation.size();
     }
     ~Simulator(){}
 

@@ -3,24 +3,24 @@
 #include "include/GL/glew.h"
 #include <queue>
 
-void getDataNode(const std::string& name, AnimationData& node, AnimationData** returnNode)
+void getDataNode(const uint32 boneIndex, AnimationData& node, AnimationData** returnNode)
 {
-    if (node._name == name)
+    if (node._boneIndex == boneIndex)
     {
         *returnNode = &node;
         return;
     }
     for (AnimationData& childNode : node._childrens)
     {
-        getDataNode(name, childNode, returnNode);
+        getDataNode(boneIndex, childNode, returnNode);
     }
     return;
 }
 
-AnimationData* Animation::returnAnimationData(const std::string& name)
+AnimationData* Animation::returnAnimationData(const uint32 boneIndex)
 {   
     AnimationData* returnNode = NULL;
-    getDataNode(name, _rootNode, &returnNode);
+    getDataNode(boneIndex, _rootNode, &returnNode);
 
     return returnNode;
 }

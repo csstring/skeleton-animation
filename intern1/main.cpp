@@ -36,6 +36,7 @@ int main()
     window.initialize();
     shader.initialize();
 
+    std::chrono::system_clock::time_point programstart = std::chrono::system_clock::now();
     Skeleton skeleton;
     Animation animation;
     CmuFileParser parser("./asf/131-dance.asf",&skeleton, &animation);
@@ -52,12 +53,15 @@ int main()
     std::cout << "amc parsing time : " << sec.count() <<"seconds"<< std::endl;
 
     Simulator simulator(&skeleton, &animation);
-    sec = std::chrono::system_clock::now() - start;
+    start = std::chrono::system_clock::now();
     simulator.setupModelMatrix();
     sec = std::chrono::system_clock::now() - start;
     std::cout << "postion parsing time : " << sec.count() <<"seconds"<< std::endl;
 
     simulator.animationDataMaping();
+    std::chrono::duration<double>programend = std::chrono::system_clock::now() - programstart;
+    std::cout << "program time : " << programend.count() <<"seconds"<< std::endl;
+
 
     uint32 animationDataIndex = 0;
     uint32 maxIndex = simulator.getTotalData();
@@ -68,7 +72,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         shader.use();
-        glm::mat4 projection = glm::perspective(glm::radians(70.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, -0.01f, 30.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(70.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, -0.01f, 5.0f);
         shader.setMat4("projection", projection);
         shader.setMat4("view", window._view);
         simulator.draw(animationDataIndex++, shader._programId);
