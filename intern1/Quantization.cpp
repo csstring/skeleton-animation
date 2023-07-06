@@ -1,9 +1,7 @@
 #include "include/Quantization.h"
-#include "include/GLM/glm.hpp"
 #include <cstring>
 #include <cmath>
-#include <bitset>
-const int32 OFFSET = 15;
+
 int16 toShort(float val)
 {   
     int16 returnVal = static_cast<int16>(std::roundf(val * (1 << 14)));

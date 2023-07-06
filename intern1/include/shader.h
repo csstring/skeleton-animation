@@ -1,9 +1,6 @@
 #pragma once
 #include "Common.h"
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
-#include "GLM/glm.hpp"
-#include "GLM/ext.hpp"
+#include "include/GLM/ext.hpp"
 
 class Shader : Noncopyable
 {   
@@ -14,7 +11,9 @@ class Shader : Noncopyable
         void        setMat4(const std::string &name, glm::mat4 mat4) const;
         void        setUint(const std::string &name, unsigned int index) const;
 
-        uint32      _programId;//fixme
+    public :
+        uint32      _programId;//fixme goto private?
+
     private:
         std::string _vertexFullPath;
         std::string _fragmentFullPath;

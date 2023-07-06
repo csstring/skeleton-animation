@@ -2,31 +2,27 @@
 #include "common.h"
 #include <string>
 class Skeleton;
-class Bone;
 class Animation;
 class AnimationData;
 class AMCFileParser : Noncopyable
 {
+    public : 
+        explicit AMCFileParser(std::string filePath, Skeleton* skeleton, Animation* animation) 
+                : _filePath(filePath), _skeleton(skeleton), _animation(animation), _total(0){};
+                
+                ~AMCFileParser()
+                {
+                    _skeleton = NULL;
+                    _animation = NULL;
+                };
+        bool    loadAMCFile();
+    private:
+        void    boneDataindexing(std::vector<AnimationData*>& indexVector);
+
     private:
         const std::string _filePath;
         Skeleton*         _skeleton;
         Animation*        _animation;
-        uint32             _total;
-
-        void boneDataindexing(std::vector<AnimationData*>& indexVector);
-    public : 
-        explicit AMCFileParser(
-            std::string filePath, 
-            Skeleton* skeleton,
-            Animation* animation
-        ) : _filePath(filePath), _skeleton(skeleton), _animation(animation), _total(0)
-        {};
-        ~AMCFileParser()
-        {
-            _skeleton = NULL;
-            _animation = NULL;
-        };
-
-        bool loadAMCFile();
+        uint32            _total;
 
 };

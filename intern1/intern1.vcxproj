@@ -144,7 +144,6 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationDataMatrixSetup.cpp" />
     <ClCompile Include="AnimationDataResize.cpp" />
-    <ClCompile Include="Bone.cpp" />
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="main.cpp" />

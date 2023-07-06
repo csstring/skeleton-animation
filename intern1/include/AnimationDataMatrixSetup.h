@@ -1,6 +1,5 @@
 #pragma once
 #include "AnimationTreeTraversal.h"
-#include "common.h"
 
 class AnimationDataMatrixSetup: public AnimationTreeTraversal
 {

@@ -8,7 +8,6 @@
 #include "include/GLM/gtx/transform.hpp"
 #include "include/GLM/gtc/matrix_transform.hpp"
 #include "include/Quantization.h"
-//#include "include/GLM/gtc/quaternion.hpp"
 #include "include/GLM/gtx/quaternion.hpp"
 #include "fstream"
 #include <algorithm>
@@ -100,6 +99,8 @@ bool AMCFileParser::loadAMCFile(void)
             else if (dof == DOF::TZ)
                 animationData->_localTrans[animationFrame].z += val;
         }
+        
+        //quat pack unpack test
         glm::quat firstQuat = glm::quat_cast(matrix);
         quatPressData tempComp = packQuaternionData(firstQuat);
         glm::quat secondQuat = unpackQuaternionData(tempComp);

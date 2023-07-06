@@ -1,6 +1,5 @@
 #include "include/Animation.h"
 #include "include/AnimationTreeTraversal.h"
-#include "include/GL/glew.h"
 #include <queue>
 
 void getDataNode(const uint32 boneIndex, AnimationData& node, AnimationData** returnNode)

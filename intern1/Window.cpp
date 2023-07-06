@@ -1,6 +1,7 @@
+#include "include/GLM/ext.hpp"
+#include "include/Window.h"
 #include "include/GL/glew.h"
 #include "include/GLFW/glfw3.h"
-#include "include/Window.h"
 
 void Window::initialize(void)
 {
@@ -12,7 +13,7 @@ void Window::initialize(void)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    _window = glfwCreateWindow(WINDOW_WITH, WINDOW_HEIGHT, "Scope", NULL, NULL);  
+    _window = glfwCreateWindow(WINDOW_WITH, WINDOW_HEIGHT, "model", NULL, NULL);  
     if (_window == NULL) 
     {
         glfwTerminate();
@@ -25,6 +26,7 @@ void Window::initialize(void)
         ft_assert("glew init failed");
 
     clearColorSetUp();
+    glfwSwapInterval(1);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
