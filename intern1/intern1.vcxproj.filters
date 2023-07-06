@@ -92,5 +92,8 @@
     <ClInclude Include="include\AnimationTreeTraversal.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="include\Quantization.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

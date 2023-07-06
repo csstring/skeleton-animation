@@ -34,7 +34,3 @@ private:
 //debug
 void ft_assert(const std::string& exec);
 std::vector<std::string> ft_split(const std::string& str);
-
-//quat
-compressedQuat packQuaternionData(glm::quat quat);
-glm::quat unpackQuaternionData(compressedQuat packData);
