@@ -1,5 +1,4 @@
 #include "include/Skeleton.h"
-#include "include/Bone.h"
 
 int32 Skeleton::findBoneIndex(const std::string& name) const
 {

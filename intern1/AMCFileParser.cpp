@@ -1,18 +1,12 @@
 #include "include/AMCFileParser.h"
 #include "include/Skeleton.h"
 #include "include/Animation.h"
-#include "include/Bone.h"
 #include "include/AnimationDataResize.h"
 #include "include/AnimationDataMatrixSetup.h"
-#include "include/GLM/glm.hpp"
+#include "include/GLM/ext.hpp"
 #include "include/GLM/gtx/transform.hpp"
-#include "include/GLM/gtc/matrix_transform.hpp"
 #include "include/Quantization.h"
-#include "include/GLM/gtx/quaternion.hpp"
 #include "fstream"
-#include <algorithm>
-#include <iostream>
-#include <cctype>
 
 void AMCFileParser::boneDataindexing(std::vector<AnimationData*>& indexVector)
 {

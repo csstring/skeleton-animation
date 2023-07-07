@@ -1,17 +1,12 @@
 
-#include <stdio.h>
 #include <string>
 #include <vector>
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-#include <stdlib.h>
-#include <string.h>
-
+#include <direct.h>
 #include "include/GL/glew.h"
 #include "include/shader.h"
-#include <direct.h>
 
 Shader::Shader(const char* vertexRelativePath,const char* fragmentRelativePath)
 {
@@ -55,7 +50,7 @@ void Shader::initialize()
 	int32 InfoLogLength;
 
 	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", _vertexFullPath);
+	std::cout << "Compiling shader : " << _vertexFullPath << std::endl;
 	char const* VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
 	glCompileShader(VertexShaderID);
@@ -71,7 +66,7 @@ void Shader::initialize()
 	}
 
 	// Compile Fragment Shader
-	printf("Compiling shader : %s\n", _fragmentFullPath);
+	std::cout << "Compiling shader : " << _fragmentFullPath << std::endl;
 	char const* FragmentSourcePointer = FragmentShaderCode.c_str();
 	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
 	glCompileShader(FragmentShaderID);
@@ -82,11 +77,13 @@ void Shader::initialize()
 	if (InfoLogLength > 0) {
 		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
 		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-		printf("%s\n", &FragmentShaderErrorMessage[0]);
+		std::string ErrorMessage(FragmentShaderErrorMessage.begin(), FragmentShaderErrorMessage.end());
+		
+		std::cout << ErrorMessage << std::endl;
 	}
 
 	// Link the program
-	printf("Linking program\n");
+	std::cout << "Linking program" << std::endl;
 	_programId = glCreateProgram();
 	glAttachShader(_programId, VertexShaderID);
 	glAttachShader(_programId, FragmentShaderID);
@@ -98,7 +95,9 @@ void Shader::initialize()
 	if (InfoLogLength > 0) {
 		std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
 		glGetProgramInfoLog(_programId, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-		printf("%s\n", &ProgramErrorMessage[0]);
+		std::string ErrorMessage(ProgramErrorMessage.begin(), ProgramErrorMessage.end());
+		
+		std::cout << ErrorMessage << std::endl;
 	}
 
 

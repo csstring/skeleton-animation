@@ -1,5 +1,4 @@
 #include "include/Quantization.h"
-#include <cstring>
 #include <cmath>
 
 int16 toShort(float val)

@@ -1,9 +1,9 @@
 #include "include/Simulator.h"
 #include "include/Animation.h"
 #include "include/Skeleton.h"
-#include <queue>
 #include "include/AnimationDataMatrixSetup.h"
 #include "include/GL/glew.h"
+#include <queue>
 
 void Simulator::initialize(void)
 {

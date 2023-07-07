@@ -2,14 +2,9 @@
 #include "include/Skeleton.h"
 #include "include/Animation.h"
 #include "include/Bone.h"
-#include "fstream"
-#include "include/GLM/glm.hpp"
 #include "include/GLM/gtx/transform.hpp"
-#include "include/GLM/gtc/matrix_transform.hpp"
-#include "include/GLM/gtc/matrix_inverse.hpp"
-#include <algorithm>
-#include <iostream>
-#include <cctype>
+#include "fstream"
+
 bool CmuFileParser::loadCmuFile(void)
 {
     std::ifstream ifs(_filePath);
