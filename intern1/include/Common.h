@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "include/GLM/glm.hpp"
 
 typedef signed char         int8;
 typedef signed short        int16;
@@ -35,3 +36,4 @@ void ft_assert(const std::string& exec);
 
 //utility
 std::vector<std::string> ft_split(const std::string& str);
+glm::mat4 ft_rotate(const glm::vec3 start, const glm::vec3 end);

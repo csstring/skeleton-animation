@@ -89,7 +89,9 @@ bool CmuFileParser::parseAsfRoot(std::ifstream& ifs)
 
     bone._boneIndex = 0;
     bone._boneName = "root";
-    
+    bone._length = 0;
+    bone._direction = glm::vec3(0.0f);
+
     std::string buffer;
     for (int i = 0; i < 4; ++i)
     {

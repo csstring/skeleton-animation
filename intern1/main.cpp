@@ -65,6 +65,7 @@ int main()
         shader.setMat4("projection", projection);
         shader.setMat4("view", window._view);
         simulator.draw(animationDataIndex++, shader._programId);
+        if (animationDataIndex >= maxIndex) animationDataIndex = 1;
         window.bufferSwap();
         glfwPollEvents();
     }

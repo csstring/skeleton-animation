@@ -3,6 +3,7 @@
 #include "include/Skeleton.h"
 #include "include/AnimationDataMatrixSetup.h"
 #include "include/GL/glew.h"
+#include "include/Cylinder.h"
 #include <queue>
 
 void Simulator::initialize(void)
@@ -11,6 +12,7 @@ void Simulator::initialize(void)
 
     VAO.resize(size);
     VBO.resize(size);
+    TVBO.resize(size);
     _total = _animation->_rootNode._localRotation.size();
 }
 
@@ -36,10 +38,12 @@ void Simulator::animationDataMaping(void)
 
         glGenBuffers(1, &VBO[index]);
         glBindBuffer(GL_ARRAY_BUFFER, VBO[index]);
-    
         glEnableVertexAttribArray(0);	
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), (void*)0);//size 열의 개수
-        glVertexAttribDivisor(0, 1);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);//size 열의 개수
+        // glGenBuffers(1, &TVBO[index]);
+        // glBindBuffer(GL_ARRAY_BUFFER, TVBO[index]);
+        // glEnableVertexAttribArray(0);	
+        // glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);//size 열의 개수
 
         glBindVertexArray(0);
 
@@ -48,7 +52,7 @@ void Simulator::animationDataMaping(void)
         index++;
     }
 }
-
+#include "include/GLM/gtx/quaternion.hpp"
 void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
 {
     std::queue<AnimationData*> dataQueue;
@@ -61,10 +65,13 @@ void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
         AnimationData* curData = dataQueue.front();
         dataQueue.pop();
 
+
         glBindVertexArray(VAO[index]);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[index]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(curData->_pos[animationTime]), &curData->_pos[animationTime], GL_STREAM_DRAW);
-        glDrawArrays(GL_POINTS,0,1);
+        Bone bone =_skeleton->getBoneVector()[curData->_boneIndex];
+        glm::mat4 toParentDir = curData->_worldTrans[animationTime] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
+        Cylinder cylinder(0.2, 0.7 *_skeleton->getGBL() * bone._length ,16, toParentDir);
+        cylinder.initialize();
+        cylinder.render(VBO[index]);
         glBindVertexArray(0);
 
         for (int i =0; i < curData->_childrens.size(); ++i)
