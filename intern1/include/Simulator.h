@@ -12,7 +12,7 @@ class Simulator : Noncopyable
     private:
         Skeleton*           _skeleton;
         Animation*          _animation;
-        std::vector<uint32> VAO, VBO, TVBO;
+        std::vector<uint32> VAO, VBO;
         uint32              _total;
     public:
         Simulator(Skeleton* skeleton, Animation* animation) : _skeleton(skeleton), _animation(animation){}

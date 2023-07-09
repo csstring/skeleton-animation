@@ -12,7 +12,6 @@ void Simulator::initialize(void)
 
     VAO.resize(size);
     VBO.resize(size);
-    TVBO.resize(size);
     _total = _animation->_rootNode._localRotation.size();
 }
 
@@ -40,10 +39,6 @@ void Simulator::animationDataMaping(void)
         glBindBuffer(GL_ARRAY_BUFFER, VBO[index]);
         glEnableVertexAttribArray(0);	
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);//size 열의 개수
-        // glGenBuffers(1, &TVBO[index]);
-        // glBindBuffer(GL_ARRAY_BUFFER, TVBO[index]);
-        // glEnableVertexAttribArray(0);	
-        // glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);//size 열의 개수
 
         glBindVertexArray(0);
 
@@ -52,7 +47,7 @@ void Simulator::animationDataMaping(void)
         index++;
     }
 }
-#include "include/GLM/gtx/quaternion.hpp"
+
 void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
 {
     std::queue<AnimationData*> dataQueue;

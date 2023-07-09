@@ -147,6 +147,7 @@
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cylinder.cpp" />
+    <ClCompile Include="Ground.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Quantization.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="include\CmuFileParser.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Cylinder.h" />
+    <ClInclude Include="include\Ground.h" />
     <ClInclude Include="include\Quantization.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\Simulator.h" />
