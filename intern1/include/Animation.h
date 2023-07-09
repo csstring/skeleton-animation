@@ -8,6 +8,7 @@ class AnimationTreeTraversal;
 struct AnimationData
 {
         std::vector<glm::quat>     _localRotation;
+        //복사 애니메이션 객체 따로 만들고 worldTrans,index 넣어도 되지 않나
         std::vector<glm::vec4>     _localTrans;
 
         // std::vector<glm::mat4>     _worldTrans;
@@ -19,7 +20,7 @@ struct AnimationData
         std::vector<AnimationData> _childrens;
 };
 
-class Animation : Noncopyable
+class Animation : Noncopyable//복사해서 비교 데이터 만들어야 할듯
 {
     public:
         explicit Animation()
