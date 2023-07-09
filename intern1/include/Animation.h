@@ -8,13 +8,12 @@ class AnimationTreeTraversal;
 struct AnimationData
 {
         std::vector<glm::quat>     _localRotation;
-        std::vector<glm::mat4>     _worldTrans;
         std::vector<glm::vec4>     _localTrans;
-        std::vector<glm::vec4>     _pos;
 
-        glm::quat                  _c;
-        glm::quat                  _invC;
-        glm::vec4                  _b;
+        // std::vector<glm::mat4>     _worldTrans;
+        // glm::quat                  _c;
+        // glm::quat                  _invC;
+        // glm::vec4                  _b; //amc에서 local정하기
         int32                      _boneIndex;
         AnimationData*             _parentPointer;
         std::vector<AnimationData> _childrens;

@@ -15,6 +15,5 @@ void AnimationDataMatrixSetup::processNode(AnimationData& data)
             data._worldTrans[i] = data._parentPointer->_worldTrans[i] * trnasM * rotatinM;
         else
             data._worldTrans[i] = trnasM * rotatinM;
-        data._pos[i] = data._worldTrans[i] * glm::vec4(0.0f,0.0f,0.0f,1.0f);
     }
 }
