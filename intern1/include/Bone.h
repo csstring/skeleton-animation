@@ -1,8 +1,8 @@
 #pragma once
 #include "common.h"
-#include "GLM/glm.hpp"
 #include <string>
 #include <vector>
+#include "include/GLM/ext.hpp"
 
 enum class DOF{
     RX,
@@ -22,5 +22,8 @@ struct Bone
     glm::vec3        _axis;
     glm::vec3        _direction;
     std::vector<DOF> _dof;
+    glm::quat        _c;
+    glm::quat        _invC;
+    glm::vec3        _b; //amc에서 local정하기
 };
 

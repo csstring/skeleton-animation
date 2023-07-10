@@ -245,9 +245,9 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
             glm::mat4 rotZ = glm::rotate(axis[2], glm::vec3(0.0f,0.0f,1.0f));
 
             glm::mat4 c = rotZ * rotY * rotX * glm::mat4(1.0f);
-            animationData->_c = glm::quat_cast(c);
-            animationData->_invC = glm::quat_cast(glm::inverse(c));
-            animationData->_b = glm::vec4(bone._postion.x, bone._postion.y, bone._postion.z, 1.0f);
+            bone._c = glm::quat_cast(c);
+            bone._invC = glm::quat_cast(glm::inverse(c));
+            bone._b = glm::vec3(bone._postion.x, bone._postion.y, bone._postion.z);
         }
 
         //other
@@ -265,11 +265,11 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
             glm::mat4 rotZ = glm::rotate(axis[2], glm::vec3(0.0f,0.0f,1.0f));
 
             glm::mat3 c = rotZ * rotY * rotX;
-            animationData->_childrens[i]._c = glm::quat_cast(c);
-            animationData->_childrens[i]._invC = glm::quat_cast(glm::inverse(c));
+            bone._c = glm::quat_cast(c);
+            bone._invC = glm::quat_cast(glm::inverse(c));
 
             glm::vec3 dir = _skeleton->getGBL() * bone._length * bone._direction;
-            animationData->_childrens[i]._b = glm::vec4(dir, 1.0f);
+            bone._b = glm::vec3(dir);
         }
     }
     return true;

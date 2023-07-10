@@ -4,6 +4,7 @@
 #include "include/AnimationDataResize.h"
 #include "include/AnimationDataMatrixSetup.h"
 #include "include/GLM/ext.hpp"
+#include "include/GLM/gtx/quaternion.hpp"
 #include "include/GLM/gtx/transform.hpp"
 #include "include/Quantization.h"
 #include "fstream"
@@ -68,14 +69,25 @@ bool AMCFileParser::loadAMCFile(void)
         {
             moveBoneIndex = 0;
             animationFrame = std::stoi(buffer)-1;
+            ///fix me
+            uint32 bone1 = _skeleton->findBoneIndex("lhipjoint");
+            uint32 bone2 = _skeleton->findBoneIndex("rhipjoint");
+            Bone bone3 = _skeleton->getBoneVector()[bone1];
+            Bone bone4 = _skeleton->getBoneVector()[bone2];
+
+            AnimationData* animationData1 = _animation->returnAnimationData(bone1);
+            AnimationData* animationData2 = _animation->returnAnimationData(bone2);
+            animationData1->_localTrans[animationFrame] = glm::translate(glm::mat4(1.0f), bone3._b);
+            animationData2->_localTrans[animationFrame] = glm::translate(glm::mat4(1.0f), bone4._b);
             continue;
         }
 
         AnimationData* animationData = boneIndexVector[moveBoneIndex];
-        std::vector<DOF> dofs = _skeleton->getBoneVector()[animationData->_boneIndex]._dof;
+        Bone bone = _skeleton->getBoneVector()[animationData->_boneIndex];
 
         glm::mat4 matrix(1.0f);
-        for (DOF dof : dofs)
+        glm::vec3 localTransV(0.0f);
+        for (DOF dof : bone._dof)
         {
             float val;
             ifs >> val;
@@ -87,19 +99,20 @@ bool AMCFileParser::loadAMCFile(void)
             else if (dof == DOF::RZ)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * matrix; 
             else if (dof == DOF::TX)
-                animationData->_localTrans[animationFrame].x += val;
+                localTransV.x += val;
             else if (dof == DOF::TY)
-                animationData->_localTrans[animationFrame].y += val;
+                localTransV.y += val;
             else if (dof == DOF::TZ)
-                animationData->_localTrans[animationFrame].z += val;
+                localTransV.z += val;
         }
         
         //quat pack unpack test
-        glm::quat firstQuat = glm::quat_cast(matrix);
-        quatPressData tempComp = packQuaternionData(firstQuat);
-        glm::quat secondQuat = unpackQuaternionData(tempComp);
+        glm::quat localRot = glm::quat_cast(matrix);
+        animationData->_localRotation[animationFrame] = bone._c * localRot * bone._invC;
 
-        animationData->_localRotation[animationFrame] = secondQuat;
+        glm::vec3 transV = glm::toMat3(animationData->_localRotation[animationFrame]) * bone._b + localTransV;
+        animationData->_localTrans[animationFrame] = glm::translate(glm::mat4(1.0f), transV);
+        //temp
         moveBoneIndex++;
     }
     return true;
