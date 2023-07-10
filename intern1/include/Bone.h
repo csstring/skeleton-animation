@@ -16,14 +16,14 @@ enum class DOF{
 struct Bone
 {
     uint32           _boneIndex;
-    float            _length;
     std::string      _boneName;
+    float            _length;
     glm::vec3        _postion;
     glm::vec3        _axis;
     glm::vec3        _direction;
-    std::vector<DOF> _dof;
-    glm::quat        _c;
-    glm::quat        _invC;
+    std::vector<DOF> _dof;//
+    glm::quat        _c;//
+    glm::quat        _invC;//
     glm::vec3        _b; //amc에서 local정하기
 };
 
