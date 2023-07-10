@@ -20,7 +20,6 @@ struct Bone
     std::string      _boneName;
     glm::vec3        _postion;
     glm::vec3        _axis;
-    glm::vec3        _color;
     glm::vec3        _direction;
     std::vector<DOF> _dof;
 };

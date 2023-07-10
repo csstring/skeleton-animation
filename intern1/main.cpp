@@ -10,7 +10,7 @@
 #include "include/CmuFileParser.h"
 #include "include/Simulator.h"
 #include "include/AMCFileParser.h"
-
+#include "include/Ground.h"
 #include <chrono>
 #include <cmath>
 std::chrono::system_clock::time_point start;
@@ -54,7 +54,8 @@ int main()
 
     uint32 animationDataIndex = 0;
     uint32 maxIndex = simulator.getTotalData();
-
+    Ground ground;
+    ground.initialize();
     while (window.isWindowClose() == false && animationDataIndex < maxIndex)
     {
         window.processInput();
@@ -65,6 +66,8 @@ int main()
         shader.setMat4("projection", projection);
         shader.setMat4("view", window._view);
         simulator.draw(animationDataIndex++, shader._programId);
+        ground.draw();
+        if (animationDataIndex >= maxIndex) animationDataIndex = 1;
         window.bufferSwap();
         glfwPollEvents();
     }
