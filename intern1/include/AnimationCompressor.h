@@ -4,18 +4,17 @@
 #include <vector>
 #include <utility>
 class Animation;
-typedef std::vector<std::vector<std::pair<uint32, glm::mat4>>> compressedData;
 
 class AnimationCompressor
 {
     private:
         std::vector<uint32> getCompressKeyFrame();
-        std::pair<uint32, int32> findFramePoint(std::vector<uint32> frameList, uint32 index);
+        std::pair<float, int32> findFramePoint(std::vector<uint32> frameList, uint32 index);
     public:
         AnimationCompressor(){}
         ~AnimationCompressor(){}
-        compressedData getCompressedData(Animation* animation, uint32 errorRange);      
+        std::vector<uint32> getCompressedData(Animation* animation, float errorRange);      
     private:
-        uint32 _errorRange;
+        float _errorRange;
         std::vector<glm::quat> _KeyFrameData;
 };

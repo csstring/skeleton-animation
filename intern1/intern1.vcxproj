@@ -142,12 +142,14 @@
   <ItemGroup>
     <ClCompile Include="AMCFileParser.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationCompressor.cpp" />
     <ClCompile Include="AnimationDataMatrixSetup.cpp" />
     <ClCompile Include="AnimationDataResize.cpp" />
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Quantization.cpp" />
     <ClCompile Include="shader.cpp" />
@@ -158,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="include\AMCFileParser.h" />
     <ClInclude Include="include\Animation.h" />
+    <ClInclude Include="include\AnimationCompressor.h" />
     <ClInclude Include="include\AnimationDataMatrixSetup.h" />
     <ClInclude Include="include\AnimationDataResize.h" />
     <ClInclude Include="include\AnimationTreeTraversal.h" />
@@ -166,6 +169,7 @@
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Cylinder.h" />
     <ClInclude Include="include\Ground.h" />
+    <ClInclude Include="include\Line.h" />
     <ClInclude Include="include\Quantization.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\Simulator.h" />

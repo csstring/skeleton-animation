@@ -53,7 +53,8 @@ int main()
 
 
     uint32 animationDataIndex = 0;
-    uint32 maxIndex = simulator.getTotalData();
+    uint32 maxIndex = simulator.getTotalKeyCount();
+
     Ground ground;
     ground.initialize();
     while (window.isWindowClose() == false && animationDataIndex < maxIndex)
@@ -66,7 +67,7 @@ int main()
         shader.setMat4("projection", projection);
         shader.setMat4("view", window._view);
         simulator.draw(animationDataIndex++, shader._programId);
-        ground.draw();
+        //ground.draw();
         if (animationDataIndex >= maxIndex) animationDataIndex = 1;
         window.bufferSwap();
         glfwPollEvents();
