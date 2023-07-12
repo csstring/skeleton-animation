@@ -19,31 +19,7 @@ void Simulator::initialize(void)
     VBC.resize(size);
     _transForm.resize(size);
     boneBufferMaping();
-    _keyCount = _animations[0]._rootNode._localRotation.size();
-
-    AnimationCompressor compressor;
-    // 압축률 추출기
-    // float mul = 0;
-    // int count = 0;
-    // for (int i = 0; i <= 60; i += 20)
-    // {
-    //     while (true)
-    //     {
-    //         std::vector<uint32> v = compressor.getCompressedData(_animation, mul / 100000000.0f);
-    //         if ((_keyCount-v.size()) * 100 / (_keyCount) >= i)
-    //         {
-    //             std::cout << (_keyCount-v.size()) * 100 / (_keyCount ) << "%" << std::endl;
-    //             std::cout << "mul : " << mul << std::endl;
-    //             _compresskeyFrame[count] = v;
-    //             count++;
-    //             mul++;
-    //             break;
-    //         }
-    //         mul *= 1.3;
-    //     }
-    // }
-    for (int i =0; i < 4; ++i)
-        _compresskeyFrame[i] = compressor.getCompressedData(&_animations[0], compressMul[i] / 100000000.0f);
+    _keyCount = _animations[0]._rootNode._localRotation.size();//fix me
 }
 
 void Simulator::boneBufferMaping(void)
@@ -141,26 +117,6 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
 
 void Simulator::update(float keyTime, uint32 animationIndex)//나중에 압축 데이터를 직접 넣어야 하나?
 {
-    // float keyArray[5];
-    // keyArray[4] = keyTime;
-    // std::vector<uint32>::iterator it;
-    // it = std::lower_bound(_compresskeyFrame[animationIndex].begin(), _compresskeyFrame[animationIndex].end(), keyTime) + 1;
-    // for (int i =3; i >=0; --i)
-    // {
-    //     if (it == _compresskeyFrame[animationIndex].end())
-    //     {
-    //         it--;
-    //         keyArray[i] = *it;
-    //     }
-    //     else if (it == _compresskeyFrame[animationIndex].begin())
-    //         keyArray[i] = *it;
-    //     else
-    //     {
-    //         keyArray[i] = *it;
-    //         it--;
-    //     }
-    // }
-
     updateTransForm(_animations[0]._rootNode, glm::mat4(1.0f), keyTime);
     updateTransForm(*_animations[1].returnAnimationData(11/*lowerback*/), _transForm[0], keyTime);
     if (keyTime == 1)//0 nan
@@ -172,3 +128,24 @@ void Simulator::update(float keyTime, uint32 animationIndex)//나중에 압축 �
         _modelPos = glm::translate(_modelPos, (glm::vec3)trans);
     }
 }
+
+    // 압축률 추출기
+    // float mul = 0;
+    // int count = 0;
+    // for (int i = 0; i <= 60; i += 20)
+    // {
+    //     while (true)
+    //     {
+    //         std::vector<uint32> v = compressor.getCompressedData(_animation, mul / 100000000.0f);
+    //         if ((_keyCount-v.size()) * 100 / (_keyCount) >= i)
+    //         {
+    //             std::cout << (_keyCount-v.size()) * 100 / (_keyCount ) << "%" << std::endl;
+    //             std::cout << "mul : " << mul << std::endl;
+    //             _compresskeyFrame[count] = v;
+    //             count++;
+    //             mul++;
+    //             break;
+    //         }
+    //         mul *= 1.3;
+    //     }
+    // }
