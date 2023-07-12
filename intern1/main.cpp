@@ -11,6 +11,7 @@
 #include "include/Simulator.h"
 #include "include/AMCFileParser.h"
 #include "include/Ground.h"
+#include "include/AnimationCompressor.h"
 #include <chrono>
 #include <cmath>
 std::chrono::system_clock::time_point start;
@@ -23,12 +24,14 @@ void fileLoad(Simulator& simulator)
     CmuFileParser parser(asfPath,&simulator._skeleton, &simulator._animations[0]);
     parser.loadCmuFile();
 
+    AnimationCompressor compressor;
     AnimationData root = simulator._animations[0]._rootNode;
     for (int i = 0; i < simulator._animations.size(); ++i)
     {
         simulator._animations[i]._rootNode = root;
         AMCFileParser amcParser(amcPathList[i], &simulator._skeleton, &simulator._animations[i]);
         amcParser.loadAMCFile();
+        compressor.CompressData(&simulator._animations[i], 0.00000001);
     }
 }
 

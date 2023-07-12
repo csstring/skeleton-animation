@@ -16,8 +16,8 @@ class Simulator : Noncopyable
         std::vector<glm::mat4> _transForm;
         std::vector<uint32>    _compresskeyFrame[4];//애니메이션 개수 만큼 배열 되어야 할듯
 
-        void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, float* keyArray);
-
+        void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, float keyTime);
+        void getFrameIterator(float* keyArray, float findKeyTime, const std::vector<std::pair<float,glm::quat>>& animationFrame);
     public:
         Simulator()
         {
@@ -30,7 +30,7 @@ class Simulator : Noncopyable
         uint32 getTotalKeyCount(void){return _keyCount;};
 
         void boneBufferMaping(void);
-        void update(uint32 keyTime, uint32 animationIndex);
+        void update(float keyTime, uint32 animationIndex);
         void draw(uint32 animationTime,uint32 shaderPrograms);
 
     public : 

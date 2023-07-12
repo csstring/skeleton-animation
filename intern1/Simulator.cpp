@@ -95,20 +95,42 @@ void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
     }
 }
 
-void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, float* keyArray)
+void Simulator::getFrameIterator(float* keyArray, float findKeyTime, const std::vector<std::pair<float,glm::quat>>& animationFrame)//time? index?
 {
+    auto it = std::lower_bound(animationFrame.begin(), animationFrame.end(), findKeyTime) + 1;;
+    
+    for (int i =3; i >=0; --i)
+    {
+        if (it == animationFrame.end())
+        {
+            it--;
+            keyArray[i] = it->first;
+        }
+        else if (it == animationFrame.begin())
+            keyArray[i] = it->first;
+        else
+        {
+            keyArray[i] = it->first;
+            it--;
+        }
+    }
+}
+
+void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, float keyTime)
+{
+    float keyArray[4];
+    getFrameIterator(keyArray, keyTime, node._localRotation);
     glm::quat t0 = node._localRotation[keyArray[0]];
     glm::quat t1 = node._localRotation[keyArray[1]];
     glm::quat t2 = node._localRotation[keyArray[2]];
     glm::quat t3 = node._localRotation[keyArray[3]];
     glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyArray[4] -keyArray[1])/(keyArray[2]-keyArray[1]));
-    glm::quat t4 = node._localRotation[keyArray[4]];
 
     glm::mat4 interpolT = glm::catmullRom(//trans vec3로 바꿔야하나
                         node._localTrans[keyArray[0]],
-                        node._localTrans[keyArray[0]],
-                        node._localTrans[keyArray[0]],
-                        node._localTrans[keyArray[0]],
+                        node._localTrans[keyArray[1]],
+                        node._localTrans[keyArray[2]],
+                        node._localTrans[keyArray[3]],
                         (keyArray[4] -keyArray[1])/(keyArray[2]-keyArray[1])
                     );
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
@@ -117,30 +139,30 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
         updateTransForm(child, wolrdTrans, keyArray);
 }
 
-void Simulator::update(uint32 keyTime, uint32 animationIndex)//나중에 압축 데이터를 직접 넣어야 하나?
+void Simulator::update(float keyTime, uint32 animationIndex)//나중에 압축 데이터를 직접 넣어야 하나?
 {
-    float keyArray[5];
-    keyArray[4] = keyTime;
-    std::vector<uint32>::iterator it;
-    it = std::lower_bound(_compresskeyFrame[animationIndex].begin(), _compresskeyFrame[animationIndex].end(), keyTime) + 1;
-    for (int i =3; i >=0; --i)
-    {
-        if (it == _compresskeyFrame[animationIndex].end())
-        {
-            it--;
-            keyArray[i] = *it;
-        }
-        else if (it == _compresskeyFrame[animationIndex].begin())
-            keyArray[i] = *it;
-        else
-        {
-            keyArray[i] = *it;
-            it--;
-        }
-    }
+    // float keyArray[5];
+    // keyArray[4] = keyTime;
+    // std::vector<uint32>::iterator it;
+    // it = std::lower_bound(_compresskeyFrame[animationIndex].begin(), _compresskeyFrame[animationIndex].end(), keyTime) + 1;
+    // for (int i =3; i >=0; --i)
+    // {
+    //     if (it == _compresskeyFrame[animationIndex].end())
+    //     {
+    //         it--;
+    //         keyArray[i] = *it;
+    //     }
+    //     else if (it == _compresskeyFrame[animationIndex].begin())
+    //         keyArray[i] = *it;
+    //     else
+    //     {
+    //         keyArray[i] = *it;
+    //         it--;
+    //     }
+    // }
 
-    updateTransForm(_animations[0]._rootNode, glm::mat4(1.0f), keyArray);
-    updateTransForm(*_animations[1].returnAnimationData(11/*lowerback*/), _transForm[0], keyArray);
+    updateTransForm(_animations[0]._rootNode, glm::mat4(1.0f), keyTime);
+    updateTransForm(*_animations[1].returnAnimationData(11/*lowerback*/), _transForm[0], keyTime);
     if (keyTime == 1)//0 nan
     {
         glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1);
