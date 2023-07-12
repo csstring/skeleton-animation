@@ -31,7 +31,7 @@ void fileLoad(Simulator& simulator)
         simulator._animations[i]._rootNode = root;
         AMCFileParser amcParser(amcPathList[i], &simulator._skeleton, &simulator._animations[i]);
         amcParser.loadAMCFile();
-        compressor.CompressData(&simulator._animations[i], 0.00000001);
+        //compressor.CompressData(&simulator._animations[i], 0.00000001);
     }
 }
 

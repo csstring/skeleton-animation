@@ -7,10 +7,10 @@
 
 std::pair<float, int32> AnimationCompressor::findFramePoint(std::vector<uint32> frameList, uint32 index)
 {
-    float k1 = frameList[index];
-    float k2 = frameList[index + 1]; 
-    float k3 = frameList[index + 2]; 
-    float k4 = frameList[index + 3];
+    uint32 k1 = frameList[index];
+    uint32 k2 = frameList[index + 1]; 
+    uint32 k3 = frameList[index + 2]; 
+    uint32 k4 = frameList[index + 3];
     std::pair<float, int32> returnVal({0,-1});
     auto it = _KeyFrameData->begin();
 
@@ -71,8 +71,8 @@ void AnimationCompressor::getCompressKeyFrame(std::vector<uint32>& frameList)
 //data swap
 void AnimationCompressor::dataSwap(AnimationData* node, std::vector<uint32>& frameList)
 {
-    std::vector<std::pair<float,glm::quat>> R;
-    std::vector<std::pair<float,glm::mat4>> T;
+    std::vector<std::pair<uint32,glm::quat>> R;
+    std::vector<std::pair<uint32,glm::mat4>> T;
 
     R.reserve(frameList.size());
     T.reserve(frameList.size());

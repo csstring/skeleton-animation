@@ -71,9 +71,14 @@ void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
     }
 }
 
-void Simulator::getFrameIterator(float* keyArray, float findKeyTime, const std::vector<std::pair<float,glm::quat>>& animationFrame)//time? index?
+inline bool pairCompare(const std::pair<uint32, glm::quat>& a, const uint32& val)
 {
-    auto it = std::lower_bound(animationFrame.begin(), animationFrame.end(), findKeyTime) + 1;;
+    return a.first < val;
+}
+
+void Simulator::getFrameIterator(uint32* keyArray, uint32 findKeyFrame, const std::vector<std::pair<uint32,glm::quat>>& animationFrame)//time? index?
+{
+    auto it = std::lower_bound(animationFrame.begin(), animationFrame.end(), findKeyFrame, pairCompare) + 1;;
     
     for (int i =3; i >=0; --i)
     {
@@ -92,41 +97,42 @@ void Simulator::getFrameIterator(float* keyArray, float findKeyTime, const std::
     }
 }
 
-void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, float keyTime)
+void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyFrame)
 {
-    float keyArray[4];
-    getFrameIterator(keyArray, keyTime, node._localRotation);
-    glm::quat t0 = node._localRotation[keyArray[0]];
-    glm::quat t1 = node._localRotation[keyArray[1]];
-    glm::quat t2 = node._localRotation[keyArray[2]];
-    glm::quat t3 = node._localRotation[keyArray[3]];
-    glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyArray[4] -keyArray[1])/(keyArray[2]-keyArray[1]));
+    uint32 keyArray[4];
+    getFrameIterator(keyArray, keyFrame, node._localRotation);
 
-    glm::mat4 interpolT = glm::catmullRom(//trans vec3로 바꿔야하나
-                        node._localTrans[keyArray[0]],
-                        node._localTrans[keyArray[1]],
-                        node._localTrans[keyArray[2]],
-                        node._localTrans[keyArray[3]],
-                        (keyArray[4] -keyArray[1])/(keyArray[2]-keyArray[1])
-                    );
+    const glm::quat& t0 = node._localRotation[keyArray[0]].second;
+    const glm::quat& t1 = node._localRotation[keyArray[1]].second;
+    const glm::quat& t2 = node._localRotation[keyArray[2]].second;
+    const glm::quat& t3 = node._localRotation[keyArray[3]].second;
+    glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyFrame -keyArray[1])/(keyArray[2]-keyArray[1]));
+
+    const glm::mat4& v0 = node._localTrans[keyArray[0]].second;
+    const glm::mat4& v1 = node._localTrans[keyArray[1]].second;
+    const glm::mat4& v2 = node._localTrans[keyArray[2]].second;
+    const glm::mat4& v3 = node._localTrans[keyArray[3]].second;
+    glm::mat4 interpolT = glm::catmullRom(v0,v1,v2,v3,(keyFrame -keyArray[1])/(keyArray[2]-keyArray[1]));
+
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
     _transForm[node._boneIndex] = wolrdTrans;
     for (const AnimationData& child : node._childrens)
-        updateTransForm(child, wolrdTrans, keyArray);
+        updateTransForm(child, wolrdTrans, keyFrame);
 }
 
 void Simulator::update(float keyTime, uint32 animationIndex)//나중에 압축 데이터를 직접 넣어야 하나?
 {
-    updateTransForm(_animations[0]._rootNode, glm::mat4(1.0f), keyTime);
-    updateTransForm(*_animations[1].returnAnimationData(11/*lowerback*/), _transForm[0], keyTime);
-    if (keyTime == 1)//0 nan
-    {
-        glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1);
-        _modelPos = glm::translate(_modelPos, -(glm::vec3)trans);
-    } else if (keyTime == _keyCount-1){
-        glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1); 
-        _modelPos = glm::translate(_modelPos, (glm::vec3)trans);
-    }
+    if (keyTime < 1) keyTime = 1;
+    updateTransForm(_animations[0]._rootNode, glm::mat4(1.0f), keyTime);//시간 넣으면 프레임 변환 해야 할듯
+    updateTransForm(*_animations[0].returnAnimationData(11/*lowerback*/), _transForm[0], keyTime);
+    // if (keyTime == 1)//0 nan
+    // {
+    //     glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1);
+    //     _modelPos = glm::translate(_modelPos, -(glm::vec3)trans);
+    // } else if (keyTime == _keyCount-1){
+    //     glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1); 
+    //     _modelPos = glm::translate(_modelPos, (glm::vec3)trans);
+    // }
 }
 
     // 압축률 추출기

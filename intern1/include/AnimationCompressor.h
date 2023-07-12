@@ -5,7 +5,7 @@
 #include <utility>
 
 class Animation;
-
+struct AnimationData;
 class AnimationCompressor
 {
     private:
@@ -20,5 +20,5 @@ class AnimationCompressor
     
     private:
         float _errorRange;
-        std::vector<std::pair<float,glm::quat>>* _KeyFrameData;
+        std::vector<std::pair<uint32,glm::quat>>* _KeyFrameData;
 };
