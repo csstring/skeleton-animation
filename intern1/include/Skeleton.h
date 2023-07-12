@@ -28,4 +28,5 @@ class Skeleton
         float             _mass;
         float             _globalLengthMultiplier;
         std::vector<Bone> _boneVector;
+        
 };

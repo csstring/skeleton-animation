@@ -18,9 +18,10 @@ struct Bone
     uint32           _boneIndex;
     std::string      _boneName;
     float            _length;
+    glm::vec3        _direction;
+    
     glm::vec3        _postion;
     glm::vec3        _axis;
-    glm::vec3        _direction;
     std::vector<DOF> _dof;//
     glm::quat        _c;//
     glm::quat        _invC;//

@@ -1,7 +1,6 @@
 #include "include/Simulator.h"
 #include "include/Animation.h"
 #include "include/Skeleton.h"
-#include "include/AnimationDataMatrixSetup.h"
 #include "include/GL/glew.h"
 #include "include/Cylinder.h"
 #include "include/AnimationCompressor.h"
@@ -13,13 +12,14 @@
 const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
 void Simulator::initialize(void)
 {
-    int64 size = _skeleton->getBoneVector().size();
+    int64 size = _skeleton.getBoneVector().size();
 
     VAO.resize(size);
     VBO.resize(size);
     VBC.resize(size);
     _transForm.resize(size);
-    _keyCount = _animation->_rootNode._localRotation.size();
+    boneBufferMaping();
+    _keyCount = _animations[0]._rootNode._localRotation.size();
 
     AnimationCompressor compressor;
     // 압축률 추출기
@@ -43,92 +43,54 @@ void Simulator::initialize(void)
     //     }
     // }
     for (int i =0; i < 4; ++i)
-        _compresskeyFrame[i] = compressor.getCompressedData(_animation, compressMul[i] / 100000000.0f);
+        _compresskeyFrame[i] = compressor.getCompressedData(&_animations[0], compressMul[i] / 100000000.0f);
 }
 
-void Simulator::setupModelMatrix(void)
+void Simulator::boneBufferMaping(void)
 {
-    AnimationDataMatrixSetup matrixSetup;
-    _animation->AnimationDataTraver(matrixSetup);
-}
-
-void Simulator::animationDataMaping(void)
-{
-    std::queue<AnimationData*> dataQueue;
-    std::vector<Bone>& boneVector = _skeleton->getBoneVector();
-    uint32 index = 0;
-
-    dataQueue.push(&_animation->_rootNode);
-    while (dataQueue.size() != 0)
+    std::vector<Bone>& boneVector = _skeleton.getBoneVector();
+    uint32 boneIndex = 0;
+    for(Bone& bone : boneVector)
     {
-        AnimationData* curData = dataQueue.front();
-        dataQueue.pop();
-        glGenVertexArrays(1, &VAO[index]);
-        glBindVertexArray(VAO[index]);
+        glGenVertexArrays(1, &VAO[bone._boneIndex]);
+        glBindVertexArray(VAO[bone._boneIndex]);
 
-        glGenBuffers(1, &VBO[index]);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO[index]);
+        glGenBuffers(1, &VBO[bone._boneIndex]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO[bone._boneIndex]);
         glEnableVertexAttribArray(0);	
         glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);//size 열의 개수
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-        glGenBuffers(1, &VBC[index]);
-        glBindBuffer(GL_ARRAY_BUFFER, VBC[index]);
+        glGenBuffers(1, &VBC[bone._boneIndex]);
+        glBindBuffer(GL_ARRAY_BUFFER, VBC[bone._boneIndex]);
         glEnableVertexAttribArray(1);	
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);//size 열의 개수
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glBindVertexArray(0);
-        for (int i =0; i < curData->_childrens.size(); ++i)
-            dataQueue.push(&curData->_childrens[i]);
-        index++;
     }
 }
 
 void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
 {
-    // std::queue<AnimationData*> dataQueue;
-    // std::vector<Bone>& boneVector = _skeleton->getBoneVector();
-    // uint32 index = 0;
+    std::vector<Bone>& boneVector = _skeleton.getBoneVector();
 
-    // dataQueue.push(&_animation->_rootNode);
-    // while (dataQueue.size() != 0)
-    // {
-    //     AnimationData* curData = dataQueue.front();
-    //     dataQueue.pop();
-
-
-    //     glBindVertexArray(VAO[index]);
-    //     Bone bone =_skeleton->getBoneVector()[curData->_boneIndex];
-    //     glm::mat4 toParentDir = curData->_worldTrans[animationTime] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
-    //     Cylinder cylinder(0.2, 0.7 *_skeleton->getGBL() * bone._length ,16, toParentDir);
-    //     cylinder.initialize();
-    //     cylinder.render(VBO[index]);
-    //     glBindVertexArray(0);
-
-    //     for (int i =0; i < curData->_childrens.size(); ++i)
-    //         dataQueue.push(&curData->_childrens[i]);
-    //     index++;
-    // }
-    for (int i =0; i <=2; ++i)//comprees test
+    for (int i =0; i <=0; ++i)//comprees test
     {
         update(animationTime, i);
-        uint32 boneIndex = 0;
         glm::vec3 color(0.0f);
         color[i] = 1;
-        while (boneIndex < _skeleton->getBoneVector().size())
+        for(Bone& bone : boneVector)
         {
-            glBindVertexArray(VAO[boneIndex]);
-            Bone bone =_skeleton->getBoneVector()[boneIndex];
-            glm::mat4 toParentDir = _transForm[boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
-            // Cylinder cylinder(0.2, 0.7 *_skeleton->getGBL() * bone._length ,16, toParentDir);
+            glBindVertexArray(VAO[bone._boneIndex]);
+            glm::mat4 toParentDir = _modelPos * _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
+            // Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
             // cylinder.initialize();
-            // cylinder.render(VBO[boneIndex]);
-            Line line(0.7 *_skeleton->getGBL() * bone._length, toParentDir);
-            line.initialize(color, VBC[boneIndex]);
-            line.render(VBO[boneIndex]);
+            // cylinder.render(VBO[bone._boneIndex]);
+            Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
+            line.initialize(color, VBC[bone._boneIndex]);
+            line.render(VBO[bone._boneIndex]);
             glBindVertexArray(0);
-            boneIndex++;
         }
     }
 }
@@ -149,7 +111,6 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
                         node._localTrans[keyArray[0]],
                         (keyArray[4] -keyArray[1])/(keyArray[2]-keyArray[1])
                     );
-    //glm::mat4 interpolT = node._localTrans[keyArray[4]];
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
     _transForm[node._boneIndex] = wolrdTrans;
     for (const AnimationData& child : node._childrens)
@@ -178,5 +139,14 @@ void Simulator::update(uint32 keyTime, uint32 animationIndex)//나중에 압축 
         }
     }
 
-    updateTransForm(_animation->_rootNode, glm::mat4(1.0f), keyArray);
+    updateTransForm(_animations[0]._rootNode, glm::mat4(1.0f), keyArray);
+    updateTransForm(*_animations[1].returnAnimationData(11/*lowerback*/), _transForm[0], keyArray);
+    if (keyTime == 1)//0 nan
+    {
+        glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1);
+        _modelPos = glm::translate(_modelPos, -(glm::vec3)trans);
+    } else if (keyTime == _keyCount-1){
+        glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1); 
+        _modelPos = glm::translate(_modelPos, (glm::vec3)trans);
+    }
 }

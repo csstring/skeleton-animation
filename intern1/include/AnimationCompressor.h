@@ -3,6 +3,7 @@
 #include "include/Common.h"
 #include <vector>
 #include <utility>
+
 class Animation;
 
 class AnimationCompressor

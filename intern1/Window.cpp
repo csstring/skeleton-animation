@@ -26,7 +26,7 @@ void Window::initialize(void)
         ft_assert("glew init failed");
 
     clearColorSetUp();
-    glfwSwapInterval(3);
+    glfwSwapInterval(1);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);

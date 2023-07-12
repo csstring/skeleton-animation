@@ -255,7 +255,6 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
         for (int i =0; i < v.size(); ++i)
         {
             animationData->_childrens[i]._boneIndex = _skeleton->findBoneIndex(v[i]);
-            animationData->_childrens[i]._parentPointer = animationData;
 
             Bone& bone = _skeleton->getBoneVector()[animationData->_childrens[i]._boneIndex];
             glm::vec3 axis = bone._axis;

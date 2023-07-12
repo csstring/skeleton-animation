@@ -143,7 +143,6 @@
     <ClCompile Include="AMCFileParser.cpp" />
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationCompressor.cpp" />
-    <ClCompile Include="AnimationDataMatrixSetup.cpp" />
     <ClCompile Include="AnimationDataResize.cpp" />
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
@@ -161,7 +160,6 @@
     <ClInclude Include="include\AMCFileParser.h" />
     <ClInclude Include="include\Animation.h" />
     <ClInclude Include="include\AnimationCompressor.h" />
-    <ClInclude Include="include\AnimationDataMatrixSetup.h" />
     <ClInclude Include="include\AnimationDataResize.h" />
     <ClInclude Include="include\AnimationTreeTraversal.h" />
     <ClInclude Include="include\Bone.h" />

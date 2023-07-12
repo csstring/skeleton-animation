@@ -29,7 +29,7 @@ std::pair<float, int32> AnimationCompressor::findFramePoint(std::vector<uint32> 
     return returnVal;
 }
 
-std::vector<uint32> AnimationCompressor::getCompressKeyFrame()//뭘 기준으로 압축 할건지
+std::vector<uint32> AnimationCompressor::getCompressKeyFrame()
 {
     std::vector<uint32> frameList;
     bool flag = true;

@@ -2,7 +2,6 @@
 #include "include/Skeleton.h"
 #include "include/Animation.h"
 #include "include/AnimationDataResize.h"
-#include "include/AnimationDataMatrixSetup.h"
 #include "include/GLM/ext.hpp"
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/GLM/gtx/transform.hpp"
@@ -60,7 +59,7 @@ bool AMCFileParser::loadAMCFile(void)
             break;
     }
 
-    uint32 animationFrame = 0;
+    float animationTime = 0;
     uint32 moveBoneIndex = 0;
     while (ifs >> buffer)
     {
@@ -68,7 +67,7 @@ bool AMCFileParser::loadAMCFile(void)
         if (moveBoneIndex == boneIndexVector.size())
         {
             moveBoneIndex = 0;
-            animationFrame = std::stoi(buffer)-1;
+            animationTime = std::stoi(buffer)-1 / 1;//fix me 120frame, 60 frame
             ///fix me
             uint32 bone1 = _skeleton->findBoneIndex("lhipjoint");
             uint32 bone2 = _skeleton->findBoneIndex("rhipjoint");
@@ -77,8 +76,8 @@ bool AMCFileParser::loadAMCFile(void)
 
             AnimationData* animationData1 = _animation->returnAnimationData(bone1);
             AnimationData* animationData2 = _animation->returnAnimationData(bone2);
-            animationData1->_localTrans[animationFrame] = glm::translate(glm::mat4(1.0f), bone3._b);
-            animationData2->_localTrans[animationFrame] = glm::translate(glm::mat4(1.0f), bone4._b);
+            animationData1->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone3._b)});
+            animationData2->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone4._b)});
             continue;
         }
 
@@ -106,12 +105,11 @@ bool AMCFileParser::loadAMCFile(void)
                 localTransV.z += val;
         }
         
-        //quat pack unpack test
-        glm::quat localRot = glm::quat_cast(matrix);
-        animationData->_localRotation[animationFrame] = bone._c * localRot * bone._invC;
+        glm::quat localRot = bone._c * glm::quat_cast(matrix) * bone._invC;
+        animationData->_localRotation.push_back({animationTime, localRot });
 
-        glm::vec3 transV = glm::toMat3(animationData->_localRotation[animationFrame]) * bone._b + localTransV;
-        animationData->_localTrans[animationFrame] = glm::translate(glm::mat4(1.0f), transV);
+        glm::vec3 transV = glm::toMat3(localRot) * bone._b + localTransV;
+        animationData->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), transV)});
         //temp
         moveBoneIndex++;
     }

@@ -3,7 +3,8 @@
 #include <string>
 class Skeleton;
 class Animation;
-class AnimationData;
+struct AnimationData;
+
 class AMCFileParser : Noncopyable
 {
     public : 
