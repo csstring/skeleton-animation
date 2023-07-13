@@ -15,10 +15,10 @@ struct AnimationData
         std::vector<AnimationData>                  _childrens;
 };
 
-class Animation//복사해서 비교 데이터 만들어야 할듯
+class Animation
 {
     public:
-        explicit Animation()
+        explicit Animation(const char* name, float animationSpeed) : _name(name), _animationSpeed(animationSpeed)
         {
             _rootNode._boneIndex = 0;
         }
@@ -28,6 +28,8 @@ class Animation//복사해서 비교 데이터 만들어야 할듯
         void           AnimationDataTraver(AnimationTreeTraversal& travel);
         
     public:
+        uint64 _animationMillisecond;//m
+        float _animationSpeed;
         AnimationData  _rootNode;
         std::string    _name;
 };

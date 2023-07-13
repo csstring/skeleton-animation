@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 #include "include/GLM/glm.hpp"
 
 typedef signed char         int8;
@@ -37,3 +38,13 @@ void ft_assert(const std::string& exec);
 //utility
 std::vector<std::string> ft_split(const std::string& str);
 glm::mat4 ft_rotate(const glm::vec3 start, const glm::vec3 end);
+
+inline std::chrono::steady_clock::time_point getCurTimePoint(void)
+{
+    return std::chrono::steady_clock::now();
+}
+
+inline std::chrono::steady_clock::time_point getAfterTimePoint(float time)
+{
+    return std::chrono::steady_clock::now() + std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(time/1000));
+}

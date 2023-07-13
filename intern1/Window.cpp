@@ -2,6 +2,7 @@
 #include "include/Window.h"
 #include "include/GL/glew.h"
 #include "include/GLFW/glfw3.h"
+#include "include/Simulator.h"
 
 void Window::initialize(void)
 {
@@ -26,13 +27,12 @@ void Window::initialize(void)
         ft_assert("glew init failed");
 
     clearColorSetUp();
-    glfwSwapInterval(1);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
 }
 
-void Window::processInput(void)
+void Window::processInput(Simulator& simulator)
 {
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
@@ -48,6 +48,20 @@ void Window::processInput(void)
         _view = glm::translate(_view, glm::vec3(0.0f, 1.0f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
         _view = glm::translate(_view, glm::vec3(0.0f, -1.0f, 0.0f));
+    if (glfwGetKey(_window, GLFW_KEY_KP_8 ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::UP);
+    if (glfwGetKey(_window, GLFW_KEY_KP_5 ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::BACK);
+    if (glfwGetKey(_window, GLFW_KEY_KP_4 ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::REFT);
+    if (glfwGetKey(_window, GLFW_KEY_KP_6 ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::RIGHT);
+    if (glfwGetKey(_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(_window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::ATTACK);
+    if (glfwGetKey(_window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS || glfwGetKey(_window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::JUMP);
+    if (glfwGetKey(_window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS || glfwGetKey(_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::RUN);
 }
 
 void Window::clearColorSetUp(float r, float g, float b, float a)

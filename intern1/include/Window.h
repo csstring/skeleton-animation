@@ -2,6 +2,8 @@
 #include "Common.h"
 
 struct GLFWwindow;
+class Simulator;
+
 class Window : Noncopyable
 {
     public :
@@ -9,7 +11,7 @@ class Window : Noncopyable
                    ~Window(void){}
                    
         void        initialize(void);
-        void        processInput(void);
+        void        processInput(Simulator& simulator);
         void        clearColorSetUp(float r = 0, float g = 0, float b = 0, float a = 0);
         bool        isWindowClose(void);
         void        bufferSwap(void);

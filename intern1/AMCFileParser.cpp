@@ -118,15 +118,17 @@ bool AMCFileParser::loadAMCFile(void)
     }
     //fixme
     uint32 bone1 = _skeleton->findBoneIndex("lhipjoint");
-            uint32 bone2 = _skeleton->findBoneIndex("rhipjoint");
-            Bone bone3 = _skeleton->getBoneVector()[bone1];
-            Bone bone4 = _skeleton->getBoneVector()[bone2];
+    uint32 bone2 = _skeleton->findBoneIndex("rhipjoint");
+    Bone bone3 = _skeleton->getBoneVector()[bone1];
+    Bone bone4 = _skeleton->getBoneVector()[bone2];
 
-            AnimationData* animationData1 = _animation->returnAnimationData(bone1);
-            AnimationData* animationData2 = _animation->returnAnimationData(bone2);
-            animationData1->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
-            animationData2->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
-            animationData1->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone3._b)});
-            animationData2->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone4._b)});
+    AnimationData* animationData1 = _animation->returnAnimationData(bone1);
+    AnimationData* animationData2 = _animation->returnAnimationData(bone2);
+    animationData1->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
+    animationData2->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
+    animationData1->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone3._b)});
+    animationData2->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone4._b)});
+
+    _animation->_animationMillisecond = std::roundf((float)(animationTime * 1000) / (120.0f * _animation->_animationSpeed));
     return true;
 }

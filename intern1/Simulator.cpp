@@ -17,7 +17,13 @@ void Simulator::initialize(void)
     VAO.resize(size);
     VBO.resize(size);
     VBC.resize(size);
+
+    _modelPos = glm::mat4(1.0f);
     _transForm.resize(size);
+    _backTransForm.resize(size);
+    Animation* pushAnimation = findAnimation("walk");//find
+    _lowerBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
+    _upperBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
     boneBufferMaping();
     _keyCount = _animations[0]._rootNode._localRotation.size();//fix me
 }
@@ -47,13 +53,13 @@ void Simulator::boneBufferMaping(void)
     }
 }
 
-void Simulator::draw(uint32 animationTime, uint32 shaderProgram)
+void Simulator::draw(void)
 {
     std::vector<Bone>& boneVector = _skeleton.getBoneVector();
 
     for (int i =0; i <=0; ++i)//comprees test
     {
-        update(animationTime, i);
+        update();
         glm::vec3 color(0.0f);
         color[i] = 1;
         for(Bone& bone : boneVector)
@@ -100,6 +106,7 @@ void Simulator::getFrameIterator(uint32* keyArray, uint32 findKeyFrame, const st
 void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyFrame)
 {
     uint32 keyArray[4];
+    if (keyFrame == 0) keyFrame = 1;
     getFrameIterator(keyArray, keyFrame, node._localRotation);
 
     const glm::quat& t0 = node._localRotation[keyArray[0]].second;
@@ -119,22 +126,135 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
     for (const AnimationData& child : node._childrens)
         updateTransForm(child, wolrdTrans, keyFrame);
 }
-
-void Simulator::update(float keyTime, uint32 animationIndex)//나중에 압축 데이터를 직접 넣어야 하나?
+/*
+1.종료 된 애니메이션 제거 _modelpos변경 비어 있으면 추가
+2. 비어 있을때 어떤 애니메이션 추가해줄지, 아이들, 상체 하체 애니메이션, 쓰던 애니메이션
+3.2개 이상이면 선형 보간 시작, 앞에 종료시간 변경
+*/
+#include "include/GLM/gtx/rotate_vector.hpp"
+void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
 {
-    if (keyTime < 1) keyTime = 1;
-    updateTransForm(_animations[0]._rootNode, glm::mat4(1.0f), keyTime);//시간 넣으면 프레임 변환 해야 할듯
-    updateTransForm(*_animations[0].returnAnimationData(11/*lowerback*/), _transForm[0], keyTime);
-    // if (keyTime == 1)//0 nan
+    // if (curTime >= _upperBodyAnimation.begin()->second)
     // {
-    //     glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1);
-    //     _modelPos = glm::translate(_modelPos, -(glm::vec3)trans);
-    // } else if (keyTime == _keyCount-1){
-    //     glm::vec4 trans = _transForm[0] * glm::vec4(0,0,0,1); 
-    //     _modelPos = glm::translate(_modelPos, (glm::vec3)trans);
+    //     _upperBodyAnimation.pop_front();
+    //     if (_upperBodyAnimation.empty())//일단 walk fixme
+    //     {
+    //         Animation* pushAnimation = findAnimation("walk");//find
+    //         _upperBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
+    //     }
     // }
+    if (curTime >= _lowerBodyAnimation.begin()->second)
+    {
+        _lowerBodyAnimation.pop_front();
+
+        glm::vec4 end1 = (_transForm[0]) * glm::vec4(0,0,0,1) ;
+        //glm::vec4 end2 = (_modelPos) * glm::vec4(0,0,0,1) ;
+        end1.y = 0;
+        // end2.y = 0;
+        // end1 = end1 + end2;
+        _modelPos = glm::translate(_modelPos, (glm::vec3)end1);
+
+        if (_lowerBodyAnimation.empty())//일단 walk fixme
+        {
+            Animation* pushAnimation = findAnimation("idle");//find
+            glm::vec4 start = pushAnimation->_rootNode._localTrans[0].second * glm::vec4(0,0,0,1);
+            start.y = 0;
+            _modelPos = glm::translate(_modelPos, -(glm::vec3)start);
+            _lowerBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
+        }
+        else
+        {
+            Animation* pushAnimation = _lowerBodyAnimation.begin()->first;//find
+            glm::vec4 start = pushAnimation->_rootNode._localTrans[0].second * glm::vec4(0,0,0,1);
+            start.y = 0;
+            _modelPos = glm::translate(_modelPos, -(glm::vec3)start);
+        }
+    }
 }
 
+void Simulator::update()//나중에 압축 데이터를 직접 넣어야 하나?
+{
+    std::chrono::steady_clock::time_point curTime = getCurTimePoint();
+    eraseAnimation(curTime);
+    
+    std::chrono::milliseconds curMillisecond;
+    uint64 keyFrame;
+    Animation* animation;
+    //lower
+    if (_lowerBodyAnimation.empty() == false)
+    {
+        animation = _lowerBodyAnimation.begin()->first;
+        curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(_lowerBodyAnimation.begin()->second - curTime);
+        updateTransForm(animation->_rootNode, glm::mat4(1.0f), (animation->_animationMillisecond - curMillisecond.count())*120/1000);//시간 넣으면 프레임 변환 해야 할듯
+    }
+    //upper
+    // if (_upperBodyAnimation.empty() == false)
+    // {
+    //     animation = _upperBodyAnimation.begin()->first;
+    //     curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(_upperBodyAnimation.begin()->second - curTime);
+    //     updateTransForm(*animation->returnAnimationData(11/*lowerback*/), _transForm[0], (animation->_animationMillisecond - curMillisecond.count())*120/1000);
+    // }
+    //보간
+}
+
+Animation* Simulator::findAnimation(const std::string& name)
+{
+    for (int32 i = 0; i < _animations.size(); ++i)
+    {
+        if (_animations[i]._name == name)
+            return &_animations[i];
+    }
+    return NULL;
+}
+
+void Simulator::pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, std::chrono::steady_clock::time_point>>& animationDeque)
+{
+    animationDeque.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
+    if (animationDeque.size() >= 2)
+        animationDeque.front().second = getAfterTimePoint(OVERLAPTIME);
+}
+
+void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일단 돌려놓기
+{
+    if (key == KeyInput::UP && _lowerBodyAnimation.size() < 2)
+    {
+        Animation* pushAnimation = findAnimation("walk");//find
+        this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+    }
+    else if (key == KeyInput::BACK && _lowerBodyAnimation.size() < 2)
+    {
+        Animation* pushAnimation = findAnimation("walk");//find
+        this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+        _modelPos = glm::rotate(_modelPos, PI, glm::vec3(0,1,0));
+    }
+    else if (key == KeyInput::REFT && _lowerBodyAnimation.size() < 2)
+    {
+        Animation* pushAnimation = findAnimation("walk");//find
+        this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+        _modelPos = glm::rotate(_modelPos, PI/2, glm::vec3(0,1,0));
+    }
+    else if (key == KeyInput::RIGHT && _lowerBodyAnimation.size() < 2)
+    {
+        Animation* pushAnimation = findAnimation("walk");//find
+        this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+        _modelPos = glm::rotate(_modelPos, -PI/2, glm::vec3(0,1,0));
+    }
+    else if (key == KeyInput::RUN && _upperBodyAnimation.size() < 2)
+    {
+        Animation* pushAnimation = findAnimation("run");//find
+        this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+    }
+    else if (key == KeyInput::ATTACK && _upperBodyAnimation.size() < 2)
+    {
+        Animation* pushAnimation = findAnimation("attck");//find
+        this->pushAnimation(pushAnimation, _upperBodyAnimation);
+    }
+    else if (key == KeyInput::JUMP && _lowerBodyAnimation.size() < 2)
+    {
+        Animation* pushAnimation = findAnimation("jump");//find
+        this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+    }
+}
     // 압축률 추출기
     // float mul = 0;
     // int count = 0;

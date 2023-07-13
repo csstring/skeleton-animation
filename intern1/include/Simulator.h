@@ -2,22 +2,39 @@
 #include "common.h"
 #include "Bone.h"
 #include "Skeleton.h"
-#include <vector>
+#include <deque>
 #include <iostream>
 #include "Animation.h"
 struct AnimationData;
-
+enum class KeyInput{
+    UP,
+    BACK,
+    REFT,
+    RIGHT,
+    RUN,
+    ATTACK,
+    JUMP
+};
+const float OVERLAPTIME = 400;
 class Simulator : Noncopyable
 {
     private:
+        std::deque<std::pair<Animation*, std::chrono::steady_clock::time_point>> _upperBodyAnimation;//endtime
+        std::deque<std::pair<Animation*, std::chrono::steady_clock::time_point>> _lowerBodyAnimation;
+        
         std::vector<uint32>    VAO, VBO, VBC;
-        uint32                 _keyCount;
-        glm::mat4              _modelPos;
+        uint32                 _keyCount;//지워야함
+        glm::mat4              _modelPos;//스켈레톤으로 옮겨야 하나
         std::vector<glm::mat4> _transForm;
-        std::vector<uint32>    _compresskeyFrame[4];//애니메이션 개수 만큼 배열 되어야 할듯
+        std::vector<glm::mat4> _backTransForm;
 
+    private :
         void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime);
         void getFrameIterator(uint32* keyArray, uint32 findKeyTime, const std::vector<std::pair<uint32,glm::quat>>& animationFrame);
+        Animation* findAnimation(const std::string& name);
+        void eraseAnimation(std::chrono::steady_clock::time_point& curTime);
+        void pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, std::chrono::steady_clock::time_point>>& animationDeque);
+
     public:
         Simulator()
         {
@@ -28,10 +45,11 @@ class Simulator : Noncopyable
 
         //getter
         uint32 getTotalKeyCount(void){return _keyCount;};
-
+        
+        void changeAnimation(KeyInput key);
         void boneBufferMaping(void);
-        void update(float keyTime, uint32 animationIndex);
-        void draw(uint32 animationTime,uint32 shaderPrograms);
+        void update(void);
+        void draw(void);
 
     public : 
         Skeleton               _skeleton;
