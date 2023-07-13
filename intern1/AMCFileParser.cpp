@@ -61,6 +61,8 @@ bool AMCFileParser::loadAMCFile(void)
 
     uint32 animationTime = 0;
     uint32 moveBoneIndex = 0;
+    glm::vec3 firstTrans;
+    glm::mat4 firstRot;
     while (ifs >> buffer)
     {
         
@@ -107,7 +109,16 @@ bool AMCFileParser::loadAMCFile(void)
             else if (dof == DOF::TZ)
                 localTransV.z += val;
         }
-        
+        if (moveBoneIndex == 0 && animationTime ==0)
+        {
+            firstTrans = localTransV;
+            firstTrans.y = 0;
+        }
+        if (moveBoneIndex == 0)
+        {
+            //matrix = glm::rotate(matrix, PI/2, glm::vec3(0,1,0));
+            localTransV -= firstTrans;
+        }
         glm::quat localRot = bone._c * glm::quat_cast(matrix) * bone._invC;
         animationData->_localRotation.push_back({animationTime, localRot });
 

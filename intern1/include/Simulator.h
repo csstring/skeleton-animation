@@ -24,7 +24,8 @@ class Simulator : Noncopyable
         
         std::vector<uint32>    VAO, VBO, VBC;
         uint32                 _keyCount;//지워야함
-        glm::mat4              _modelPos;//스켈레톤으로 옮겨야 하나
+        glm::mat4              _worldTrans;//스켈레톤으로 옮겨야 하나
+        glm::mat4              _worldRotation;
         std::vector<glm::mat4> _transForm;
         std::vector<glm::mat4> _backTransForm;
 
@@ -34,12 +35,10 @@ class Simulator : Noncopyable
         Animation* findAnimation(const std::string& name);
         void eraseAnimation(std::chrono::steady_clock::time_point& curTime);
         void pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, std::chrono::steady_clock::time_point>>& animationDeque);
+        void boneBufferMaping(void);
 
     public:
-        Simulator()
-        {
-            _modelPos = glm::mat4(1.0f);
-        }
+        Simulator(){}
         ~Simulator(){}
         void initialize(void);
 
@@ -47,7 +46,6 @@ class Simulator : Noncopyable
         uint32 getTotalKeyCount(void){return _keyCount;};
         
         void changeAnimation(KeyInput key);
-        void boneBufferMaping(void);
         void update(void);
         void draw(void);
 

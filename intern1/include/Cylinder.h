@@ -24,7 +24,7 @@ class Cylinder
             _numVerticesTotal = _numVerticesSide + _numVerticesTopBottom * 2;
         }
         ~Cylinder(){}
-        void initialize();
+        void initialize(glm::vec3 color, uint32 VBC);
         void render(uint32 vbo) const;
     private:
 };

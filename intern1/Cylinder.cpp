@@ -2,7 +2,7 @@
 #include "include/GL/glew.h"
 #include <cmath>
 
-void Cylinder::initialize()
+void Cylinder::initialize(glm::vec3 color, uint32 VBC)
 {
     const float angleStep = 2.0f * PI / static_cast<float>(_numSlices);
     float curAngle = 0.0f;
@@ -44,6 +44,12 @@ void Cylinder::initialize()
         glm::vec4 vertexBottom(pos.x, pos.y, 0, 1);
         _vertices.push_back(_transForm * vertexBottom);
     }
+
+    std::vector<glm::vec3> colors;
+    colors.resize(_vertices.size(), color);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBC);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * colors.size(), colors.data(), GL_STATIC_DRAW);
 }
 
 void Cylinder::render(uint32 VBO) const

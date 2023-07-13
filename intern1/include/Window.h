@@ -19,5 +19,6 @@ class Window : Noncopyable
         glm::mat4   _view;//fixme
 
     private :
+        glm::mat4 createViewMatrix();
         GLFWwindow* _window;
 };

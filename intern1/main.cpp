@@ -66,7 +66,7 @@ int main()
         
         window.processInput(simulator);
         simulator.draw();
-        ground.draw();
+        //ground.draw();
         window.bufferSwap();
         glfwPollEvents();
     }

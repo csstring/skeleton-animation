@@ -18,7 +18,8 @@ void Simulator::initialize(void)
     VBO.resize(size);
     VBC.resize(size);
 
-    _modelPos = glm::mat4(1.0f);
+    _worldTrans = glm::mat4(1.0f);
+    _worldRotation = glm::mat4(1.0f);
     _transForm.resize(size);
     _backTransForm.resize(size);
     Animation* pushAnimation = findAnimation("walk");//find
@@ -65,13 +66,13 @@ void Simulator::draw(void)
         for(Bone& bone : boneVector)
         {
             glBindVertexArray(VAO[bone._boneIndex]);
-            glm::mat4 toParentDir = _modelPos * _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
-            // Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
-            // cylinder.initialize();
-            // cylinder.render(VBO[bone._boneIndex]);
-            Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
-            line.initialize(color, VBC[bone._boneIndex]);
-            line.render(VBO[bone._boneIndex]);
+            glm::mat4 toParentDir = _worldTrans * _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
+            Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
+            cylinder.initialize(color, VBC[bone._boneIndex]);
+            cylinder.render(VBO[bone._boneIndex]);
+            // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
+            // line.initialize(color, VBC[bone._boneIndex]);
+            // line.render(VBO[bone._boneIndex]);
             glBindVertexArray(0);
         }
     }
@@ -84,35 +85,30 @@ inline bool pairCompare(const std::pair<uint32, glm::quat>& a, const uint32& val
 
 void Simulator::getFrameIterator(uint32* keyArray, uint32 findKeyFrame, const std::vector<std::pair<uint32,glm::quat>>& animationFrame)//time? index?
 {
-    auto it = std::lower_bound(animationFrame.begin(), animationFrame.end(), findKeyFrame, pairCompare) + 1;;
-    
+    auto it = std::lower_bound(animationFrame.begin(), animationFrame.end(), findKeyFrame, pairCompare);
+    uint32 frontDistance = std::distance(animationFrame.begin(), it);
+    if (it != animationFrame.end()) it++;
+    if (it == animationFrame.end()) it = animationFrame.end() - 1; 
+    else if (frontDistance <= 3) it = animationFrame.begin() + 4;
     for (int i =3; i >=0; --i)
     {
-        if (it == animationFrame.end())
-        {
-            it--;
-            keyArray[i] = it->first;
-        }
-        else if (it == animationFrame.begin())
-            keyArray[i] = it->first;
-        else
-        {
-            keyArray[i] = it->first;
-            it--;
-        }
+        keyArray[i] = it->first;
+        it--;
     }
 }
 
 void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyFrame)
 {
     uint32 keyArray[4];
-    if (keyFrame == 0) keyFrame = 1;
+    if (keyFrame <= 1) keyFrame = 2;
     getFrameIterator(keyArray, keyFrame, node._localRotation);
 
     const glm::quat& t0 = node._localRotation[keyArray[0]].second;
     const glm::quat& t1 = node._localRotation[keyArray[1]].second;
     const glm::quat& t2 = node._localRotation[keyArray[2]].second;
     const glm::quat& t3 = node._localRotation[keyArray[3]].second;
+    if (keyFrame < keyArray[1])
+        ft_assert("alsdkjfasldkfj");
     glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyFrame -keyArray[1])/(keyArray[2]-keyArray[1]));
 
     const glm::mat4& v0 = node._localTrans[keyArray[0]].second;
@@ -127,7 +123,7 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
         updateTransForm(child, wolrdTrans, keyFrame);
 }
 /*
-1.종료 된 애니메이션 제거 _modelpos변경 비어 있으면 추가
+1.종료 된 애니메이션 제거 _worldTrans변경 비어 있으면 추가
 2. 비어 있을때 어떤 애니메이션 추가해줄지, 아이들, 상체 하체 애니메이션, 쓰던 애니메이션
 3.2개 이상이면 선형 보간 시작, 앞에 종료시간 변경
 */
@@ -147,19 +143,17 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
     {
         _lowerBodyAnimation.pop_front();
 
-        glm::vec4 end1 = (_transForm[0]) * glm::vec4(0,0,0,1) ;
-        //glm::vec4 end2 = (_modelPos) * glm::vec4(0,0,0,1) ;
+        glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
+
         end1.y = 0;
-        // end2.y = 0;
-        // end1 = end1 + end2;
-        _modelPos = glm::translate(_modelPos, (glm::vec3)end1);
+        _worldTrans = glm::translate(_worldTrans, (glm::vec3)end1);
 
         if (_lowerBodyAnimation.empty())//일단 walk fixme
         {
             Animation* pushAnimation = findAnimation("idle");//find
             glm::vec4 start = pushAnimation->_rootNode._localTrans[0].second * glm::vec4(0,0,0,1);
             start.y = 0;
-            _modelPos = glm::translate(_modelPos, -(glm::vec3)start);
+            _worldTrans = glm::translate(_worldTrans, -(glm::vec3)start);
             _lowerBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
         }
         else
@@ -167,11 +161,11 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
             Animation* pushAnimation = _lowerBodyAnimation.begin()->first;//find
             glm::vec4 start = pushAnimation->_rootNode._localTrans[0].second * glm::vec4(0,0,0,1);
             start.y = 0;
-            _modelPos = glm::translate(_modelPos, -(glm::vec3)start);
+            _worldTrans = glm::translate(_worldTrans, -(glm::vec3)start);
         }
     }
 }
-
+#include "include/GLM/gtx/string_cast.hpp"
 void Simulator::update()//나중에 압축 데이터를 직접 넣어야 하나?
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
@@ -185,7 +179,7 @@ void Simulator::update()//나중에 압축 데이터를 직접 넣어야 하나?
     {
         animation = _lowerBodyAnimation.begin()->first;
         curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(_lowerBodyAnimation.begin()->second - curTime);
-        updateTransForm(animation->_rootNode, glm::mat4(1.0f), (animation->_animationMillisecond - curMillisecond.count())*120/1000);//시간 넣으면 프레임 변환 해야 할듯
+        updateTransForm(animation->_rootNode, _worldRotation, (animation->_animationMillisecond - curMillisecond.count())*120/1000);//시간 넣으면 프레임 변환 해야 할듯
     }
     //upper
     // if (_upperBodyAnimation.empty() == false)
@@ -225,21 +219,21 @@ void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일
     {
         Animation* pushAnimation = findAnimation("walk");//find
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);
-        _modelPos = glm::rotate(_modelPos, PI, glm::vec3(0,1,0));
+        _worldRotation = glm::rotate(_worldRotation, PI, glm::vec3(0,1,0));
     }
     else if (key == KeyInput::REFT && _lowerBodyAnimation.size() < 2)
     {
         Animation* pushAnimation = findAnimation("walk");//find
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);
-        _modelPos = glm::rotate(_modelPos, PI/2, glm::vec3(0,1,0));
+        _worldRotation = glm::rotate(_worldRotation, PI/2, glm::vec3(0,1,0));
     }
     else if (key == KeyInput::RIGHT && _lowerBodyAnimation.size() < 2)
     {
         Animation* pushAnimation = findAnimation("walk");//find
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);
-        _modelPos = glm::rotate(_modelPos, -PI/2, glm::vec3(0,1,0));
+        _worldRotation = glm::rotate(_worldRotation, -PI/2, glm::vec3(0,1,0));
     }
-    else if (key == KeyInput::RUN && _upperBodyAnimation.size() < 2)
+    else if (key == KeyInput::RUN && _lowerBodyAnimation.size() < 2)
     {
         Animation* pushAnimation = findAnimation("run");//find
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);

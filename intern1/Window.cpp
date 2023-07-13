@@ -30,6 +30,8 @@ void Window::initialize(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
+
+    _view = createViewMatrix();
 }
 
 void Window::processInput(Simulator& simulator)
@@ -37,17 +39,17 @@ void Window::processInput(Simulator& simulator)
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
     if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, -1.0f)); 
+        _view = glm::translate(_view, glm::vec3(0.0f, -0.3f, -0.0f)); 
     if (glfwGetKey(_window, GLFW_KEY_DOWN ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, 1.0f));
+        _view = glm::translate(_view, glm::vec3(0.0f, 0.3f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_RIGHT ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(1.0f, 0.0f, 0.0f));
+        _view = glm::translate(_view, glm::vec3(0.3f, 0.0f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_LEFT ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(-1.0f, 0.0f, 0.0f));
+        _view = glm::translate(_view, glm::vec3(-0.3f, 0.0f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_W ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 1.0f, 0.0f));
+        _view = glm::translate(_view, glm::vec3(0.0f, 0.3f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, -1.0f, 0.0f));
+        _view = glm::translate(_view, glm::vec3(0.0f, -0.3f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_KP_8 ) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::UP);
     if (glfwGetKey(_window, GLFW_KEY_KP_5 ) == GLFW_PRESS)
@@ -79,4 +81,18 @@ bool Window::isWindowClose(void)
 void Window::bufferSwap(void)
 {
     glfwSwapBuffers(_window);
+}
+
+glm::mat4 Window::createViewMatrix()
+{
+    //y
+    // glm::vec3 cameraPos(0.0f, 100.0f, 0.0f);  // 카메라 위치
+    // glm::vec3 targetPos(0.0f, 0.0f, 0.0f);   // 바라보는 지점
+    // glm::vec3 upVector(0.0f, 0.0f, 1.0f);    // 위쪽 방향
+    //z
+    glm::vec3 cameraPos(0.0f, 0.0f, 100.0f);  // 카메라 위치
+    glm::vec3 targetPos(0.0f, 0.0f, 0.0f);   // 바라보는 지점
+    glm::vec3 upVector(0.0f, 1.0f, 0.0f);    // 위쪽 방향
+    glm::mat4 viewMatrix = glm::lookAt(cameraPos, targetPos, upVector);
+    return viewMatrix;
 }
