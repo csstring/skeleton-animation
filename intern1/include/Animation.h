@@ -28,7 +28,7 @@ class Animation
         void           AnimationDataTraver(AnimationTreeTraversal& travel);
         
     public:
-        uint64 _animationMillisecond;//m
+        uint64 _animationMillisecond;
         float _animationSpeed;
         AnimationData  _rootNode;
         std::string    _name;

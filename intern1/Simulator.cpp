@@ -77,6 +77,9 @@ void Simulator::draw(void)
             // line.render(VBO[bone._boneIndex]);
             glBindVertexArray(0);
         }
+        glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
+        end1.y = 0;
+        _worldTrans = glm::translate(_worldTrans, (glm::vec3)end1);
     }
 }
 
@@ -101,11 +104,11 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
         itR++;
     uint32 frontDistance = std::distance(node._localRotation.begin(), itR);
     if (frontDistance < 3) itR = node._localRotation.begin() + 3;
-
+    if (keyFrame < (itR -2)->first) keyFrame = (itR -2)->first;
     const glm::quat& t0 = (itR - 3)->second;
     const glm::quat& t1 = (itR - 2)->second;
     const glm::quat& t2 = (itR - 1)->second;
-    const glm::quat& t3 = itR->second;
+    const glm::quat& t3 = (itR - 0)->second;
     glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyFrame - (itR -2)->first)/((itR-1)->first - (itR -2)->first));
 
     auto itT = std::lower_bound(node._localTrans.begin(), node._localTrans.end(), keyFrame, pairCompare);
@@ -113,6 +116,7 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
         itT++;
     frontDistance = std::distance(node._localTrans.begin(), itT);
     if (frontDistance < 3) itT = node._localTrans.begin() + 3;
+
     const glm::mat4& v0 = (itT - 3)->second;
     const glm::mat4& v1 = (itT - 2)->second;
     const glm::mat4& v2 = (itT - 1)->second;
@@ -124,15 +128,14 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
         _transForm[node._boneIndex] = wolrdTrans;
     else if (fix == TransFormFix::BACK)
         _backTransForm[node._boneIndex] = wolrdTrans;
+
     for (const AnimationData& child : node._childrens)
         updateTransForm(child, wolrdTrans, keyFrame, fix);
 }
 /*
-1.종료 된 애니메이션 제거 _worldTrans변경 비어 있으면 추가
 2. 비어 있을때 어떤 애니메이션 추가해줄지, 아이들, 상체 하체 애니메이션, 쓰던 애니메이션
-3.2개 이상이면 선형 보간 시작, 앞에 종료시간 변경
+3.2개 이상이면 선형 보간 시작
 */
-#include "include/GLM/gtx/rotate_vector.hpp"
 void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
 {
     // if (curTime >= _upperBodyAnimation.begin()->second)
@@ -146,16 +149,11 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
     // }
     if (curTime >= _lowerBodyAnimation.begin()->second._endTime)
     {
+        Animation* pushAnimation = _lowerBodyAnimation.front().first;
         _lowerBodyAnimation.pop_front();
-
-        glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
-
-        end1.y = 0;
-        _worldTrans = glm::translate(_worldTrans, (glm::vec3)end1);
 
         if (_lowerBodyAnimation.empty())
         {
-            Animation* pushAnimation = findAnimation("idle");//find
             TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
             _lowerBodyAnimation.push_back({pushAnimation, node});
         }
@@ -173,7 +171,17 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
     }
 }
 
-void Simulator::update()//나중에 압축 데이터를 직접 넣어야 하나?
+void Simulator::animationBlending(const std::chrono::milliseconds& time)
+{
+    float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
+    //i=1 끝까지root빼고 보간
+    for (uint8 i = 0; i < _transForm.size(); ++i)
+    {
+        _transForm[i] = glm::mix(_transForm[i], _backTransForm[i], interpolVal);
+    }
+}
+
+void Simulator::update()
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
     eraseAnimation(curTime);
@@ -186,13 +194,15 @@ void Simulator::update()//나중에 압축 데이터를 직접 넣어야 하나?
     {
         animation = _lowerBodyAnimation.begin()->first;
         curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation.begin()->second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::FRONT);//시간 넣으면 프레임 변환 해야 할듯
+        updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::FRONT);
     }
     if (_lowerBodyAnimation.size() >= 2)
     {
         animation = _lowerBodyAnimation[1].first;
         curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation[1].second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::BACK);//시간 넣으면 프레임 변환 해야 할듯
+        updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::BACK);
+
+        animationBlending(curMillisecond);
     }
     //upper
     // if (_upperBodyAnimation.empty() == false)
@@ -202,6 +212,7 @@ void Simulator::update()//나중에 압축 데이터를 직접 넣어야 하나?
     //     updateTransForm(*animation->returnAnimationData(11/*lowerback*/), _transForm[0], (animation->_animationMillisecond - curMillisecond.count())*120/1000);
     // }
     //보간
+
 }
 
 Animation* Simulator::findAnimation(const std::string& name)
@@ -225,7 +236,7 @@ void Simulator::pushAnimation(Animation* pushAnimation, std::deque<std::pair<Ani
 
 void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일단 돌려놓기
 {
-    if (key == KeyInput::UP && _lowerBodyAnimation.size() < 2)
+    if (key == KeyInput::UP && _lowerBodyAnimation.front().first->_name != "walk")
     {
         Animation* pushAnimation = findAnimation("walk");//find
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);

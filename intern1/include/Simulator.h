@@ -6,7 +6,7 @@
 #include <iostream>
 #include "Animation.h"
 struct AnimationData;
-const float OVERLAPTIME = 400;
+const float OVERLAPTIME = 200;
 enum class KeyInput
 {
     UP,
@@ -55,7 +55,8 @@ class Simulator : Noncopyable
         Animation* findAnimation(const std::string& name);
         void eraseAnimation(std::chrono::steady_clock::time_point& curTime);
         void pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, TimeNode>>& animationDeque);
-        void boneBufferMaping(void);
+        void boneBufferMaping(void);     
+        void animationBlending(const std::chrono::milliseconds& time);
 
     public:
         Simulator(){}
