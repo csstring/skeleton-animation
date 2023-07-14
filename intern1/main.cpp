@@ -36,8 +36,8 @@ void fileLoad(Simulator& simulator)
         simulator._animations[i]._rootNode = root;
         AMCFileParser amcParser(amcPathList[i], &simulator._skeleton, &simulator._animations[i]);
         amcParser.loadAMCFile();
-        if (simulator._animations[i]._name == "dance")
-            compressor.CompressData(&simulator._animations[i], 355.184/100000000.0f);
+        // if (simulator._animations[i]._name == "dance")
+        //     compressor.CompressData(&simulator._animations[i], 355.184/100000000.0f);
     }
 }
 
@@ -53,8 +53,6 @@ int main()
     fileLoad(simulator);
     simulator.initialize();
 
-    uint32 maxIndex = simulator.getTotalKeyCount();
-
     Ground ground;
     ground.initialize();
     while (window.isWindowClose() == false)
@@ -68,7 +66,7 @@ int main()
         
         window.processInput(simulator);
         simulator.draw();
-        ground.draw();
+        //ground.draw();
         window.bufferSwap();
         glfwPollEvents();
     }
