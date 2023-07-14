@@ -39,9 +39,9 @@ void Window::processInput(Simulator& simulator)
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
     if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, -0.3f, -0.0f)); 
+        _view = glm::translate(_view, glm::vec3(0.0f, -0.0f, -0.3f)); 
     if (glfwGetKey(_window, GLFW_KEY_DOWN ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 0.3f, 0.0f));
+        _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, 0.3f));
     if (glfwGetKey(_window, GLFW_KEY_RIGHT ) == GLFW_PRESS)
         _view = glm::translate(_view, glm::vec3(0.3f, 0.0f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_LEFT ) == GLFW_PRESS)

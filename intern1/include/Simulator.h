@@ -31,7 +31,7 @@ class Simulator : Noncopyable
 
     private :
         void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime);
-        void getFrameIterator(uint32* keyArray, uint32 findKeyTime, const std::vector<std::pair<uint32,glm::quat>>& animationFrame);
+        void getFrameIterator(uint32* keyArray, uint32& findKeyTime, const std::vector<std::pair<uint32,glm::quat>>& animationFrame);
         Animation* findAnimation(const std::string& name);
         void eraseAnimation(std::chrono::steady_clock::time_point& curTime);
         void pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, std::chrono::steady_clock::time_point>>& animationDeque);

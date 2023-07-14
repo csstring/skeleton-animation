@@ -16,15 +16,16 @@
 #include <cmath>
 std::chrono::system_clock::time_point start;
 std::chrono::duration<double>sec;
-
+const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
 void fileLoad(Simulator& simulator)
 {
-    std::vector<const char*> amcPathList = {"./amc/walk1.amc", "./amc/run.amc","./amc/jump.amc","./amc/attack.amc","./amc/idle.amc"};
+    std::vector<const char*> amcPathList = {"./amc/walk1.amc", "./amc/run.amc","./amc/jump.amc","./amc/attack.amc","./amc/idle.amc", "./amc/dance.amc"};
     simulator._animations.push_back(Animation("walk", 1));
     simulator._animations.push_back(Animation("run", 1));
     simulator._animations.push_back(Animation("jump", 1));
     simulator._animations.push_back(Animation("attack", 1));
     simulator._animations.push_back(Animation("idle", 1));
+    simulator._animations.push_back(Animation("dance", 1));
     CmuFileParser parser(asfPath,&simulator._skeleton, &simulator._animations[0]);
     parser.loadCmuFile();
 
@@ -35,7 +36,8 @@ void fileLoad(Simulator& simulator)
         simulator._animations[i]._rootNode = root;
         AMCFileParser amcParser(amcPathList[i], &simulator._skeleton, &simulator._animations[i]);
         amcParser.loadAMCFile();
-        //compressor.CompressData(&simulator._animations[i], 0.00000001);
+        if (simulator._animations[i]._name == "dance")
+            compressor.CompressData(&simulator._animations[i], 355.184/100000000.0f);
     }
 }
 
@@ -66,7 +68,7 @@ int main()
         
         window.processInput(simulator);
         simulator.draw();
-        //ground.draw();
+        ground.draw();
         window.bufferSwap();
         glfwPollEvents();
     }

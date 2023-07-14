@@ -22,7 +22,7 @@ void Simulator::initialize(void)
     _worldRotation = glm::mat4(1.0f);
     _transForm.resize(size);
     _backTransForm.resize(size);
-    Animation* pushAnimation = findAnimation("walk");//find
+    Animation* pushAnimation = findAnimation("dance");//find
     _lowerBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
     _upperBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
     boneBufferMaping();
@@ -58,7 +58,7 @@ void Simulator::draw(void)
 {
     std::vector<Bone>& boneVector = _skeleton.getBoneVector();
 
-    for (int i =0; i <=0; ++i)//comprees test
+    for (int i =0; i <=3; ++i)//comprees test
     {
         update();
         glm::vec3 color(0.0f);
@@ -67,12 +67,12 @@ void Simulator::draw(void)
         {
             glBindVertexArray(VAO[bone._boneIndex]);
             glm::mat4 toParentDir = _worldTrans * _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
-            Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
-            cylinder.initialize(color, VBC[bone._boneIndex]);
-            cylinder.render(VBO[bone._boneIndex]);
-            // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
-            // line.initialize(color, VBC[bone._boneIndex]);
-            // line.render(VBO[bone._boneIndex]);
+            // Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
+            // cylinder.initialize(color, VBC[bone._boneIndex]);
+            // cylinder.render(VBO[bone._boneIndex]);
+            Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
+            line.initialize(color, VBC[bone._boneIndex]);
+            line.render(VBO[bone._boneIndex]);
             glBindVertexArray(0);
         }
     }
@@ -83,39 +83,39 @@ inline bool pairCompare(const std::pair<uint32, glm::quat>& a, const uint32& val
     return a.first < val;
 }
 
-void Simulator::getFrameIterator(uint32* keyArray, uint32 findKeyFrame, const std::vector<std::pair<uint32,glm::quat>>& animationFrame)//time? index?
+void Simulator::getFrameIterator(uint32* keyArray, uint32& findKeyFrame, const std::vector<std::pair<uint32,glm::quat>>& animationFrame)//time? index?
 {
     auto it = std::lower_bound(animationFrame.begin(), animationFrame.end(), findKeyFrame, pairCompare);
+    if (it != animationFrame.end() && it + 1 != animationFrame.end())
+        it++;
     uint32 frontDistance = std::distance(animationFrame.begin(), it);
-    if (it != animationFrame.end()) it++;
-    if (it == animationFrame.end()) it = animationFrame.end() - 1; 
-    else if (frontDistance <= 3) it = animationFrame.begin() + 4;
-    for (int i =3; i >=0; --i)
-    {
-        keyArray[i] = it->first;
-        it--;
-    }
+    if (frontDistance < 3) it = animationFrame.begin() + 3;
 }
 
-void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyFrame)
+void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyFrame)//fixme
 {
-    uint32 keyArray[4];
-    if (keyFrame <= 1) keyFrame = 2;
-    getFrameIterator(keyArray, keyFrame, node._localRotation);
+    auto itR = std::lower_bound(node._localRotation.begin(), node._localRotation.end(), keyFrame, pairCompare);
+    if (itR != node._localRotation.end() && itR + 1 != node._localRotation.end())
+        itR++;
+    uint32 frontDistance = std::distance(node._localRotation.begin(), itR);
+    if (frontDistance < 3) itR = node._localRotation.begin() + 3;
 
-    const glm::quat& t0 = node._localRotation[keyArray[0]].second;
-    const glm::quat& t1 = node._localRotation[keyArray[1]].second;
-    const glm::quat& t2 = node._localRotation[keyArray[2]].second;
-    const glm::quat& t3 = node._localRotation[keyArray[3]].second;
-    if (keyFrame < keyArray[1])
-        ft_assert("alsdkjfasldkfj");
-    glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyFrame -keyArray[1])/(keyArray[2]-keyArray[1]));
+    const glm::quat& t0 = (itR - 3)->second;
+    const glm::quat& t1 = (itR - 2)->second;
+    const glm::quat& t2 = (itR - 1)->second;
+    const glm::quat& t3 = itR->second;
+    glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyFrame - (itR -2)->first)/((itR-1)->first - (itR -2)->first));
 
-    const glm::mat4& v0 = node._localTrans[keyArray[0]].second;
-    const glm::mat4& v1 = node._localTrans[keyArray[1]].second;
-    const glm::mat4& v2 = node._localTrans[keyArray[2]].second;
-    const glm::mat4& v3 = node._localTrans[keyArray[3]].second;
-    glm::mat4 interpolT = glm::catmullRom(v0,v1,v2,v3,(keyFrame -keyArray[1])/(keyArray[2]-keyArray[1]));
+    auto itT = std::lower_bound(node._localTrans.begin(), node._localTrans.end(), keyFrame, pairCompare);
+    if (itT != node._localTrans.end() && itT + 1 != node._localTrans.end())
+        itT++;
+    frontDistance = std::distance(node._localTrans.begin(), itT);
+    if (frontDistance < 3) itT = node._localTrans.begin() + 3;
+    const glm::mat4& v0 = (itT - 3)->second;
+    const glm::mat4& v1 = (itT - 2)->second;
+    const glm::mat4& v2 = (itT - 1)->second;
+    const glm::mat4& v3 = (itT - 0)->second;
+    glm::mat4 interpolT = glm::catmullRom(v0,v1,v2,v3,(keyFrame - (itT -2)->first)/((itT-1)->first - (itT -2)->first));
 
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
     _transForm[node._boneIndex] = wolrdTrans;
@@ -150,7 +150,7 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
 
         if (_lowerBodyAnimation.empty())//일단 walk fixme
         {
-            Animation* pushAnimation = findAnimation("idle");//find
+            Animation* pushAnimation = findAnimation("dance");//find
             glm::vec4 start = pushAnimation->_rootNode._localTrans[0].second * glm::vec4(0,0,0,1);
             start.y = 0;
             _worldTrans = glm::translate(_worldTrans, -(glm::vec3)start);
@@ -165,7 +165,7 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
         }
     }
 }
-#include "include/GLM/gtx/string_cast.hpp"
+
 void Simulator::update()//나중에 압축 데이터를 직접 넣어야 하나?
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
@@ -249,23 +249,3 @@ void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);
     }
 }
-    // 압축률 추출기
-    // float mul = 0;
-    // int count = 0;
-    // for (int i = 0; i <= 60; i += 20)
-    // {
-    //     while (true)
-    //     {
-    //         std::vector<uint32> v = compressor.getCompressedData(_animation, mul / 100000000.0f);
-    //         if ((_keyCount-v.size()) * 100 / (_keyCount) >= i)
-    //         {
-    //             std::cout << (_keyCount-v.size()) * 100 / (_keyCount ) << "%" << std::endl;
-    //             std::cout << "mul : " << mul << std::endl;
-    //             _compresskeyFrame[count] = v;
-    //             count++;
-    //             mul++;
-    //             break;
-    //         }
-    //         mul *= 1.3;
-    //     }
-    // }
