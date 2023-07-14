@@ -47,6 +47,8 @@ void Window::processInput(Simulator& simulator)
     //     _view = glm::translate(_view, glm::vec3(0.0f, 0.3f, 0.0f));
     // if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
     //     _view = glm::translate(_view, glm::vec3(0.0f, -0.3f, 0.0f));
+    
+    //y축
     if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
         _view = glm::translate(_view, glm::vec3(0.0f, -0.5f, -0.0f)); 
     if (glfwGetKey(_window, GLFW_KEY_DOWN ) == GLFW_PRESS)

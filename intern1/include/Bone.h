@@ -20,11 +20,12 @@ struct Bone
     float            _length;
     glm::vec3        _direction;
     
+    //fixme : 아래쪽 데이터 필요없어서 정리 해야함
     glm::vec3        _postion;
     glm::vec3        _axis;
-    std::vector<DOF> _dof;//
-    glm::quat        _c;//
-    glm::quat        _invC;//
-    glm::vec3        _b; //amc에서 local정하기
+    std::vector<DOF> _dof;
+    glm::quat        _c;
+    glm::quat        _invC;
+    glm::vec3        _b;
 };
 

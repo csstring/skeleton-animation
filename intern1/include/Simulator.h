@@ -42,10 +42,12 @@ class Simulator : Noncopyable
         std::deque<std::pair<Animation*, TimeNode>> _lowerBodyAnimation;
         
         std::vector<uint32>    VAO, VBO, VBC;
-        glm::mat4              _worldTrans;//스켈레톤으로 옮겨야 하나
-        glm::mat4              _worldRotation, _worldRotBuffer;
         std::vector<glm::mat4> _transForm;
         std::vector<glm::mat4> _backTransForm;
+        
+        //스켈레톤으로 옮겨야 하나
+        glm::mat4              _worldTrans;
+        glm::mat4              _worldRotation, _worldRotBuffer;
 
     private :
         void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime, TransFormFix fix);
