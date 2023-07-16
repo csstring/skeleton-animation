@@ -102,12 +102,12 @@ bool AMCFileParser::loadAMCFile(void)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)) * matrix; 
             else if (dof == DOF::RZ)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * matrix; 
-            else if (dof == DOF::TX)
-                localTransV.x += val;
-            else if (dof == DOF::TY)
-                localTransV.y += val;
-            else if (dof == DOF::TZ)
-                localTransV.z += val;
+            // else if (dof == DOF::TX)
+            //     localTransV.x += val;
+            // else if (dof == DOF::TY)
+            //     localTransV.y += val;
+            // else if (dof == DOF::TZ)
+            //     localTransV.z += val;
         }
         if (moveBoneIndex == 0 && animationTime ==0)
         {
@@ -115,10 +115,11 @@ bool AMCFileParser::loadAMCFile(void)
         }
         if (moveBoneIndex == 0)
         {
-            //matrix = glm::rotate(matrix, PI/2, glm::vec3(0,1,0));
             glm::vec3 tmp = localTransV;
             localTransV -= firstTrans;
             firstTrans = tmp;
+            if (_animation->_name == "idle")
+                matrix = glm::rotate(glm::radians(90.0f), glm::vec3(0.0f,1.0f,0.0f)) * matrix;
         }
         glm::quat localRot = bone._c * glm::quat_cast(matrix) * bone._invC;
         animationData->_localRotation.push_back({animationTime, localRot });

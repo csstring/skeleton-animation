@@ -15,7 +15,8 @@ enum class KeyInput
     RIGHT,
     RUN,
     ATTACK,
-    JUMP
+    JUMP,
+    STOP
 };
 enum class TransFormFix
 {
@@ -40,6 +41,7 @@ class Simulator : Noncopyable
     private:
         std::deque<std::pair<Animation*, TimeNode>> _upperBodyAnimation;//endtime
         std::deque<std::pair<Animation*, TimeNode>> _lowerBodyAnimation;
+        std::deque<std::pair<Animation*, TimeNode>> _lowerBodyBackAnimation;
         
         std::vector<uint32>    VAO, VBO, VBC;
         std::vector<glm::mat4> _transForm;

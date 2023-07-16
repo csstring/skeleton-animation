@@ -30,12 +30,18 @@ void Window::initialize(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
-
+    glfwSwapInterval(3);
     _view = createViewMatrix();
 }
 
 void Window::processInput(Simulator& simulator)
 {
+    static int currentWalkState,previousWalkState;
+    static int currentBackState,previousBackState;
+
+    currentWalkState = glfwGetKey(_window, GLFW_KEY_KP_8);
+    currentBackState = glfwGetKey(_window, GLFW_KEY_KP_5);
+
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
     //z축
@@ -57,15 +63,26 @@ void Window::processInput(Simulator& simulator)
         _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, -0.5f));
     if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
         _view = glm::translate(_view, glm::vec3(0.0f, -0.0f, 0.5f));
-
     if (glfwGetKey(_window, GLFW_KEY_RIGHT ) == GLFW_PRESS)
         _view = glm::translate(_view, glm::vec3(0.3f, 0.0f, 0.0f));
     if (glfwGetKey(_window, GLFW_KEY_LEFT ) == GLFW_PRESS)
         _view = glm::translate(_view, glm::vec3(-0.3f, 0.0f, 0.0f));
-    if (glfwGetKey(_window, GLFW_KEY_KP_8 ) == GLFW_PRESS)
+
+    if (currentWalkState == GLFW_PRESS && previousWalkState == GLFW_RELEASE)
+    {
         simulator.changeAnimation(KeyInput::UP);
-    if (glfwGetKey(_window, GLFW_KEY_KP_5 ) == GLFW_PRESS)
+        previousWalkState = currentWalkState;
+    } else if (currentWalkState == GLFW_RELEASE && previousWalkState == GLFW_PRESS) {
+        previousWalkState = currentWalkState;
+        simulator.changeAnimation(KeyInput::STOP);
+    }
+    if (currentBackState == GLFW_PRESS && previousBackState == GLFW_RELEASE)
+    {
+        previousBackState = currentBackState;
+    } else if (currentBackState == GLFW_RELEASE && previousBackState == GLFW_PRESS) {
+        previousBackState = currentBackState;
         simulator.changeAnimation(KeyInput::BACK);
+    }
     if (glfwGetKey(_window, GLFW_KEY_KP_4 ) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::REFT);
     if (glfwGetKey(_window, GLFW_KEY_KP_6 ) == GLFW_PRESS)
