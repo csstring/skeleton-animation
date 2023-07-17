@@ -52,7 +52,8 @@ int main()
     Simulator simulator;
     fileLoad(simulator);
     simulator.initialize();
-
+    //비슷한 지점 찾기
+    //simulator._animations[4].findSameFrame(10);
     Ground ground;
     ground.initialize();
     while (window.isWindowClose() == false)

@@ -26,7 +26,7 @@ class Animation
 
         AnimationData* returnAnimationData(const uint32 boneIndex);
         void           AnimationDataTraver(AnimationTreeTraversal& travel);
-        
+        void           findSameFrame(uint32 count);
     public:
         uint64 _animationMillisecond;
         float _animationSpeed;

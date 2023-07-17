@@ -39,3 +39,55 @@ void Animation::AnimationDataTraver(AnimationTreeTraversal& travel)
             dataQueue.push(&curData->_childrens[i]);
     }
 }
+
+void Animation::findSameFrame(uint32 count)
+{
+    std::queue<AnimationData* > dataQueue;
+    std::vector<glm::vec3> origin[31];
+    std::vector<uint32> frameList;
+    float errorRange = 0;
+    int curCount = 0;
+
+    dataQueue.push(&_rootNode);
+    while (dataQueue.size() != 0)
+    {
+        AnimationData* curData = dataQueue.front();
+        dataQueue.pop();
+        for (auto& mt : curData->_localTrans)
+        {
+            origin[curData->_boneIndex].push_back(mt.second * glm::vec4(0,0,0,1));
+        }
+        for (int i =0; i < curData->_childrens.size(); ++i)
+        dataQueue.push(&curData->_childrens[i]);
+    }
+    // errorRange += glm::abs(origin[0][0].x - origin[1][i].x);
+    // errorRange += glm::abs(origin[0][0].y - origin[1][i].y);
+    // errorRange += glm::abs(origin[0][0].z - origin[1][i].z);
+    while (curCount < count)
+    {
+        frameList.clear();
+        curCount = 0;
+        for (int i = 1; i < origin[0].size(); ++i)
+        {
+            float curError = 0;
+            for (int j = 0; j < 31; ++j)
+            {
+                curError += glm::abs(origin[j][0].x - origin[j][i].x);
+                curError += glm::abs(origin[j][0].y - origin[j][i].y);
+                curError += glm::abs(origin[j][0].z - origin[j][i].z);
+            }
+            if (errorRange == 0)
+                errorRange = curError;
+            if (curError < errorRange)
+            {
+                frameList.push_back(i);
+                curCount++;
+            }
+        }
+        errorRange *= 1.02;
+    }
+    for (auto it : frameList)
+    {
+        std::cout << "frame : " << it << std::endl;
+    }
+}

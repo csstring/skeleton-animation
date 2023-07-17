@@ -30,7 +30,7 @@ void Window::initialize(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
-    glfwSwapInterval(3);
+    glfwSwapInterval(4);
     _view = createViewMatrix();
 }
 
@@ -38,9 +38,11 @@ void Window::processInput(Simulator& simulator)
 {
     static int currentWalkState,previousWalkState;
     static int currentBackState,previousBackState;
+    static int currentRunState,previousRunState;
 
     currentWalkState = glfwGetKey(_window, GLFW_KEY_KP_8);
     currentBackState = glfwGetKey(_window, GLFW_KEY_KP_5);
+    currentRunState = glfwGetKey(_window, GLFW_KEY_LEFT_SHIFT);
 
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
@@ -91,8 +93,13 @@ void Window::processInput(Simulator& simulator)
         simulator.changeAnimation(KeyInput::ATTACK);
     if (glfwGetKey(_window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS || glfwGetKey(_window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::JUMP);
-    if (glfwGetKey(_window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS || glfwGetKey(_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    if (currentRunState == GLFW_PRESS && previousRunState == GLFW_RELEASE)
+    {
         simulator.changeAnimation(KeyInput::RUN);
+        previousRunState = currentRunState;
+    } else if (currentRunState == GLFW_RELEASE && previousRunState == GLFW_PRESS) {
+        previousRunState = currentRunState;
+    }
 }
 
 void Window::clearColorSetUp(float r, float g, float b, float a)
@@ -115,9 +122,9 @@ void Window::bufferSwap(void)
 glm::mat4 Window::createViewMatrix()
 {
     //y
-    glm::vec3 cameraPos(0.0f, 100.0f, 0.0f);  // 카메라 위치
+    glm::vec3 cameraPos(0.0f, 0.0f, 100.0f);  // 카메라 위치
     glm::vec3 targetPos(0.0f, 0.0f, 0.0f);   // 바라보는 지점
-    glm::vec3 upVector(0.0f, 0.0f, 1.0f);    // 위쪽 방향
+    glm::vec3 upVector(0.0f, 1.0f, 0.0f);    // 위쪽 방향
     //z
     // glm::vec3 cameraPos(0.0f, 0.0f, 100.0f);  // 카메라 위치
     // glm::vec3 targetPos(0.0f, 0.0f, 0.0f);   // 바라보는 지점

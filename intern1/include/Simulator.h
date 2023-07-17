@@ -23,7 +23,7 @@ enum class TransFormFix
     FRONT,
     BACK
 };
-class TimeNode
+struct TimeNode
 {
     public:
         explicit TimeNode(
@@ -67,8 +67,9 @@ class Simulator : Noncopyable
         void changeAnimation(KeyInput key);
         void update(void);
         void draw(void);
-
     public : 
         Skeleton               _skeleton;
         std::vector<Animation> _animations;
 };
+
+std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref);

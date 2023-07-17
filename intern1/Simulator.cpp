@@ -23,11 +23,11 @@ void Simulator::initialize(void)
     _worldRotBuffer = glm::mat4(1.0f);
     _transForm.resize(size);
     _backTransForm.resize(size);
-    Animation* pushAnimation = findAnimation("walk");//find
+    Animation* pushAnimation = findAnimation("idle");//find
     TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
 
     _lowerBodyAnimation.push_back({pushAnimation, node});
-    _upperBodyAnimation.push_back({pushAnimation, node});
+    //_upperBodyAnimation.push_back({pushAnimation, node});
     boneBufferMaping();
 }
 
@@ -100,11 +100,14 @@ void Simulator::getFrameIterator(uint32* keyArray, uint32& findKeyFrame, const s
 void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyFrame, TransFormFix fix)//fixme
 {
     auto itR = std::lower_bound(node._localRotation.begin(), node._localRotation.end(), keyFrame, pairCompare);
-    if (itR != node._localRotation.end() && itR + 1 != node._localRotation.end())
+    if (itR == node._localRotation.end()) 
+        itR--;
+    if (itR + 1 != node._localRotation.end())
         itR++;
     uint32 frontDistance = std::distance(node._localRotation.begin(), itR);
     if (frontDistance < 3) itR = node._localRotation.begin() + 3;
-    if (keyFrame < (itR -2)->first) keyFrame = (itR -2)->first;
+    if (keyFrame < (itR -2)->first) keyFrame = (itR -2)->first + 1;
+    else if (keyFrame > (itR - 1)->first) keyFrame = (itR - 1)->first;
     const glm::quat& t0 = (itR - 3)->second;
     const glm::quat& t1 = (itR - 2)->second;
     const glm::quat& t2 = (itR - 1)->second;
@@ -112,11 +115,7 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
     glm::quat interpolR = glm::catmullRom(t0,t1,t2,t3, (keyFrame - (itR -2)->first)/((itR-1)->first - (itR -2)->first));
 
     auto itT = std::lower_bound(node._localTrans.begin(), node._localTrans.end(), keyFrame, pairCompare);
-    if (itT != node._localTrans.end() && itT + 1 != node._localTrans.end())
-        itT++;
-    frontDistance = std::distance(node._localTrans.begin(), itT);
-    if (frontDistance < 3) itT = node._localTrans.begin() + 3;
-
+    itT++;
     const glm::mat4& v0 = (itT - 3)->second;
     const glm::mat4& v1 = (itT - 2)->second;
     const glm::mat4& v2 = (itT - 1)->second;
@@ -124,24 +123,9 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
     glm::mat4 interpolT = glm::catmullRom(v0,v1,v2,v3,(keyFrame - (itT -2)->first)/((itT-1)->first - (itT -2)->first));
 
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
-    static int state;
     if (fix == TransFormFix::FRONT)
     {
-        if (node._boneIndex == 10)
-        {
-            glm::vec4 after = wolrdTrans * glm::vec4(0,0,0,1);
-            glm::vec4 before = _transForm[10] * glm::vec4(0,0,0,1);
-            if (state == 0 && after.z > before.z)
-            {
-                std::cout << "right" <<keyFrame << std::endl;
-                state = 1;
-            } else if (state == 1 && after.z < before.z){
-                std::cout << "left" <<keyFrame << std::endl;
-                state = 0;
-            }
-        }
         _transForm[node._boneIndex] = wolrdTrans;
-
     }
     else if (fix == TransFormFix::BACK)
         _backTransForm[node._boneIndex] = wolrdTrans;
@@ -149,10 +133,7 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
     for (const AnimationData& child : node._childrens)
         updateTransForm(child, wolrdTrans, keyFrame, fix);
 }
-/*
-2. 비어 있을때 어떤 애니메이션 추가해줄지, 아이들, 상체 하체 애니메이션, 쓰던 애니메이션
-3.2개 이상이면 선형 보간 시작
-*/
+
 void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
 {
     // if (curTime >= _upperBodyAnimation.begin()->second)
@@ -167,21 +148,27 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
     if (_lowerBodyBackAnimation.empty() == false && curTime >= _lowerBodyBackAnimation.begin()->second._endTime)
         _lowerBodyBackAnimation.pop_front();
 
-    if (curTime >= _lowerBodyAnimation.begin()->second._endTime)
-        _lowerBodyAnimation.pop_front();
-    else if (_lowerBodyAnimation.size() == 1 && 
+    if (_lowerBodyAnimation.size() == 1 && 
             getAfterTimePoint(OVERLAPTIME) >= _lowerBodyAnimation.begin()->second._endTime)
     {
         Animation* pushAnimation = _lowerBodyAnimation.front().first;
         TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
         _lowerBodyAnimation.push_back({pushAnimation, node});
     }
+    if (curTime >= _lowerBodyAnimation.begin()->second._endTime)
+        _lowerBodyAnimation.pop_front();
 }
 
 void Simulator::animationBlending(const std::chrono::milliseconds& time)
 {
     float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
-    //i=1 끝까지root빼고 보간
+    if (interpolVal > 1)
+    {
+        for (auto& it : _lowerBodyAnimation){
+            std::cout << it;
+        }
+        return;
+    }
     for (uint8 i = 0; i < _transForm.size(); ++i)
     {
         _transForm[i] = glm::mix(_transForm[i], _backTransForm[i], interpolVal);
@@ -205,6 +192,10 @@ void Simulator::update()
     }
     if (_lowerBodyAnimation.size() >= 2)
     {
+        for (auto& it : _lowerBodyAnimation){
+            if (curTime > it.second._endTime)
+                ft_assert("time");
+        }
         animation = _lowerBodyAnimation[1].first;
         curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation[1].second._startTime);
         updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::BACK);
@@ -240,11 +231,14 @@ Animation* Simulator::findAnimation(const std::string& name)
 
 void Simulator::pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, TimeNode>>& animationDeque)
 {
-    TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
+    if (animationDeque.size() >= 3)
+        animationDeque.pop_back();
+    if (animationDeque.size() >= 1 &&
+        animationDeque.back().second._endTime > getAfterTimePoint(OVERLAPTIME))
+        animationDeque.back().second._endTime = getAfterTimePoint(OVERLAPTIME);
 
+    TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
     animationDeque.push_back({pushAnimation, node});
-    if (animationDeque.size() >= 2 && animationDeque.front().second._endTime >= getAfterTimePoint(OVERLAPTIME))
-        animationDeque.front().second._endTime = getAfterTimePoint(OVERLAPTIME);
 }
 
 void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일단 돌려놓기
@@ -268,13 +262,22 @@ void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일
     }
     else if (key == KeyInput::STOP)
     {
+        std::cout << "idle input" << std::endl;
         Animation* pushAnimation = findAnimation("idle");//find
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);
     }
-    else if (key == KeyInput::RUN && _lowerBodyAnimation.size() < 2)
+    else if (key == KeyInput::RUN)
     {
-        Animation* pushAnimation = findAnimation("run");//find
-        this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+        if (_lowerBodyAnimation.begin()->first->_name == "walk")
+        {
+            Animation* pushAnimation = findAnimation("run");//find
+            this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+        }
+        else if (_lowerBodyAnimation.begin()->first->_name == "run")
+        {
+            Animation* pushAnimation = findAnimation("walk");//find
+            this->pushAnimation(pushAnimation, _lowerBodyAnimation);
+        }
     }
     else if (key == KeyInput::ATTACK && _upperBodyAnimation.size() < 2)
     {
@@ -289,4 +292,11 @@ void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일
         else
             this->pushAnimation(pushAnimation, _lowerBodyBackAnimation);
     }
+}
+
+std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref)
+{
+    std::cout << "name : " << ref.first->_name << "\n";
+    std::cout << "millisecond : " << ref.first->_animationMillisecond << std::endl;
+    return os;
 }
