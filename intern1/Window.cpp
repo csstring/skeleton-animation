@@ -30,7 +30,7 @@ void Window::initialize(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
-    glfwSwapInterval(4);
+    glfwSwapInterval(1);
     _view = createViewMatrix();
 }
 
@@ -83,7 +83,7 @@ void Window::processInput(Simulator& simulator)
         previousBackState = currentBackState;
     } else if (currentBackState == GLFW_RELEASE && previousBackState == GLFW_PRESS) {
         previousBackState = currentBackState;
-        simulator.changeAnimation(KeyInput::BACK);
+        simulator.changeAnimation(KeyInput::LOWERBACK);
     }
     if (glfwGetKey(_window, GLFW_KEY_KP_4 ) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::REFT);

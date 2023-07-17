@@ -120,6 +120,11 @@ bool AMCFileParser::loadAMCFile(void)
             firstTrans = tmp;
             if (_animation->_name == "idle")
                 matrix = glm::rotate(glm::radians(90.0f), glm::vec3(0.0f,1.0f,0.0f)) * matrix;
+            else if (_animation->_name == "runJump2")
+            {
+                matrix = glm::rotate(glm::radians(180.0f), glm::vec3(0.0f,1.0f,0.0f)) * matrix;
+                localTransV = glm::rotate(glm::radians(180.0f), glm::vec3(0.0f,1.0f,0.0f)) * glm::vec4(localTransV,1);
+            }
         }
         glm::quat localRot = bone._c * glm::quat_cast(matrix) * bone._invC;
         animationData->_localRotation.push_back({animationTime, localRot });

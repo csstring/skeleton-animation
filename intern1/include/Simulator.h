@@ -10,7 +10,7 @@ const float OVERLAPTIME = 200;
 enum class KeyInput
 {
     UP,
-    BACK,
+    LOWERBACK,
     REFT,
     RIGHT,
     RUN,
@@ -20,8 +20,9 @@ enum class KeyInput
 };
 enum class TransFormFix
 {
-    FRONT,
-    BACK
+    LOWERFRONT,
+    LOWERBACK,
+    UPPERFRONT
 };
 struct TimeNode
 {
@@ -46,6 +47,7 @@ class Simulator : Noncopyable
         std::vector<uint32>    VAO, VBO, VBC;
         std::vector<glm::mat4> _transForm;
         std::vector<glm::mat4> _backTransForm;
+        std::vector<glm::mat4> _upperTransForm;
         
         //스켈레톤으로 옮겨야 하나
         glm::mat4              _worldTrans;

@@ -78,7 +78,6 @@ void Simulator::draw(void)
             glBindVertexArray(0);
         }
         glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
-        end1.y = 0;
         _worldTrans = glm::translate(_worldTrans, (glm::vec3)end1);
     }
 }
@@ -106,7 +105,7 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
         itR++;
     uint32 frontDistance = std::distance(node._localRotation.begin(), itR);
     if (frontDistance < 3) itR = node._localRotation.begin() + 3;
-    if (keyFrame < (itR -2)->first) keyFrame = (itR -2)->first + 1;
+    if (keyFrame <= (itR -2)->first) keyFrame = (itR -2)->first + 1;
     else if (keyFrame > (itR - 1)->first) keyFrame = (itR - 1)->first;
     const glm::quat& t0 = (itR - 3)->second;
     const glm::quat& t1 = (itR - 2)->second;
@@ -123,11 +122,11 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
     glm::mat4 interpolT = glm::catmullRom(v0,v1,v2,v3,(keyFrame - (itT -2)->first)/((itT-1)->first - (itT -2)->first));
 
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
-    if (fix == TransFormFix::FRONT)
+    if (fix == TransFormFix::LOWERFRONT)
     {
         _transForm[node._boneIndex] = wolrdTrans;
     }
-    else if (fix == TransFormFix::BACK)
+    else if (fix == TransFormFix::LOWERBACK)
         _backTransForm[node._boneIndex] = wolrdTrans;
 
     for (const AnimationData& child : node._childrens)
@@ -164,10 +163,11 @@ void Simulator::animationBlending(const std::chrono::milliseconds& time)
     float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
     if (interpolVal > 1)
     {
-        for (auto& it : _lowerBodyAnimation){
-            std::cout << it;
-        }
-        return;
+        interpolVal = 1;
+        // for (auto& it : _lowerBodyAnimation){
+        //     std::cout << it;
+        // }
+        // return;
     }
     for (uint8 i = 0; i < _transForm.size(); ++i)
     {
@@ -180,39 +180,44 @@ void Simulator::update()
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
     eraseAnimation(curTime);
     
-    std::chrono::milliseconds curMillisecond;
+    std::chrono::milliseconds millisecondFromBegin, millisecondToEnd;
     uint64 keyFrame;
     Animation* animation;
     //lower
     if (_lowerBodyAnimation.empty() == false)
     {
         animation = _lowerBodyAnimation.begin()->first;
-        curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation.begin()->second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::FRONT);
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation.begin()->second._startTime);
+        updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERFRONT);
     }
     if (_lowerBodyAnimation.size() >= 2)
     {
-        for (auto& it : _lowerBodyAnimation){
-            if (curTime > it.second._endTime)
-                ft_assert("time");
-        }
+        // for (auto& it : _lowerBodyAnimation){
+        //     if (curTime > it.second._endTime)
+        //         ft_assert("time");
+        // }
         animation = _lowerBodyAnimation[1].first;
-        curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation[1].second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::BACK);
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation[1].second._startTime);
+        updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
 
-        animationBlending(curMillisecond);
-    } else if (_lowerBodyBackAnimation.empty() == false) {
+        animationBlending(millisecondFromBegin);
+    }
+    if (_lowerBodyBackAnimation.empty() == false) 
+    {
         animation = _lowerBodyBackAnimation.front().first;
-        curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyBackAnimation.front().second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, curMillisecond.count()*120/1000, TransFormFix::BACK);
-
-        animationBlending(curMillisecond);
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyBackAnimation.front().second._startTime);
+        updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
+        millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_lowerBodyBackAnimation.front().second._endTime - curTime);
+        if (millisecondToEnd.count() <= OVERLAPTIME)
+            animationBlending(millisecondToEnd);
+        else
+            animationBlending(millisecondFromBegin);
     }
     //upper
     // if (_upperBodyAnimation.empty() == false)
     // {
     //     animation = _upperBodyAnimation.begin()->first;
-    //     curMillisecond = std::chrono::duration_cast<std::chrono::milliseconds>(_upperBodyAnimation.begin()->second - curTime);
+    //     millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(_upperBodyAnimation.begin()->second - curTime);
     //     updateTransForm(*animation->returnAnimationData(11/*lowerback*/), _transForm[0], (animation->_animationMillisecond - curMillisecond.count())*120/1000);
     // }
     //보간
@@ -241,14 +246,14 @@ void Simulator::pushAnimation(Animation* pushAnimation, std::deque<std::pair<Ani
     animationDeque.push_back({pushAnimation, node});
 }
 
-void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일단 돌려놓기
+void Simulator::changeAnimation(KeyInput key)
 {
     if (key == KeyInput::UP)
     {
         Animation* pushAnimation = findAnimation("walk");//find
         this->pushAnimation(pushAnimation, _lowerBodyAnimation);
     }
-    else if (key == KeyInput::BACK)
+    else if (key == KeyInput::LOWERBACK)
     {
         _worldRotation = glm::rotate(_worldRotation, PI, glm::vec3(0,1,0));//애니메이션 끝나고 돌려야함
     }
@@ -279,18 +284,15 @@ void Simulator::changeAnimation(KeyInput key)//rot도 보간을 해야하나 일
             this->pushAnimation(pushAnimation, _lowerBodyAnimation);
         }
     }
-    else if (key == KeyInput::ATTACK && _upperBodyAnimation.size() < 2)
+    else if (key == KeyInput::ATTACK)
     {
         Animation* pushAnimation = findAnimation("attck");//find
         this->pushAnimation(pushAnimation, _upperBodyAnimation);
     }
-    else if (key == KeyInput::JUMP && _lowerBodyAnimation.size() < 2)
+    else if (key == KeyInput::JUMP && _lowerBodyBackAnimation.empty() == true)
     {
-        Animation* pushAnimation = findAnimation("jump");//find
-        if (_lowerBodyAnimation.front().first->_name == "idle")
-            this->pushAnimation(pushAnimation, _lowerBodyAnimation);
-        else
-            this->pushAnimation(pushAnimation, _lowerBodyBackAnimation);
+        Animation* pushAnimation = findAnimation("runJump2");//find
+        this->pushAnimation(pushAnimation, _lowerBodyBackAnimation);
     }
 }
 
