@@ -43,6 +43,7 @@ bool AMCFileParser::loadAMCFile(void)
     {
         if ('0' <= buffer[0] && buffer[0] <= '9')
             _total++;
+            //첫벡터마지막 벡터로 방향 뽑기
     }
     ifs.close();
 
@@ -148,5 +149,19 @@ bool AMCFileParser::loadAMCFile(void)
     animationData2->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone4._b)});
 
     _animation->_animationMillisecond = std::roundf((float)(animationTime * 1000) / (120.0f * _animation->_animationSpeed));
+
+    //rot to xy
+
+    // glm::vec3 start = glm::normalize(_animation->_rootNode._localTrans.back().second * glm::vec4(0,0,0,1));
+    // glm::vec3 end = glm::normalize(start);
+    // end.y = 0;
+    // glm::mat4 rotXY = ft_rotate(start, end);
+    // for (auto it : boneIndexVector)
+    // {
+    //     for (uint32 i = 0; i < it->_localTrans.size(); ++i)
+    //     {
+    //         it->_localTrans[i].second *= rotXY;
+    //     }
+    // }
     return true;
 }
