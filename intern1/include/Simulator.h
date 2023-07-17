@@ -48,7 +48,7 @@ class Simulator : Noncopyable
         std::vector<glm::mat4> _transForm;
         std::vector<glm::mat4> _backTransForm;
         std::vector<glm::mat4> _upperTransForm;
-        
+
         //스켈레톤으로 옮겨야 하나
         glm::mat4              _worldTrans;
         glm::mat4              _worldRotation, _worldRotBuffer;
@@ -60,7 +60,7 @@ class Simulator : Noncopyable
         void eraseAnimation(std::chrono::steady_clock::time_point& curTime);
         void pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, TimeNode>>& animationDeque);
         void boneBufferMaping(void);     
-        void animationBlending(const std::chrono::milliseconds& time);
+        void animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans);
 
     public:
         Simulator(){}

@@ -23,6 +23,7 @@ void Simulator::initialize(void)
     _worldRotBuffer = glm::mat4(1.0f);
     _transForm.resize(size);
     _backTransForm.resize(size);
+    _upperTransForm.resize(size, glm::mat4(0.0f));
     Animation* pushAnimation = findAnimation("idle");//find
     TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
 
@@ -123,29 +124,21 @@ void Simulator::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
 
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
     if (fix == TransFormFix::LOWERFRONT)
-    {
         _transForm[node._boneIndex] = wolrdTrans;
-    }
     else if (fix == TransFormFix::LOWERBACK)
         _backTransForm[node._boneIndex] = wolrdTrans;
-
+    else if (fix == TransFormFix::UPPERFRONT)
+        _upperTransForm[node._boneIndex] = wolrdTrans;
     for (const AnimationData& child : node._childrens)
         updateTransForm(child, wolrdTrans, keyFrame, fix);
 }
 
 void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
 {
-    // if (curTime >= _upperBodyAnimation.begin()->second)
-    // {
-    //     _upperBodyAnimation.pop_front();
-    //     if (_upperBodyAnimation.empty())//일단 walk fixme
-    //     {
-    //         Animation* pushAnimation = findAnimation("walk");//find
-    //         _upperBodyAnimation.push_back({pushAnimation, getAfterTimePoint(pushAnimation->_animationMillisecond)});
-    //     }
-    // }
     if (_lowerBodyBackAnimation.empty() == false && curTime >= _lowerBodyBackAnimation.begin()->second._endTime)
         _lowerBodyBackAnimation.pop_front();
+    if (_upperBodyAnimation.empty() == false && curTime >= _upperBodyAnimation.begin()->second._endTime)
+        _upperBodyAnimation.pop_front();
 
     if (_lowerBodyAnimation.size() == 1 && 
             getAfterTimePoint(OVERLAPTIME) >= _lowerBodyAnimation.begin()->second._endTime)
@@ -158,20 +151,16 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
         _lowerBodyAnimation.pop_front();
 }
 
-void Simulator::animationBlending(const std::chrono::milliseconds& time)
+void Simulator::animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans)
 {
     float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
     if (interpolVal > 1)
-    {
         interpolVal = 1;
-        // for (auto& it : _lowerBodyAnimation){
-        //     std::cout << it;
-        // }
-        // return;
-    }
     for (uint8 i = 0; i < _transForm.size(); ++i)
     {
-        _transForm[i] = glm::mix(_transForm[i], _backTransForm[i], interpolVal);
+        if (mixTrans[i] == glm::mat4(0.0f))
+            continue;
+        _transForm[i] = glm::mix(_transForm[i], mixTrans[i], interpolVal);
     }
 }
 
@@ -200,7 +189,7 @@ void Simulator::update()
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation[1].second._startTime);
         updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
 
-        animationBlending(millisecondFromBegin);
+        animationBlending(millisecondFromBegin, _backTransForm);
     }
     if (_lowerBodyBackAnimation.empty() == false) 
     {
@@ -209,18 +198,21 @@ void Simulator::update()
         updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
         millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_lowerBodyBackAnimation.front().second._endTime - curTime);
         if (millisecondToEnd.count() <= OVERLAPTIME)
-            animationBlending(millisecondToEnd);
+            animationBlending(millisecondToEnd,_backTransForm);
         else
-            animationBlending(millisecondFromBegin);
+            animationBlending(millisecondFromBegin,_backTransForm);
     }
-    //upper
-    // if (_upperBodyAnimation.empty() == false)
-    // {
-    //     animation = _upperBodyAnimation.begin()->first;
-    //     millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(_upperBodyAnimation.begin()->second - curTime);
-    //     updateTransForm(*animation->returnAnimationData(11/*lowerback*/), _transForm[0], (animation->_animationMillisecond - curMillisecond.count())*120/1000);
-    // }
-    //보간
+    if (_upperBodyAnimation.empty() == false) 
+    {
+        animation = _upperBodyAnimation.front().first;
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _upperBodyAnimation.front().second._startTime);
+        updateTransForm(*animation->returnAnimationData(11/*lowerback*/), _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::UPPERFRONT);
+        millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_upperBodyAnimation.front().second._endTime - curTime);
+        if (millisecondToEnd.count() <= OVERLAPTIME)
+            animationBlending(millisecondToEnd, _upperTransForm);
+        else
+            animationBlending(millisecondFromBegin, _upperTransForm);
+    }
 
 }
 
@@ -284,9 +276,9 @@ void Simulator::changeAnimation(KeyInput key)
             this->pushAnimation(pushAnimation, _lowerBodyAnimation);
         }
     }
-    else if (key == KeyInput::ATTACK)
+    else if (key == KeyInput::ATTACK && _upperBodyAnimation.empty() == true)
     {
-        Animation* pushAnimation = findAnimation("attck");//find
+        Animation* pushAnimation = findAnimation("punch");//find
         this->pushAnimation(pushAnimation, _upperBodyAnimation);
     }
     else if (key == KeyInput::JUMP && _lowerBodyBackAnimation.empty() == true)
