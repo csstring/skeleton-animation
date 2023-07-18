@@ -3,6 +3,7 @@
 #include "include/GL/glew.h"
 #include "include/GLFW/glfw3.h"
 #include "include/Simulator.h"
+#include "include/Camera.h"
 
 void Window::initialize(void)
 {
@@ -34,7 +35,7 @@ void Window::initialize(void)
     _view = createViewMatrix();
 }
 
-void Window::processInput(Simulator& simulator)
+void Window::processInput(Simulator& simulator, Camera& camera)
 {
     static int currentWalkState,previousWalkState;
     static int currentBackState,previousBackState;
@@ -58,9 +59,9 @@ void Window::processInput(Simulator& simulator)
     
     //y축
     if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, -0.5f, -0.0f)); 
+        camera._cameraPos += cameraSpeed * camera._cameraFront;
     if (glfwGetKey(_window, GLFW_KEY_DOWN ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 0.5f, 0.0f));
+        camera._cameraPos -= cameraSpeed * camera._cameraFront;
     if (glfwGetKey(_window, GLFW_KEY_W ) == GLFW_PRESS)
         _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, -0.5f));
     if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)

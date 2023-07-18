@@ -13,6 +13,7 @@
 #include "include/Ground.h"
 #include "include/AnimationCompressor.h"
 #include "include/BodyFactory.h"
+#include "include/Camera.h"
 #include <chrono>
 #include <cmath>
 std::chrono::system_clock::time_point start;
@@ -45,10 +46,12 @@ void fileLoad(Simulator& simulator)
 int main() 
 {
     Window window;
+    Camera camera;
     Shader shader("/shaderSource/VertexShader.glsl","/shaderSource/FragmentShader.glsl");
     
     window.initialize();
     shader.initialize();
+    camera.initialize();
 
     Simulator simulator;
     BodyFactory bodyFactory;
@@ -64,14 +67,14 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         shader.use();
+        window.processInput(simulator, camera);
         glm::mat4 projection = glm::perspective(glm::radians(70.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, -0.01f, 5.0f);
+        camera.update();
         shader.setMat4("projection", projection);
-        shader.setMat4("view", window._view);
-        
-        window.processInput(simulator);
+        shader.setMat4("view", camera._view);
         simulator.update();
         simulator.draw();
-        //ground.draw();
+        ground.draw();
         window.bufferSwap();
         glfwPollEvents();
     }

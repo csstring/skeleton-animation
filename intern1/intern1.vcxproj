@@ -145,6 +145,7 @@
     <ClCompile Include="AnimationCompressor.cpp" />
     <ClCompile Include="AnimationDataResize.cpp" />
     <ClCompile Include="BodyFactory.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="include\BodyFactory.h" />
     <ClInclude Include="include\BodyInterface.h" />
     <ClInclude Include="include\Bone.h" />
+    <ClInclude Include="include\Camera.h" />
     <ClInclude Include="include\Character.h" />
     <ClInclude Include="include\CmuFileParser.h" />
     <ClInclude Include="include\Common.h" />
