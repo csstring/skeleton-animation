@@ -19,11 +19,14 @@ class AMCFileParser : Noncopyable
         bool    loadAMCFile();
     private:
         void    boneDataindexing(std::vector<AnimationData*>& indexVector);
+        void    dumyBoneInitialize(void);
+        void    saveTotalFrame(void);
 
     private:
         const std::string _filePath;
         Skeleton*         _skeleton;
         Animation*        _animation;
         uint32            _total;
-
+        glm::mat4         _rotToXY;
+        float             _tane;
 };

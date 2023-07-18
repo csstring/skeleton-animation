@@ -31,27 +31,52 @@ void AMCFileParser::boneDataindexing(std::vector<AnimationData*>& indexVector)
     ifs.close();
 }
 
-//캐싱, resize
-bool AMCFileParser::loadAMCFile(void)
+void AMCFileParser::dumyBoneInitialize(void)
 {
-    std::ifstream ifs(_filePath);
+    uint32 bone1 = _skeleton->findBoneIndex("lhipjoint");
+    uint32 bone2 = _skeleton->findBoneIndex("rhipjoint");
+    Bone bone3 = _skeleton->getBoneVector()[bone1];
+    Bone bone4 = _skeleton->getBoneVector()[bone2];
+
+    AnimationData* animationData1 = _animation->returnAnimationData(bone1);
+    AnimationData* animationData2 = _animation->returnAnimationData(bone2);
+    std::vector<uint32> frameList = {0, 1, _total-2, _total-1};
+    for (uint32 i =0; i < _total; ++i)
+    {
+        animationData1->_localRotation.push_back({i, glm::mat4(1.0f)});
+        animationData2->_localRotation.push_back({i, glm::mat4(1.0f)});
+        animationData1->_localTrans.push_back({i, glm::translate(glm::mat4(1.0f), bone3._b)});
+        animationData2->_localTrans.push_back({i, glm::translate(glm::mat4(1.0f), bone4._b)});
+    }
+}
+
+void AMCFileParser::saveTotalFrame(void)
+{
     std::string buffer;
+    std::ifstream ifs(_filePath);
 
     if (ifs.is_open() == false)
-        return false;
+        ft_assert("file open fail");
     while (std::getline(ifs,buffer))
     {
         if ('0' <= buffer[0] && buffer[0] <= '9')
             _total++;
-            //첫벡터마지막 벡터로 방향 뽑기
     }
     ifs.close();
+}
 
+bool AMCFileParser::loadAMCFile(void)
+{
+    std::ifstream ifs;
+    std::string buffer;
+    static float bugtem = 0;
+    saveTotalFrame();
     std::vector<AnimationData*> boneIndexVector;
     boneDataindexing(boneIndexVector);
 
     AnimationDataResize dataResizer(_total);
     _animation->AnimationDataTraver(dataResizer);
+    dumyBoneInitialize();
 
     ifs.open(_filePath);
     while (std::getline(ifs,buffer))
@@ -62,26 +87,13 @@ bool AMCFileParser::loadAMCFile(void)
 
     uint32 animationTime = 0;
     uint32 moveBoneIndex = 0;
-    glm::vec3 firstTrans;
+    glm::vec3 firstTrans, beforeTrans;
     glm::mat4 firstRot;
     while (ifs >> buffer)
     {
         
         if (moveBoneIndex == boneIndexVector.size())
         {
-            ///fix me
-            uint32 bone1 = _skeleton->findBoneIndex("lhipjoint");
-            uint32 bone2 = _skeleton->findBoneIndex("rhipjoint");
-            Bone bone3 = _skeleton->getBoneVector()[bone1];
-            Bone bone4 = _skeleton->getBoneVector()[bone2];
-
-            AnimationData* animationData1 = _animation->returnAnimationData(bone1);
-            AnimationData* animationData2 = _animation->returnAnimationData(bone2);
-            animationData1->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
-            animationData2->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
-            animationData1->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone3._b)});
-            animationData2->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone4._b)});
-            
             moveBoneIndex = 0;
             animationTime = std::stoi(buffer)-1;//fix me 120frame, 60 frame
             continue;
@@ -103,12 +115,12 @@ bool AMCFileParser::loadAMCFile(void)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)) * matrix; 
             else if (dof == DOF::RZ)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * matrix; 
-            else if (dof == DOF::TX)
-                localTransV.x += val;
-            else if (dof == DOF::TY)
-                localTransV.y += val;
-            else if (dof == DOF::TZ)
-                localTransV.z += val;
+            // else if (dof == DOF::TX)
+            //     localTransV.x += val;
+            // else if (dof == DOF::TY)
+            //     localTransV.y += val;
+            // else if (dof == DOF::TZ)
+            //     localTransV.z += val;
         }
         if (moveBoneIndex == 0 && animationTime ==0)
         {
@@ -128,40 +140,14 @@ bool AMCFileParser::loadAMCFile(void)
             }
         }
         glm::quat localRot = bone._c * glm::quat_cast(matrix) * bone._invC;
-        animationData->_localRotation.push_back({animationTime, localRot });
+        animationData->_localRotation.push_back({animationTime, localRot});
 
         glm::vec3 transV = glm::toMat3(localRot) * bone._b + localTransV;
         animationData->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), transV)});
-        //temp
+
         moveBoneIndex++;
     }
-    //fixme
-    uint32 bone1 = _skeleton->findBoneIndex("lhipjoint");
-    uint32 bone2 = _skeleton->findBoneIndex("rhipjoint");
-    Bone bone3 = _skeleton->getBoneVector()[bone1];
-    Bone bone4 = _skeleton->getBoneVector()[bone2];
-
-    AnimationData* animationData1 = _animation->returnAnimationData(bone1);
-    AnimationData* animationData2 = _animation->returnAnimationData(bone2);
-    animationData1->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
-    animationData2->_localRotation.push_back({animationTime, glm::mat4(1.0f)});
-    animationData1->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone3._b)});
-    animationData2->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), bone4._b)});
-
     _animation->_animationMillisecond = std::roundf((float)(animationTime * 1000) / (120.0f * _animation->_animationSpeed));
 
-    //rot to xy
-
-    // glm::vec3 start = glm::normalize(_animation->_rootNode._localTrans.back().second * glm::vec4(0,0,0,1));
-    // glm::vec3 end = glm::normalize(start);
-    // end.y = 0;
-    // glm::mat4 rotXY = ft_rotate(start, end);
-    // for (auto it : boneIndexVector)
-    // {
-    //     for (uint32 i = 0; i < it->_localTrans.size(); ++i)
-    //     {
-    //         it->_localTrans[i].second *= rotXY;
-    //     }
-    // }
     return true;
 }

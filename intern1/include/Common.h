@@ -5,7 +5,7 @@
 #include <vector>
 #include <chrono>
 #include "include/GLM/glm.hpp"
-
+#include "include/GLM/gtx/string_cast.hpp"
 typedef signed char         int8;
 typedef signed short        int16;
 typedef signed int          int32;
@@ -37,7 +37,7 @@ void ft_assert(const std::string& exec);
 
 //utility
 std::vector<std::string> ft_split(const std::string& str);
-glm::mat4 ft_rotate(const glm::vec3 start, const glm::vec3 end);
+glm::mat4 ft_rotate(glm::vec3 start, glm::vec3 end);
 
 inline std::chrono::steady_clock::time_point getCurTimePoint(void)
 {

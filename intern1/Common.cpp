@@ -20,11 +20,12 @@ std::vector<std::string> ft_split(const std::string& str)
     return v;
 }
 
-glm::mat4 ft_rotate(const glm::vec3 start, const glm::vec3 end)
-{
+glm::mat4 ft_rotate(glm::vec3 start, glm::vec3 end)
+{ 
+    start = glm::normalize(start);
+    end = glm::normalize(end);
     glm::vec3 axis = glm::cross(start, end);
     glm::vec3 axisNormal = glm::normalize(axis);
     float angle = glm::acos(glm::dot(start, end));
-
     return glm::rotate(angle, axisNormal);
 }

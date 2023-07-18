@@ -20,7 +20,6 @@ void Simulator::initialize(void)
 
     _worldTrans = glm::mat4(1.0f);
     _worldRotation = glm::mat4(1.0f);
-    _worldRotBuffer = glm::mat4(1.0f);
     _transForm.resize(size);
     _backTransForm.resize(size);
     _upperTransForm.resize(size, glm::mat4(0.0f));
@@ -69,7 +68,7 @@ void Simulator::draw(void)
         for(Bone& bone : boneVector)
         {
             glBindVertexArray(VAO[bone._boneIndex]);
-            glm::mat4 toParentDir = _worldTrans * _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
+            glm::mat4 toParentDir = _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
             Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
             cylinder.initialize(color, VBC[bone._boneIndex]);
             cylinder.render(VBO[bone._boneIndex]);
@@ -79,7 +78,7 @@ void Simulator::draw(void)
             glBindVertexArray(0);
         }
         glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
-        _worldTrans = glm::translate(_worldTrans, (glm::vec3)end1);
+        _worldTrans = glm::translate(glm::mat4(1.0f), (glm::vec3)end1);
     }
 }
 
@@ -148,7 +147,9 @@ void Simulator::eraseAnimation(std::chrono::steady_clock::time_point& curTime)
         _lowerBodyAnimation.push_back({pushAnimation, node});
     }
     if (curTime >= _lowerBodyAnimation.begin()->second._endTime)
+    {
         _lowerBodyAnimation.pop_front();
+    }
 }
 
 void Simulator::animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans)
@@ -177,17 +178,13 @@ void Simulator::update()
     {
         animation = _lowerBodyAnimation.begin()->first;
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation.begin()->second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERFRONT);
+        updateTransForm(animation->_rootNode, _worldTrans*_worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERFRONT);
     }
     if (_lowerBodyAnimation.size() >= 2)
     {
-        // for (auto& it : _lowerBodyAnimation){
-        //     if (curTime > it.second._endTime)
-        //         ft_assert("time");
-        // }
         animation = _lowerBodyAnimation[1].first;
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation[1].second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
+        updateTransForm(animation->_rootNode, _worldTrans*_worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
 
         animationBlending(millisecondFromBegin, _backTransForm);
     }
@@ -195,7 +192,7 @@ void Simulator::update()
     {
         animation = _lowerBodyBackAnimation.front().first;
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyBackAnimation.front().second._startTime);
-        updateTransForm(animation->_rootNode, _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
+        updateTransForm(animation->_rootNode, _worldTrans*_worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
         millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_lowerBodyBackAnimation.front().second._endTime - curTime);
         if (millisecondToEnd.count() <= OVERLAPTIME)
             animationBlending(millisecondToEnd,_backTransForm);
@@ -206,7 +203,7 @@ void Simulator::update()
     {
         animation = _upperBodyAnimation.front().first;
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _upperBodyAnimation.front().second._startTime);
-        updateTransForm(*animation->returnAnimationData(11/*lowerback*/), _worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::UPPERFRONT);
+        updateTransForm(*animation->returnAnimationData(11/*lowerback*/), _worldTrans*_worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::UPPERFRONT);
         millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_upperBodyAnimation.front().second._endTime - curTime);
         if (millisecondToEnd.count() <= OVERLAPTIME)
             animationBlending(millisecondToEnd, _upperTransForm);
@@ -252,10 +249,12 @@ void Simulator::changeAnimation(KeyInput key)
     else if (key == KeyInput::REFT)
     {
         _worldRotation = glm::rotate(_worldRotation, PI/(2*30), glm::vec3(0,1,0));
+        std::cout << glm::to_string(_worldRotation) << std::endl;
     }
     else if (key == KeyInput::RIGHT)
     {
         _worldRotation = glm::rotate(_worldRotation, -PI/(2*30), glm::vec3(0,1,0));
+        std::cout << glm::to_string(_worldRotation) << std::endl;
     }
     else if (key == KeyInput::STOP)
     {

@@ -34,7 +34,7 @@ void Animation::AnimationDataTraver(AnimationTreeTraversal& travel)
         AnimationData* curData = dataQueue.front();
         dataQueue.pop();
 
-        travel.processNode(*curData);//fixme
+        travel.processNode(*curData);
         for (int i =0; i < curData->_childrens.size(); ++i)
             dataQueue.push(&curData->_childrens[i]);
     }

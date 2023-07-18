@@ -51,7 +51,7 @@ class Simulator : Noncopyable
 
         //스켈레톤으로 옮겨야 하나
         glm::mat4              _worldTrans;
-        glm::mat4              _worldRotation, _worldRotBuffer;
+        glm::mat4              _worldRotation;
 
     private :
         void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime, TransFormFix fix);
