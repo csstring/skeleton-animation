@@ -144,6 +144,8 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AnimationCompressor.cpp" />
     <ClCompile Include="AnimationDataResize.cpp" />
+    <ClCompile Include="BodyFactory.cpp" />
+    <ClCompile Include="Character.cpp" />
     <ClCompile Include="CmuFileParser.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="Cylinder.cpp" />
@@ -162,7 +164,10 @@
     <ClInclude Include="include\AnimationCompressor.h" />
     <ClInclude Include="include\AnimationDataResize.h" />
     <ClInclude Include="include\AnimationTreeTraversal.h" />
+    <ClInclude Include="include\BodyFactory.h" />
+    <ClInclude Include="include\BodyInterface.h" />
     <ClInclude Include="include\Bone.h" />
+    <ClInclude Include="include\Character.h" />
     <ClInclude Include="include\CmuFileParser.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Cylinder.h" />
@@ -172,6 +177,7 @@
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\Simulator.h" />
     <ClInclude Include="include\Skeleton.h" />
+    <ClInclude Include="include\TimeNode.h" />
     <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

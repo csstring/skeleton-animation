@@ -12,6 +12,7 @@
 #include "include/AMCFileParser.h"
 #include "include/Ground.h"
 #include "include/AnimationCompressor.h"
+#include "include/BodyFactory.h"
 #include <chrono>
 #include <cmath>
 std::chrono::system_clock::time_point start;
@@ -50,7 +51,9 @@ int main()
     shader.initialize();
 
     Simulator simulator;
+    BodyFactory bodyFactory;
     fileLoad(simulator);
+    simulator.setPlayer(bodyFactory.makeCharacter(simulator._skeleton));
     simulator.initialize();
     //비슷한 지점 찾기
     //simulator._animations[4].findSameFrame(10);
@@ -66,6 +69,7 @@ int main()
         shader.setMat4("view", window._view);
         
         window.processInput(simulator);
+        simulator.update();
         simulator.draw();
         //ground.draw();
         window.bufferSwap();
