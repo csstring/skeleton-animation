@@ -7,10 +7,10 @@ void Cylinder::initialize(glm::vec3 color, uint32 VBC, BONEID ID)
     const float angleStep = 2.0f * PI / static_cast<float>(_numSlices);
     float curAngle = 0.0f;
     std::vector<glm::vec3> cylinderPos;
-    if (ID == BONEID::HEAD)
-    {
-        _transForm = glm::rotate(_transForm, glm::radians(45.0f), glm::vec3(0,0,1));
-    }
+    // if (ID == BONEID::HEAD)
+    // {
+    //     _transForm = glm::rotate(_transForm, glm::radians(45.0f), glm::vec3(0,0,1));
+    // }
     cylinderPos.reserve(_numSlices);
     for (uint32 i = 0; i <= _numSlices; ++i)
     {
@@ -28,24 +28,24 @@ void Cylinder::initialize(glm::vec3 color, uint32 VBC, BONEID ID)
         glm::vec4 vertexTop(pos.x, pos.y , -_heigth ,1);
         glm::vec4 vertexBottom(pos.x, pos.y, 0, 1);
 
-        _vertices.push_back(_transForm * vertexTop);
-        _vertices.push_back(_transForm * vertexBottom);
+        _vertices.push_back(_transForm * vertexTop + _pos);
+        _vertices.push_back(_transForm * vertexBottom + _pos);
     }
 
     glm::vec4 topCenter(0, 0, -_heigth, 1);
-    _vertices.push_back(_transForm * topCenter);
+    _vertices.push_back(_transForm * topCenter + _pos);
     for (const glm::vec3& pos :cylinderPos)
     {
         glm::vec4 vertexTop(pos.x, pos.y , -_heigth ,1);
-        _vertices.push_back(_transForm * vertexTop);
+        _vertices.push_back(_transForm * vertexTop + _pos);
     }
 
     glm::vec4 bottomCenter(0, 0, 0, 1);
-    _vertices.push_back(_transForm * bottomCenter);
+    _vertices.push_back(_transForm * bottomCenter + _pos);
     for (const glm::vec3& pos :cylinderPos)
     {
         glm::vec4 vertexBottom(pos.x, pos.y, 0, 1);
-        _vertices.push_back(_transForm * vertexBottom);
+        _vertices.push_back(_transForm * vertexBottom + _pos);
     }
 
     std::vector<glm::vec3> colors;

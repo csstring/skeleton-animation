@@ -14,9 +14,10 @@ class Character : Body
 {   
     private:
         std::vector<uint32>    VAO, VBO, VBC;
-        std::vector<glm::mat4> _transForm;
-        std::vector<glm::mat4> _backTransForm;
-        std::vector<glm::mat4> _upperTransForm;
+        std::vector<glm::vec4> _transForm;
+        std::vector<glm::mat4> _finalRot;
+        std::vector<glm::vec4> _backTransForm;
+        std::vector<glm::vec4> _upperTransForm;
 
         glm::mat4              _worldTrans;
         glm::mat4              _worldRotation;
@@ -32,7 +33,7 @@ class Character : Body
         void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime, TransFormFix fix);
         void eraseAnimation(const std::chrono::steady_clock::time_point& curTime);
         void boneBufferMaping(void);     
-        void animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans);
+        void animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::vec4>& mixTrans);
     
     public:
         Character(const Skeleton& skeleton) : _skeleton(skeleton){};

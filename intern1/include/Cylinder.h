@@ -10,14 +10,15 @@ class Cylinder
         float     _heigth;
         uint32    _numSlices;
         glm::mat4 _transForm;
+        glm::vec4 _pos;
         uint32 _numVerticesSide;
         uint32 _numVerticesTopBottom;
         uint32 _numVerticesTotal;
         std::vector<glm::vec4> _vertices;
     public:
         Cylinder(
-            float radius, float height, uint32 numSilices, glm::mat4 transForm
-        ) :_radius(radius), _heigth(height), _numSlices(numSilices), _transForm(transForm)
+            float radius, float height, uint32 numSilices, glm::mat4 transForm, glm::vec4 pos
+        ) :_radius(radius), _heigth(height), _numSlices(numSilices), _transForm(transForm), _pos(pos)
         {
             _numVerticesSide = (_numSlices + 1) * 2;
             _numVerticesTopBottom = _numSlices + 2;

@@ -28,8 +28,9 @@ void Character::initialize(void)
     _worldTrans = glm::mat4(1.0f);
     _worldRotation = glm::mat4(1.0f);
     _transForm.resize(size);
+    _finalRot.resize(size);
     _backTransForm.resize(size);
-    _upperTransForm.resize(size, glm::mat4(0.0f));
+    _upperTransForm.resize(size, glm::vec4(0.0f));
     boneBufferMaping();
 }
 
@@ -85,11 +86,14 @@ void Character::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
 
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
     if (fix == TransFormFix::LOWERFRONT)
-        _transForm[node._boneIndex] = wolrdTrans;
+    {
+        _transForm[node._boneIndex] = wolrdTrans * glm::vec4(0,0,0,1);
+        _finalRot[node._boneIndex] = (glm::mat3)wolrdTrans;
+    }
     else if (fix == TransFormFix::LOWERBACK)
-        _backTransForm[node._boneIndex] = wolrdTrans;
+        _backTransForm[node._boneIndex] = wolrdTrans * glm::vec4(0,0,0,1);
     else if (fix == TransFormFix::UPPERFRONT)
-        _upperTransForm[node._boneIndex] = wolrdTrans;
+        _upperTransForm[node._boneIndex] = wolrdTrans * glm::vec4(0,0,0,1);
     for (const AnimationData& child : node._childrens)
         updateTransForm(child, wolrdTrans, keyFrame, fix);
 }
@@ -114,14 +118,14 @@ void Character::eraseAnimation(const std::chrono::steady_clock::time_point& curT
     }
 }
 
-void Character::animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans)
+void Character::animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::vec4>& mixTrans)
 {
     float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
     if (interpolVal > 1)
         interpolVal = 1;
     for (uint8 i = 0; i < _transForm.size(); ++i)
     {
-        if (mixTrans[i] == glm::mat4(0.0f))
+        if (mixTrans[i] == glm::vec4(0.0f))
             continue;
         _transForm[i] = glm::mix(_transForm[i], mixTrans[i], interpolVal);
     }
@@ -182,8 +186,9 @@ void Character::draw(void)
     for(const Bone& bone : boneVector)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
-        glm::mat4 toParentDir = _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
-        Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
+        glm::vec3 dir = _transForm[bone._parentIndex] - _transForm[bone._boneIndex];
+        glm::mat4 boneDir = _finalRot[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
+        Cylinder cylinder(0.2, 0.8 *_skeleton.getGBL() * bone._length ,16, boneDir, _transForm[bone._boneIndex]);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
         // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
@@ -192,6 +197,5 @@ void Character::draw(void)
         glBindVertexArray(0);
     }
     //아래쪽 업데이트 인거 같은데
-    glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
-    _worldTrans = glm::translate(glm::mat4(1.0f), (glm::vec3)end1);
+    _worldTrans = glm::translate(glm::mat4(1.0f), (glm::vec3)_transForm[0]);
 }

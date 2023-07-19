@@ -16,6 +16,7 @@ enum class DOF{
 struct Bone
 {
     uint32           _boneIndex;
+    int32            _parentIndex;
     std::string      _boneName;
     float            _length;
     glm::vec3        _direction;
