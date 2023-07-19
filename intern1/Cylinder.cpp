@@ -1,13 +1,16 @@
 #include "include/Cylinder.h"
 #include "include/GL/glew.h"
 #include <cmath>
-
-void Cylinder::initialize(glm::vec3 color, uint32 VBC)
+//45 135
+void Cylinder::initialize(glm::vec3 color, uint32 VBC, BONEID ID)
 {
     const float angleStep = 2.0f * PI / static_cast<float>(_numSlices);
     float curAngle = 0.0f;
     std::vector<glm::vec3> cylinderPos;
-
+    if (ID == BONEID::HEAD)
+    {
+        _transForm = glm::rotate(_transForm, glm::radians(45.0f), glm::vec3(0,0,1));
+    }
     cylinderPos.reserve(_numSlices);
     for (uint32 i = 0; i <= _numSlices; ++i)
     {
@@ -47,7 +50,16 @@ void Cylinder::initialize(glm::vec3 color, uint32 VBC)
 
     std::vector<glm::vec3> colors;
     colors.resize(_vertices.size(), color);
+    if (ID == BONEID::HEAD)
+    {
+        uint32 rightEyePoint = _numVerticesSide*7/8;
+        uint32 leftEyePoint = _numVerticesSide*5/8;
 
+        colors[rightEyePoint] = glm::vec3(1,0,0);
+        colors[rightEyePoint-1] = glm::vec3(1,0,0);
+        colors[leftEyePoint] = glm::vec3(1,0,0);
+        colors[leftEyePoint-1] = glm::vec3(1,0,0);
+    }
     glBindBuffer(GL_ARRAY_BUFFER, VBC);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * colors.size(), colors.data(), GL_STATIC_DRAW);
 }

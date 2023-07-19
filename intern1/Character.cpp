@@ -184,7 +184,7 @@ void Character::draw(void)
         glBindVertexArray(VAO[bone._boneIndex]);
         glm::mat4 toParentDir = _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
         Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
-        cylinder.initialize(color, VBC[bone._boneIndex]);
+        cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
         // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
         // line.initialize(color, VBC[bone._boneIndex]);
