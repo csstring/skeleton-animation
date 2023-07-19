@@ -34,7 +34,8 @@ class Simulator : Noncopyable
         Simulator() : _player(nullptr){}
         ~Simulator()
         {
-            delete _player;
+            if (_player != nullptr)
+                delete _player;
         }
         void initialize(void);
         void changeAnimation(KeyInput key);
