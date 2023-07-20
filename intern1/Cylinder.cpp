@@ -52,8 +52,8 @@ void Cylinder::initialize(glm::vec3 color, uint32 VBC, BONEID ID)
     colors.resize(_vertices.size(), color);
     if (ID == BONEID::HEAD)
     {
-        uint32 rightEyePoint = _numVerticesSide*7/8;
-        uint32 leftEyePoint = _numVerticesSide*5/8;
+        uint32 rightEyePoint = _numVerticesSide*12/16;
+        uint32 leftEyePoint = _numVerticesSide*8/16;
 
         colors[rightEyePoint] = glm::vec3(1,0,0);
         colors[rightEyePoint-1] = glm::vec3(1,0,0);

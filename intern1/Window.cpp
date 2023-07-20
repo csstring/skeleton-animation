@@ -101,6 +101,19 @@ void Window::processInput(Simulator& simulator, Camera& camera)
     } else if (currentRunState == GLFW_RELEASE && previousRunState == GLFW_PRESS) {
         previousRunState = currentRunState;
     }
+
+    if (glfwGetKey(_window, GLFW_KEY_U) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEFRONT);
+    if (glfwGetKey(_window, GLFW_KEY_J) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEBACK);
+    if (glfwGetKey(_window, GLFW_KEY_H) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBERIGHT);
+    if (glfwGetKey(_window, GLFW_KEY_K) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBELEFT);
+    if (glfwGetKey(_window, GLFW_KEY_Y) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEUP);
+    if (glfwGetKey(_window, GLFW_KEY_I) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEDOWN);
 }
 
 void Window::clearColorSetUp(float r, float g, float b, float a)

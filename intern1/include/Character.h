@@ -1,6 +1,7 @@
 #include "BodyInterface.h"
-#include "include/TimeNode.h"
+#include "TimeNode.h"
 #include <deque>
+#include "EyeIK.h"
 struct AnimationData;
 class Animation;
 class Skeleton;
@@ -10,7 +11,7 @@ enum class TransFormFix
     LOWERBACK,
     UPPERFRONT
 };
-class Character : Body
+class Character
 {   
     private:
         std::vector<uint32>    VAO, VBO, VBC;
@@ -27,7 +28,8 @@ class Character : Body
         std::deque<std::pair<Animation*, TimeNode>> _upperBodyAnimation;//endtime
         std::deque<std::pair<Animation*, TimeNode>> _lowerBodyAnimation;
         std::deque<std::pair<Animation*, TimeNode>> _lowerBodyBackAnimation;
-    
+        EyeIK _eyeIK;
+
     private :
         void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime, TransFormFix fix);
         void eraseAnimation(const std::chrono::steady_clock::time_point& curTime);
@@ -38,7 +40,7 @@ class Character : Body
         Character(const Skeleton& skeleton) : _skeleton(skeleton){};
         ~Character(){};
         void initialize(void);
-        void update(const std::chrono::steady_clock::time_point& curTime) override;
-        void draw(void) override;
+        void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget);
+        void draw(void);
         void rotationY(float radian);
 };

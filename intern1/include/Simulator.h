@@ -5,9 +5,11 @@
 #include <deque>
 #include <iostream>
 #include "Animation.h"
+#include "Cube.h"
 struct AnimationData;
 class TimeNode;
 class Character;
+class Cube;
 
 enum class KeyInput
 {
@@ -18,7 +20,13 @@ enum class KeyInput
     RUN,
     ATTACK,
     JUMP,
-    STOP
+    STOP,
+    CUBEFRONT,
+    CUBEBACK,
+    CUBERIGHT,
+    CUBELEFT,
+    CUBEUP,
+    CUBEDOWN
 };
 
 class Simulator : Noncopyable
@@ -46,6 +54,7 @@ class Simulator : Noncopyable
     public : 
         Skeleton               _skeleton;
         std::vector<Animation> _animations;
+        Cube                   _cube;
 };
 
 std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref);

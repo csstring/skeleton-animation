@@ -31,6 +31,8 @@ void Character::initialize(void)
     _backTransForm.resize(size);
     _upperTransForm.resize(size, glm::mat4(0.0f));
     boneBufferMaping();
+
+    _eyeIK.initialize(_skeleton.getBoneVector());
 }
 
 void Character::boneBufferMaping(void)
@@ -127,7 +129,7 @@ void Character::animationBlending(const std::chrono::milliseconds& time, const s
     }
 }
 
-void Character::update(const std::chrono::steady_clock::time_point& curTime)
+void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget)
 {
     eraseAnimation(curTime);
     
@@ -171,6 +173,14 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime)
         else
             animationBlending(millisecondFromBegin, _upperTransForm);
     }
+
+    _eyeIK.setTargetPosition(eyeTarget);
+    if (_eyeIK.targetPositionCheck(_transForm))
+    {
+        const std::vector<glm::mat4>& IKTrans = _eyeIK.solveEyeIK(_transForm);
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK._start);
+        animationBlending(millisecondFromBegin ,IKTrans);
+    }
 }
 
 //up -> draw
@@ -183,7 +193,7 @@ void Character::draw(void)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
         glm::mat4 toParentDir = _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), bone._direction);// * glm::inverse(test3); 
-        Cylinder cylinder(0.2, 0.7 *_skeleton.getGBL() * bone._length ,16, toParentDir);
+        Cylinder cylinder(0.2, 0.8 *_skeleton.getGBL() * bone._length ,16, toParentDir);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
         // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);

@@ -238,6 +238,7 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
         if (boneIndex == 0)
         {
             Bone& bone = _skeleton->getBoneVector()[animationData->_boneIndex];
+            bone._parentBoneIndex = 0;
             glm::vec3 axis = bone._axis;
             
             glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));
@@ -257,6 +258,7 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
             animationData->_childrens[i]._boneIndex = _skeleton->findBoneIndex(v[i]);
 
             Bone& bone = _skeleton->getBoneVector()[animationData->_childrens[i]._boneIndex];
+            bone._parentBoneIndex = boneIndex;
             glm::vec3 axis = bone._axis;
 //mat4 fixme
             glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));

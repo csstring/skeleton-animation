@@ -2,6 +2,7 @@
 #include "include/Animation.h"
 #include "include/TimeNode.h"
 #include "include/Character.h"
+#include "include/Cube.h"
 
 const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
 void Simulator::setPlayer(Character* player)
@@ -14,7 +15,8 @@ void Simulator::setPlayer(Character* player)
 void Simulator::initialize(void)
 {
     _player->initialize();
-
+    _cube.cubeSizeChange(0.1);
+    _cube.initialize();
     Animation* pushAnimation = findAnimation("idle");//find
     TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
     _player->_lowerBodyAnimation.push_back({pushAnimation, node});
@@ -23,12 +25,14 @@ void Simulator::initialize(void)
 void Simulator::draw(void)
 {
     _player->draw();
+    _cube.draw();
 }
 
 void Simulator::update()
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
-    _player->update(curTime);
+    _cube.update();
+    _player->update(curTime, _cube._pos * _cube._vertex[0]);
 }
 
 Animation* Simulator::findAnimation(const std::string& name)
@@ -101,6 +105,18 @@ void Simulator::changeAnimation(KeyInput key)
         Animation* pushAnimation = findAnimation("runJump2");//find
         this->pushAnimation(pushAnimation, _player->_lowerBodyBackAnimation);
     }
+    else if (key == KeyInput::CUBEBACK)
+        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0,0.1));
+    else if (key == KeyInput::CUBEFRONT)
+        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0,-0.1));
+    else if (key == KeyInput::CUBERIGHT)
+        _cube._pos = glm::translate(_cube._pos, glm::vec3(0.1,0,0));
+    else if (key == KeyInput::CUBELEFT)
+        _cube._pos = glm::translate(_cube._pos, glm::vec3(-0.1,0,0));
+    else if (key == KeyInput::CUBEUP)
+        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0.1,0));
+    else if (key == KeyInput::CUBEDOWN)
+        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,-0.1,0));
 }
 
 std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref)

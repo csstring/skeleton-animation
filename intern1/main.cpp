@@ -14,6 +14,7 @@
 #include "include/AnimationCompressor.h"
 #include "include/BodyFactory.h"
 #include "include/Camera.h"
+#include "include/Cube.h"
 #include <chrono>
 #include <cmath>
 std::chrono::system_clock::time_point start;
