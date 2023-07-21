@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include "include/GLM/ext.hpp"
+#include <tuple>
 
 enum class DOF{
     RX,
@@ -20,7 +21,7 @@ struct Bone
     std::string      _boneName;
     float            _length;
     glm::vec3        _direction;
-    
+    std::vector<std::tuple<DOF, float,float>> _limits;
     //fixme : 아래쪽 데이터 필요없어서 정리 해야함
     glm::vec3        _postion;
     glm::vec3        _axis;

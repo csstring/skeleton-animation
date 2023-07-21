@@ -192,7 +192,6 @@ bool CmuFileParser::parseAsfBoneData(std::ifstream& ifs)
 bool CmuFileParser::parserAsfDof(std::ifstream& ifs, Bone& bone)
 {
     std::string buffer;
-    int dofCount = 0;
 
     while (ifs >> buffer)
     {
@@ -204,10 +203,15 @@ bool CmuFileParser::parserAsfDof(std::ifstream& ifs, Bone& bone)
         else if (buffer == "tx") bone._dof.push_back(DOF::TX);
         else if (buffer == "ty") bone._dof.push_back(DOF::TY);
         else if (buffer == "tz") bone._dof.push_back(DOF::TZ);
-        dofCount++;
     }
-    while (dofCount--)//thorw limits
+    for (DOF dof : bone._dof)
+    {
+        std::getline(ifs, buffer, '(');
+        float min, max;
+        ifs >> min, ifs >> max;
+        bone._limits.push_back({dof, min, max});
         std::getline(ifs, buffer);
+    }
     
     return true;
 }

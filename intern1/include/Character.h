@@ -28,7 +28,7 @@ class Character
         std::deque<std::pair<Animation*, TimeNode>> _upperBodyAnimation;//endtime
         std::deque<std::pair<Animation*, TimeNode>> _lowerBodyAnimation;
         std::deque<std::pair<Animation*, TimeNode>> _lowerBodyBackAnimation;
-        EyeIK _eyeIK;
+        EyeIK* _eyeIK;
 
     private :
         void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime, TransFormFix fix);
@@ -38,7 +38,10 @@ class Character
     
     public:
         Character(const Skeleton& skeleton) : _skeleton(skeleton){};
-        ~Character(){};
+        ~Character()
+        {
+            delete _eyeIK;
+        };
         void initialize(void);
         void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget);
         void draw(void);
