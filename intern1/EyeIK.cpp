@@ -84,9 +84,10 @@ const std::vector<glm::mat4>& EyeIK::solveEyeIK(const std::vector<glm::mat4>& ch
     //init head target
     for (uint32 i = _bonedirection.size()-1; i < _bonedirection.size(); ++i)
     {
+        glm::vec3 targetDir = _targetPosition - IKpos[i];
         glm::vec3 headTopPos = IKrot[i] * glm::vec4(_bonedirection[i],1);
         glm::vec3 curSee = IKrot[i] * glm::vec4(glm::cross(glm::vec3(1,0,0), _bonedirection[i]),1);
-        glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(_targetPosition));
+        glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(targetDir));
         glm::vec3 headMove = afterSee * headTopPos;
         float dis = glm::length(IKpos[i] - IKpos[i-1]);
 
