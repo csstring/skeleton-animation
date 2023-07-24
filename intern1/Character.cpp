@@ -27,8 +27,8 @@ void Character::initialize(void)
 
     _worldTrans = glm::mat4(1.0f);
     _worldRotation = glm::mat4(1.0f);
-    _transForm.resize(size);
-    _backTransForm.resize(size);
+    _baseTransForm.resize(size);
+    _lowerTransForm.resize(size);
     _upperTransForm.resize(size, glm::mat4(0.0f));
     boneBufferMaping();
 
@@ -88,9 +88,21 @@ void Character::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
 
     wolrdTrans = wolrdTrans * interpolT * glm::toMat4(interpolR);
     if (fix == TransFormFix::LOWERFRONT)
-        _transForm[node._boneIndex] = wolrdTrans;
+    {
+        _baseTransForm[node._boneIndex] = wolrdTrans;
+        // if (node._boneIndex == 0)
+        // {
+        //     glm::quat rot(wolrdTrans);
+        //     static int i = 0;
+        //     static glm::vec4 trans(0.0f);
+        //     trans += interpolT * glm::vec4(0,0,0,1);
+        //     glm::vec3 euler =  glm::eulerAngles(rot);
+        //     std::cout << glm::to_string(trans) << " index : " << i << "key : " << keyFrame<< std::endl;
+        //     i++;
+        // }
+    }
     else if (fix == TransFormFix::LOWERBACK)
-        _backTransForm[node._boneIndex] = wolrdTrans;
+        _lowerTransForm[node._boneIndex] = wolrdTrans;
     else if (fix == TransFormFix::UPPERFRONT)
         _upperTransForm[node._boneIndex] = wolrdTrans;
     for (const AnimationData& child : node._childrens)
@@ -99,21 +111,21 @@ void Character::updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans,
 
 void Character::eraseAnimation(const std::chrono::steady_clock::time_point& curTime)
 {
-    if (_lowerBodyBackAnimation.empty() == false && curTime >= _lowerBodyBackAnimation.begin()->second._endTime)
-        _lowerBodyBackAnimation.pop_front();
+    if (_lowerBodyAnimation.empty() == false && curTime >= _lowerBodyAnimation.begin()->second._endTime)
+        _lowerBodyAnimation.pop_front();
     if (_upperBodyAnimation.empty() == false && curTime >= _upperBodyAnimation.begin()->second._endTime)
         _upperBodyAnimation.pop_front();
 
-    if (_lowerBodyAnimation.size() == 1 && 
-            getAfterTimePoint(OVERLAPTIME) >= _lowerBodyAnimation.begin()->second._endTime)
+    if (_baseAnimation.size() == 1 && 
+            getAfterTimePoint(OVERLAPTIME) >= _baseAnimation.begin()->second._endTime)
     {
-        Animation* pushAnimation = _lowerBodyAnimation.front().first;
+        Animation* pushAnimation = _baseAnimation.front().first;
         TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
-        _lowerBodyAnimation.push_back({pushAnimation, node});
+        _baseAnimation.push_back({pushAnimation, node});
     }
-    if (curTime >= _lowerBodyAnimation.begin()->second._endTime)
+    if (curTime >= _baseAnimation.begin()->second._endTime)
     {
-        _lowerBodyAnimation.pop_front();
+        _baseAnimation.pop_front();
     }
 }
 
@@ -122,11 +134,17 @@ void Character::animationBlending(const std::chrono::milliseconds& time, const s
     float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
     if (interpolVal > 1)
         interpolVal = 1;
-    for (uint8 i = 0; i < _transForm.size(); ++i)
+    for (uint8 i = 0; i < _baseTransForm.size(); ++i)
     {
         if (mixTrans[i] == glm::mat4(0.0f))
             continue;
-        _transForm[i] = glm::mix(_transForm[i], mixTrans[i], interpolVal);
+        glm::quat rotBase(_baseTransForm[i]);
+        glm::quat rotMix(mixTrans[i]);
+        glm::vec4 translateBase = _baseTransForm[i] * glm::vec4(0,0,0,1);
+        glm::vec4 translateMix = mixTrans[i] * glm::vec4(0,0,0,1);
+        glm::quat rot = glm::slerp(rotBase, rotMix, interpolVal);
+        glm::vec3 trans = glm::mix(translateBase, translateMix, interpolVal);
+        _baseTransForm[i] = glm::translate(glm::mat4(1.0f), trans) * glm::toMat4(rot);
     }
 }
 
@@ -138,30 +156,30 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     uint64 keyFrame;
     Animation* animation;
     //lower
-    if (_lowerBodyAnimation.empty() == false)
+    if (_baseAnimation.empty() == false)
     {
-        animation = _lowerBodyAnimation.begin()->first;
-        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation.begin()->second._startTime);
+        animation = _baseAnimation.begin()->first;
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _baseAnimation.begin()->second._startTime);
         updateTransForm(animation->_rootNode, _worldTrans*_worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERFRONT);
     }
-    if (_lowerBodyAnimation.size() >= 2)
+    if (_baseAnimation.size() >= 2)
     {
-        animation = _lowerBodyAnimation[1].first;
-        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation[1].second._startTime);
+        animation = _baseAnimation[1].first;
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _baseAnimation[1].second._startTime);
         updateTransForm(animation->_rootNode, _worldTrans*_worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
 
-        animationBlending(millisecondFromBegin, _backTransForm);
+        animationBlending(millisecondFromBegin, _lowerTransForm);
     }
-    if (_lowerBodyBackAnimation.empty() == false) 
+    if (_lowerBodyAnimation.empty() == false) 
     {
-        animation = _lowerBodyBackAnimation.front().first;
-        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyBackAnimation.front().second._startTime);
+        animation = _lowerBodyAnimation.front().first;
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lowerBodyAnimation.front().second._startTime);
         updateTransForm(animation->_rootNode, _worldTrans*_worldRotation, millisecondFromBegin.count()*120/1000, TransFormFix::LOWERBACK);
-        millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_lowerBodyBackAnimation.front().second._endTime - curTime);
+        millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_lowerBodyAnimation.front().second._endTime - curTime);
         if (millisecondToEnd.count() <= OVERLAPTIME)
-            animationBlending(millisecondToEnd,_backTransForm);
+            animationBlending(millisecondToEnd,_lowerTransForm);
         else
-            animationBlending(millisecondFromBegin,_backTransForm);
+            animationBlending(millisecondFromBegin,_lowerTransForm);
     }
     if (_upperBodyAnimation.empty() == false) 
     {
@@ -175,16 +193,16 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
             animationBlending(millisecondFromBegin, _upperTransForm);
     }
     //world position update
-    glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
+    glm::vec4 end1 = _baseTransForm[0] * glm::vec4(0,0,0,1);
     _worldTrans = glm::translate(glm::mat4(1.0f), (glm::vec3)end1);
 
-    _eyeIK->setTargetPosition(eyeTarget);
-    if (_eyeIK->targetPositionCheck(_transForm))
-    {
-        const std::vector<glm::mat4>& IKTrans = _eyeIK->solveEyeIK(_transForm, _worldRotation);
-        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK->_start);
-        animationBlending(millisecondFromBegin ,IKTrans);
-    }
+    // _eyeIK->setTargetPosition(eyeTarget);
+    // if (_eyeIK->targetPositionCheck(_baseTransForm))
+    // {
+    //     const std::vector<glm::mat4>& IKTrans = _eyeIK->solveEyeIK(_baseTransForm, _worldRotation);
+    //     millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK->_start);
+    //     animationBlending(millisecondFromBegin ,IKTrans);
+    // }
 }
 
 //up -> draw
@@ -192,12 +210,19 @@ void Character::draw(void)
 {
     const std::vector<Bone>& boneVector = _skeleton.getBoneVector();
 
-    glm::vec3 color(1.0f);
+    glm::vec3 color(0.9412, 0.7922, 0.2549);
     for(const Bone& bone : boneVector)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
-        glm::mat4 toParentDir = _transForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3); 
-        Cylinder cylinder(0.2, 0.8 *_skeleton.getGBL() * bone._length ,16, toParentDir);
+        // if (bone._boneIndex == 0)
+        // {
+        //     glm::quat rot(_baseTransForm[0]);
+        //     glm::vec4 trans = _baseTransForm[0] * glm::vec4(0,0,0,1);
+        //     glm::vec3 euler =  glm::eulerAngles(rot);
+        //     std::cout << glm::to_string(trans) << std::endl;
+        // }
+        glm::mat4 toParentDir = _baseTransForm[bone._boneIndex] * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3); 
+        Cylinder cylinder(0.2, 1.0 *_skeleton.getGBL() * bone._length ,16, toParentDir);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
         // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);

@@ -69,7 +69,7 @@ int main()
         
         shader.use();
         window.processInput(simulator, camera);
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, 0.1f, 200.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, 0.1f, 500.0f);
         camera.update();
         shader.setMat4("projection", projection);
         shader.setMat4("view", camera._view);

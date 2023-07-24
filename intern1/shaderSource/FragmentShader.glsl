@@ -12,7 +12,7 @@ void main()
 	// if (fragPosition.y > 0.01)
     // {
     //     // Assign fixed color for z == 0
-    //     color = vec4(0.1882, 0.7608, 0.1373, 1.0);  // Yellow
+    //     color = vec4(0.9412, 0.7922, 0.2549, 1.0);  // Yellow
     // }
     // else
     // {

@@ -96,7 +96,7 @@ const std::vector<glm::mat4>& EyeIK::solveEyeIK(const std::vector<glm::mat4>& ch
     //IKrot[_bonedirection.size()-2] = glm::mix(IKrot[_bonedirection.size()-1], IKrot[_bonedirection.size()-3],0.5);
     //if reachable position
     //postion IK
-    if (reachable(characterTranspos, distance, headPosition) == true)//distance 구하는걸로 수정
+    if (reachable(characterTranspos, distance, headPosition) == true)//distance 구하는걸로 수정, fix me
     {
         glm::vec3 start = IKpos.front();
         uint32 iterCount = 0;
@@ -134,8 +134,6 @@ const std::vector<glm::mat4>& EyeIK::solveEyeIK(const std::vector<glm::mat4>& ch
     glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(IKpos[_bonedirection.size()-2] - IKpos[_bonedirection.size()-3]));
     IKrot[_bonedirection.size()-2] = glm::toMat4(afterSee) * IKrot[_bonedirection.size()-2];
     
-    // IKrot[_bonedirection.size()-2] = glm::toMat4(glm::rotation(_boneVector[_eyeBoneIndex[_bonedirection.size()-2]]._direction, 
-    // IKpos[_bonedirection.size()-2] - IKpos[_bonedirection.size()-3]));
     for (uint32 i = 0; i < _eyeBoneIndex.size(); ++i)
     {
         glm::mat4 translate = glm::translate(glm::mat4(1.0f), IKpos[i]);

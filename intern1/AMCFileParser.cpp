@@ -89,6 +89,7 @@ bool AMCFileParser::loadAMCFile(void)
     uint32 moveBoneIndex = 0;
     glm::vec3 firstTrans, beforeTrans;
     glm::mat4 firstRot;
+    glm::vec3 total(0.0f);
     while (ifs >> buffer)
     {
         
@@ -115,12 +116,12 @@ bool AMCFileParser::loadAMCFile(void)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)) * matrix; 
             else if (dof == DOF::RZ)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * matrix; 
-            // else if (dof == DOF::TX)
-            //     localTransV.x += val;
-            // else if (dof == DOF::TY)
-            //     localTransV.y += val;
-            // else if (dof == DOF::TZ)
-            //     localTransV.z += val;
+            else if (dof == DOF::TX)
+                localTransV.x += val;
+            else if (dof == DOF::TY)
+                localTransV.y += val;
+            else if (dof == DOF::TZ)
+                localTransV.z += val;
         }
         if (moveBoneIndex == 0 && animationTime ==0)
         {
@@ -129,7 +130,9 @@ bool AMCFileParser::loadAMCFile(void)
         if (moveBoneIndex == 0)
         {
             glm::vec3 tmp = localTransV;
+        
             localTransV -= firstTrans;
+            total += localTransV;
             firstTrans = tmp;
             if (_animation->_name == "idle")
                 matrix = glm::rotate(glm::radians(90.0f), glm::vec3(0.0f,1.0f,0.0f)) * matrix;
@@ -146,6 +149,11 @@ bool AMCFileParser::loadAMCFile(void)
         animationData->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), transV)});
 
         moveBoneIndex++;
+    }
+    glm::mat4 tmpr(1.0f);
+    for (auto it : _animation->_rootNode._localTrans)
+    {
+        tmpr += it.second;
     }
     _animation->_animationMillisecond = std::roundf((float)(animationTime * 1000) / (120.0f * _animation->_animationSpeed));
 

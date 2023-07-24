@@ -13,20 +13,10 @@ class Cube;
 
 enum class KeyInput
 {
-    UP,
-    LOWERBACK,
-    REFT,
-    RIGHT,
-    RUN,
-    ATTACK,
-    JUMP,
-    STOP,
-    CUBEFRONT,
-    CUBEBACK,
-    CUBERIGHT,
-    CUBELEFT,
-    CUBEUP,
-    CUBEDOWN
+    UP, LOWERBACK, REFT, RIGHT,
+    RUN, ATTACK,JUMP,STOP,CUBEFRONT,
+    CUBEBACK,CUBERIGHT,CUBELEFT,
+    CUBEUP, CUBEDOWN
 };
 
 class Simulator : Noncopyable
@@ -45,6 +35,7 @@ class Simulator : Noncopyable
             if (_player != nullptr)
                 delete _player;
         }
+        
         void initialize(void);
         void changeAnimation(KeyInput key);
         void update(void);

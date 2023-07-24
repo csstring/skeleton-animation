@@ -15,8 +15,8 @@ class Character
 {   
     private:
         std::vector<uint32>    VAO, VBO, VBC;
-        std::vector<glm::mat4> _transForm;
-        std::vector<glm::mat4> _backTransForm;
+        std::vector<glm::mat4> _baseTransForm;
+        std::vector<glm::mat4> _lowerTransForm;
         std::vector<glm::mat4> _upperTransForm;
 
         glm::mat4              _worldTrans;
@@ -26,8 +26,8 @@ class Character
 
     public:
         std::deque<std::pair<Animation*, TimeNode>> _upperBodyAnimation;//endtime
+        std::deque<std::pair<Animation*, TimeNode>> _baseAnimation;
         std::deque<std::pair<Animation*, TimeNode>> _lowerBodyAnimation;
-        std::deque<std::pair<Animation*, TimeNode>> _lowerBodyBackAnimation;
         EyeIK* _eyeIK;
 
     private :
@@ -37,10 +37,11 @@ class Character
         void animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans);
     
     public:
-        Character(const Skeleton& skeleton) : _skeleton(skeleton){};
+        Character(const Skeleton& skeleton) : _skeleton(skeleton), _eyeIK(nullptr){};
         ~Character()
         {
-            delete _eyeIK;
+            if (_eyeIK != nullptr)
+                delete _eyeIK;
         };
         void initialize(void);
         void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget);

@@ -4,7 +4,7 @@
 #include "include/Character.h"
 #include "include/Cube.h"
 
-const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
+// const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
 void Simulator::setPlayer(Character* player)
 {
     if (_player != nullptr)
@@ -19,7 +19,7 @@ void Simulator::initialize(void)
     _cube.initialize();
     Animation* pushAnimation = findAnimation("idle");//find
     TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
-    _player->_lowerBodyAnimation.push_back({pushAnimation, node});
+    _player->_baseAnimation.push_back({pushAnimation, node});
 }
 
 void Simulator::draw(void)
@@ -62,7 +62,7 @@ void Simulator::changeAnimation(KeyInput key)
     if (key == KeyInput::UP)
     {
         Animation* pushAnimation = findAnimation("walk");//find
-        this->pushAnimation(pushAnimation, _player->_lowerBodyAnimation);
+        this->pushAnimation(pushAnimation, _player->_baseAnimation);
     }
     else if (key == KeyInput::LOWERBACK)
     {
@@ -80,19 +80,19 @@ void Simulator::changeAnimation(KeyInput key)
     {
         std::cout << "idle input" << std::endl;
         Animation* pushAnimation = findAnimation("idle");//find
-        this->pushAnimation(pushAnimation, _player->_lowerBodyAnimation);
+        this->pushAnimation(pushAnimation, _player->_baseAnimation);
     }
     else if (key == KeyInput::RUN)
     {
-        if (_player->_lowerBodyAnimation.begin()->first->_name == "walk")
+        if (_player->_baseAnimation.begin()->first->_name == "walk")
         {
             Animation* pushAnimation = findAnimation("run");//find
-            this->pushAnimation(pushAnimation, _player->_lowerBodyAnimation);
+            this->pushAnimation(pushAnimation, _player->_baseAnimation);
         }
-        else if (_player->_lowerBodyAnimation.begin()->first->_name == "run")
+        else if (_player->_baseAnimation.begin()->first->_name == "run")
         {
             Animation* pushAnimation = findAnimation("walk");//find
-            this->pushAnimation(pushAnimation, _player->_lowerBodyAnimation);
+            this->pushAnimation(pushAnimation, _player->_baseAnimation);
         }
     }
     else if (key == KeyInput::ATTACK && _player->_upperBodyAnimation.empty() == true)
@@ -100,10 +100,10 @@ void Simulator::changeAnimation(KeyInput key)
         Animation* pushAnimation = findAnimation("punch");//find
         this->pushAnimation(pushAnimation, _player->_upperBodyAnimation);
     }
-    else if (key == KeyInput::JUMP && _player->_lowerBodyBackAnimation.empty() == true)
+    else if (key == KeyInput::JUMP && _player->_lowerBodyAnimation.empty() == true)
     {
         Animation* pushAnimation = findAnimation("runJump2");//find
-        this->pushAnimation(pushAnimation, _player->_lowerBodyBackAnimation);
+        this->pushAnimation(pushAnimation, _player->_lowerBodyAnimation);
     }
     else if (key == KeyInput::CUBEBACK)
         _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0,0.1));
