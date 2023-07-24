@@ -174,6 +174,9 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
         else
             animationBlending(millisecondFromBegin, _upperTransForm);
     }
+    //world position update
+    glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
+    _worldTrans = glm::translate(glm::mat4(1.0f), (glm::vec3)end1);
 
     _eyeIK->setTargetPosition(eyeTarget);
     if (_eyeIK->targetPositionCheck(_transForm))
@@ -202,7 +205,4 @@ void Character::draw(void)
         // line.render(VBO[bone._boneIndex]);
         glBindVertexArray(0);
     }
-    //아래쪽 업데이트 인거 같은데
-    glm::vec4 end1 = _transForm[0] * glm::vec4(0,0,0,1);
-    _worldTrans = glm::translate(glm::mat4(1.0f), (glm::vec3)end1);
 }
