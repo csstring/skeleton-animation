@@ -31,7 +31,7 @@ void Window::initialize(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
-    glfwSwapInterval(1);
+    // glfwSwapInterval(1);
     _view = createViewMatrix();
 }
 

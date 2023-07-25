@@ -55,7 +55,7 @@ void Animation::findSameFrame(uint32 count)
         dataQueue.pop();
         for (auto& mt : curData->_localTrans)
         {
-            origin[curData->_boneIndex].push_back(mt.second * glm::vec4(0,0,0,1));
+            origin[curData->_boneIndex].push_back(mt.second);
         }
         for (int i =0; i < curData->_childrens.size(); ++i)
         dataQueue.push(&curData->_childrens[i]);

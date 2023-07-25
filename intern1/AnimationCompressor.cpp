@@ -72,7 +72,7 @@ void AnimationCompressor::getCompressKeyFrame(std::vector<uint32>& frameList)
 void AnimationCompressor::dataSwap(AnimationData* node, std::vector<uint32>& frameList)
 {
     std::vector<std::pair<uint32,glm::quat>> R;
-    std::vector<std::pair<uint32,glm::mat4>> T;
+    std::vector<std::pair<uint32,glm::vec3>> T;
 
     R.reserve(frameList.size());
     T.reserve(frameList.size());

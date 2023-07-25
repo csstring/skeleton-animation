@@ -11,10 +11,21 @@ enum class TransFormFix
     LOWERBACK,
     UPPERFRONT
 };
+
+struct BoneLocal
+{
+    glm::quat rotationInBoneLocal;
+    glm::vec3 translationInBoneLocal;
+    glm::vec3 scaleInBoneLocal;
+};
+
 class Character
 {   
     private:
+        bool                   _isFirstBlend;
         std::vector<uint32>    VAO, VBO, VBC;
+        std::vector<BoneLocal> _boneLocalVector;
+
         std::vector<glm::mat4> _baseTransForm;
         std::vector<glm::mat4> _lowerTransForm;
         std::vector<glm::mat4> _upperTransForm;
@@ -31,11 +42,13 @@ class Character
         EyeIK* _eyeIK;
 
     private :
-        void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, uint32 keyTime, TransFormFix fix);
+        void updateTransForm(const AnimationData& node, uint32 keyTime, float interpolVal);
         void eraseAnimation(const std::chrono::steady_clock::time_point& curTime);
         void boneBufferMaping(void);     
         void animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans);
-    
+        void getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpolT, const AnimationData* node, uint32 keyFrame);
+        glm::mat4 getMatrixInCharLocal(uint32 boneindex);
+        void worldPositionUpdate(void);
     public:
         Character(const Skeleton& skeleton) : _skeleton(skeleton), _eyeIK(nullptr){};
         ~Character()

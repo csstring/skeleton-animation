@@ -45,8 +45,8 @@ void AMCFileParser::dumyBoneInitialize(void)
     {
         animationData1->_localRotation.push_back({i, glm::mat4(1.0f)});
         animationData2->_localRotation.push_back({i, glm::mat4(1.0f)});
-        animationData1->_localTrans.push_back({i, glm::translate(glm::mat4(1.0f), bone3._b)});
-        animationData2->_localTrans.push_back({i, glm::translate(glm::mat4(1.0f), bone4._b)});
+        animationData1->_localTrans.push_back({i, bone3._b});
+        animationData2->_localTrans.push_back({i, bone4._b});
     }
 }
 
@@ -146,15 +146,11 @@ bool AMCFileParser::loadAMCFile(void)
         animationData->_localRotation.push_back({animationTime, localRot});
 
         glm::vec3 transV = glm::toMat3(localRot) * bone._b + localTransV;
-        animationData->_localTrans.push_back({animationTime, glm::translate(glm::mat4(1.0f), transV)});
+        animationData->_localTrans.push_back({animationTime, transV});
 
         moveBoneIndex++;
     }
-    glm::mat4 tmpr(1.0f);
-    for (auto it : _animation->_rootNode._localTrans)
-    {
-        tmpr += it.second;
-    }
+
     _animation->_animationMillisecond = std::roundf((float)(animationTime * 1000) / (120.0f * _animation->_animationSpeed));
 
     return true;
