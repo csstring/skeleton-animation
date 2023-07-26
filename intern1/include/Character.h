@@ -1,19 +1,12 @@
 #include "BodyInterface.h"
 #include "TimeNode.h"
 #include <deque>
-#include "EyeIK.h"
+#include "BoneLocal.h"
 struct AnimationData;
 class Animation;
 class Skeleton;
 class Controller;
-
-struct BoneLocal
-{
-    glm::quat rotationInBoneLocal;
-    glm::vec3 translationInBoneLocal;
-    glm::vec3 scaleInBoneLocal;
-};
-
+class EyeIK;
 class Character
 {   
     private:
@@ -35,7 +28,6 @@ class Character
         void updateTransForm(const AnimationData& node, uint32 keyTime, float interpolVal);
         void eraseAnimation(const std::chrono::steady_clock::time_point& curTime);
         void boneBufferMaping(void);     
-        void animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans);
         void getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpolT, const AnimationData* node, uint32 keyFrame);
         void worldPositionUpdate(void);
     public:

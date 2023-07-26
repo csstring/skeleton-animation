@@ -1,7 +1,7 @@
 #pragma once
 #include "Common.h"
+#include "BoneLocal.h"
 class Bone;
-class BoneLocal;
 class Controller;
 class EyeIK
 {
@@ -29,7 +29,7 @@ class EyeIK
         void setTargetPosition(glm::vec3 targetPosition);
         bool targetPositionCheck(const std::vector<glm::mat4>& characterTranspos);
         const std::vector<glm::mat4>& solveEyeIK(
-            const std::vector<BoneLocal>& _boneLocalVector, 
+            std::vector<BoneLocal>& _boneLocalVector, 
             const glm::mat4& worldRotation, 
             const glm::mat4& worldTranslate,
             const Controller& _controller

@@ -5,6 +5,7 @@
 #include "include/GLM/gtc/quaternion.hpp"
 #include "include/EnumHeader.h"
 #include "include/Controller.h"
+#include "include/BoneLocal.h"
 #include "include/Character.h"
 //parent bone 파싱 넣어야함
 void EyeIK::setTargetPosition(glm::vec3 targetPosition)
@@ -69,7 +70,7 @@ bool EyeIK::reachable(const std::vector<glm::mat4>& characterTranspos, std::vect
 quat -> 오일러 -> 제한 각도 확인하고 비율로 오일러 회전각 정해주고 -> quat -> rot
 */
 const std::vector<glm::mat4>& EyeIK::solveEyeIK(
-    const std::vector<BoneLocal>& _boneLocalVector, 
+    std::vector<BoneLocal>& _boneLocalVector, 
     const glm::mat4& worldRotation, 
     const glm::mat4& worldTranslate, 
     const Controller& controller
@@ -77,15 +78,16 @@ const std::vector<glm::mat4>& EyeIK::solveEyeIK(
 {
     std::vector<glm::vec3> inCharLocalPos;
     std::vector<glm::mat4> inCharLocalRot;
-    std::vector<float> distance;
-
+    glm::vec3 afterHeadPosInCharLocal;
+    glm::vec3 afterHeadPosInBoneLocal;
+    glm::quat headBoneLocal = glm::inverse(controller.getMatrixInCharLocal(_eyeBoneIndex.back(), controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector));
     for (auto& it : _IKTranspos)
         it = glm::mat4(0.0f);
     for (uint32 i : _eyeBoneIndex)
     {
-        // glm::mat4 inCharTrans = controller.getMatrixInCharLocal(i, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
-        // inCharLocalPos.push_back(inCharTrans * glm::vec4(0,0,0,1));
-        // inCharLocalRot.push_back(glm::mat3(inCharTrans));
+        glm::mat4 inCharTrans = controller.getMatrixInCharLocal(i, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
+        inCharLocalPos.push_back(inCharTrans * glm::vec4(0,0,0,1));
+        inCharLocalRot.push_back(glm::mat3(inCharTrans));
     }
     //rotation
     //cursee를 살짝 아래보게하면 자연스러울듯
@@ -99,7 +101,13 @@ const std::vector<glm::mat4>& EyeIK::solveEyeIK(
     glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(targetDir));
     glm::vec3 headMove = afterSee * headTopPos;
     inCharLocalRot.back() = glm::toMat4(afterSee) * inCharLocalRot.back();
-
+    afterHeadPosInCharLocal = afterSee * inCharLocalPos.back();
+    glm::vec3 headTransInBoneLocal = inCharLocalPos.back() - afterHeadPosInCharLocal;
+    afterHeadPosInBoneLocal = headBoneLocal * headTransInBoneLocal;
+    
+    afterSee =  afterSee * headBoneLocal;
+    _boneLocalVector[this->_eyeBoneIndex.back()].rotationInBoneLocal = afterSee * _boneLocalVector[this->_eyeBoneIndex.back()].rotationInBoneLocal;
+    _boneLocalVector[this->_eyeBoneIndex.back()].translationInBoneLocal += afterHeadPosInBoneLocal;
     //inCharLocalRot[_bonedirection.size()-2] = glm::mix(inCharLocalRot[_bonedirection.size()-1], inCharLocalRot[_bonedirection.size()-3],0.5);
     //if reachable position
     //postion IK

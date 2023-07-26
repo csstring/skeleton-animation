@@ -9,6 +9,7 @@
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/Controller.h"
 #include "include/EnumHeader.h"
+#include "include/EyeIK.h"
 #include <queue>
 inline bool pairCompare(const std::pair<uint32, glm::quat>& a, const uint32& val)
 {
@@ -197,13 +198,13 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
 
         updateTransForm(*animation->returnAnimationData(11/*lowerback*/), millisecondFromBegin.count()*120/1000, interpolVal);
     }
-    // _eyeIK->setTargetPosition(eyeTarget);
+    _eyeIK->setTargetPosition(eyeTarget);
 
-    // {
-    //     const std::vector<glm::mat4>& IKTrans = _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller);
-    //     millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK->_start);
-    //     animationBlending(millisecondFromBegin ,IKTrans);
-    // }
+    {
+        const std::vector<glm::mat4>& IKTrans = _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller);
+        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK->_start);
+        // animationBlending(millisecondFromBegin ,IKTrans);
+    }
 }
 
 //up -> draw
