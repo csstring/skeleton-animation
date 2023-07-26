@@ -102,9 +102,9 @@ const std::vector<glm::mat4>& EyeIK::solveEyeIK(
     glm::vec3 headMove = afterSee * headTopPos;
     inCharLocalRot.back() = glm::toMat4(afterSee) * inCharLocalRot.back();
     afterHeadPosInCharLocal = afterSee * inCharLocalPos.back();
-    glm::vec3 headTransInBoneLocal = inCharLocalPos.back() - afterHeadPosInCharLocal;
+    glm::vec3 headTransInBoneLocal = afterHeadPosInCharLocal - inCharLocalPos.back();
     afterHeadPosInBoneLocal = headBoneLocal * headTransInBoneLocal;
-    
+
     afterSee =  afterSee * headBoneLocal;
     _boneLocalVector[this->_eyeBoneIndex.back()].rotationInBoneLocal = afterSee * _boneLocalVector[this->_eyeBoneIndex.back()].rotationInBoneLocal;
     _boneLocalVector[this->_eyeBoneIndex.back()].translationInBoneLocal += afterHeadPosInBoneLocal;
