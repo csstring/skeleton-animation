@@ -2,17 +2,11 @@
 #include "TimeNode.h"
 #include <deque>
 #include "EyeIK.h"
+#include "BoneLocal.h"
 struct AnimationData;
 class Animation;
 class Skeleton;
 class Controller;
-
-struct BoneLocal
-{
-    glm::quat rotationInBoneLocal;
-    glm::vec3 translationInBoneLocal;
-    glm::vec3 scaleInBoneLocal;
-};
 
 class Character
 {   
@@ -24,7 +18,6 @@ class Character
         glm::mat4              _worldRotation;
         const Skeleton&        _skeleton;
         const Controller&      _controller;
-
 
     public:
         std::deque<std::pair<const Animation*, TimeNode>> _upperBodyAnimation;//endtime
@@ -38,7 +31,6 @@ class Character
         void boneBufferMaping(void);     
         void animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans);
         void getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpolT, const AnimationData* node, uint32 keyFrame);
-        glm::mat4 getMatrixInCharLocal(uint32 boneindex);
         void worldPositionUpdate(void);
     public:
         Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller){};
@@ -48,6 +40,7 @@ class Character
                 delete _eyeIK;
         };
         void initialize(void);
+        const Skeleton& getCharacterSkeleton(void) const {return _skeleton;};
         void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget);
         void draw(void);
         void rotationY(float radian);

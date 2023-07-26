@@ -41,10 +41,14 @@ void Window::processInput(Simulator& simulator, Camera& camera)
     static int currentWalkState,previousWalkState;
     static int currentBackState,previousBackState;
     static int currentRunState,previousRunState;
+    static int currentAddCharState,previousAddCharState;
+    static int currentCharChangeState,previousCharChangeState;
 
     currentWalkState = glfwGetKey(_window, GLFW_KEY_KP_8);
     currentBackState = glfwGetKey(_window, GLFW_KEY_KP_5);
     currentRunState = glfwGetKey(_window, GLFW_KEY_LEFT_SHIFT);
+    currentAddCharState = glfwGetKey(_window, GLFW_KEY_P);
+    currentCharChangeState = glfwGetKey(_window, GLFW_KEY_SPACE);
 
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
@@ -115,6 +119,21 @@ void Window::processInput(Simulator& simulator, Camera& camera)
         simulator.changeAnimation(KeyInput::CUBEUP);
     if (glfwGetKey(_window, GLFW_KEY_I) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::CUBEDOWN);
+
+    if (currentAddCharState == GLFW_PRESS && previousAddCharState == GLFW_RELEASE)
+    {
+        simulator.addPlayer("idle");
+        previousAddCharState = currentAddCharState;
+    } else if (currentAddCharState == GLFW_RELEASE && previousAddCharState == GLFW_PRESS) {
+        previousAddCharState = currentAddCharState;
+    }
+    if (currentCharChangeState == GLFW_PRESS && previousCharChangeState == GLFW_RELEASE)
+    {
+        simulator.changeControllCharacter();
+        previousCharChangeState = currentCharChangeState;
+    } else if (currentCharChangeState == GLFW_RELEASE && previousCharChangeState == GLFW_PRESS) {
+        previousCharChangeState = currentCharChangeState;
+    }
 }
 
 void Window::clearColorSetUp(float r, float g, float b, float a)

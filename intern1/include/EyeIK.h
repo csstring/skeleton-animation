@@ -1,7 +1,8 @@
 #pragma once
-#include "include/Common.h"
+#include "Common.h"
 class Bone;
-
+class BoneLocal;
+class Controller;
 class EyeIK
 {
     private:
@@ -10,7 +11,7 @@ class EyeIK
         std::vector<glm::vec3> _bonedirection;
         std::vector<uint8> _eyeBoneIndex;
         std::vector<glm::mat4> _IKTranspos;
-        const std::vector<Bone>& _boneVector;
+        const std::vector<Bone>& _boneVector;//지워야 할듯?
     private:
         bool reachable(const std::vector<glm::mat4>& characterTranspos, std::vector<float>& distance,glm::vec3 headPosition);
         void positionFixLimitAngle(glm::vec3& start, glm::vec3& end, const glm::quat& startBonedir, const Bone& endBone,bool backOrFront);
@@ -27,5 +28,10 @@ class EyeIK
         void initialize();
         void setTargetPosition(glm::vec3 targetPosition);
         bool targetPositionCheck(const std::vector<glm::mat4>& characterTranspos);
-        const std::vector<glm::mat4>& solveEyeIK(const std::vector<glm::mat4>& characterTranspos, const glm::mat4& worldRotation);
+        const std::vector<glm::mat4>& solveEyeIK(
+            const std::vector<BoneLocal>& _boneLocalVector, 
+            const glm::mat4& worldRotation, 
+            const glm::mat4& worldTranslate,
+            const Controller& _controller
+        );
 };

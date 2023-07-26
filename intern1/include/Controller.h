@@ -1,11 +1,13 @@
 #pragma once
-#include "include/Common.h"
+#include "Common.h"
+#include "TimeNode.h"
+#include <utility>
 #include <deque>
+#include "BoneLocal.h"
 class Animation;
 class Skeleton;
 class Character;
-class TimeNode;
-struct BoneLocal;
+
 enum class KeyInput;
 
 class Controller
@@ -20,11 +22,10 @@ class Controller
         glm::mat4 getMatrixInCharLocal(
             uint32 boneindex,
             const Skeleton& _skeleton,
-            const std::vector<BoneLocal>& _boneLocalVector
-        ) const;
+            std::vector<BoneLocal>& _boneLocalVector) const;
         
         void pushAnimation(const std::string& name, const std::vector<Animation>& _animations, std::deque<std::pair<const Animation*, TimeNode>>& animationDeque);
-        Character* getPlayer(void){return _player;};
+        const Character* getPlayer(void) const;
         void setPlayer(Character* player);
         void controllPlayer(KeyInput key, const std::vector<Animation>& _animations);
     

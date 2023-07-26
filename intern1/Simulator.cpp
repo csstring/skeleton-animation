@@ -5,20 +5,19 @@
 #include "include/Cube.h"
 #include "include/EnumHeader.h"
 // const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
-void Simulator::addPlayer(Character* player)
+void Simulator::addPlayer(const std::string initAnimationName)//position, name 같은거 추가하면 될듯
 {
-    _players.push_back(player);
+    Character* newPlayer = _factory.makeCharacter(_skeleton, _controller);
+    _controller.pushAnimation(initAnimationName, _animations, newPlayer->_baseAnimation);
+    _players.push_back(newPlayer);
 }
 
 void Simulator::initialize(void)
 {
-    addPlayer(_factory.makeCharacter(_skeleton, _controller));
-
+    addPlayer("idle");
     _cube.cubeSizeChange(0.1);
     _cube.initialize();
     _controller.setPlayer(_players.front());
-    _controller.pushAnimation("idle", _animations, _controller.getPlayer()->_baseAnimation);
-
 }
 
 void Simulator::draw(void)
@@ -28,12 +27,26 @@ void Simulator::draw(void)
     _cube.draw();
 }
 
-void Simulator::update()
+void Simulator::update(void)
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
     _cube.update();
     for (Character* player : _players)
         player->update(curTime, _cube._pos * _cube._vertex[0]);
+}
+
+void Simulator::changeControllCharacter(void)
+{
+    const Character* curPlayer = _controller.getPlayer();
+
+    for (Character* player : _players)
+    {
+        if (player != curPlayer)
+        {
+            _controller.setPlayer(player);
+            return;
+        }
+    }
 }
 
 void Simulator::changeAnimation(KeyInput key)

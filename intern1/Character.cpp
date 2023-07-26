@@ -198,9 +198,9 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
         updateTransForm(*animation->returnAnimationData(11/*lowerback*/), millisecondFromBegin.count()*120/1000, interpolVal);
     }
     // _eyeIK->setTargetPosition(eyeTarget);
-    // if (_eyeIK->targetPositionCheck(_baseTransForm))
+
     // {
-    //     const std::vector<glm::mat4>& IKTrans = _eyeIK->solveEyeIK(_baseTransForm, _worldRotation);
+    //     const std::vector<glm::mat4>& IKTrans = _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller);
     //     millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK->_start);
     //     animationBlending(millisecondFromBegin ,IKTrans);
     // }
@@ -215,7 +215,6 @@ void Character::draw(void)
     for(const Bone& bone : boneVector)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
-
         glm::mat4 toParentDir = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(bone._boneIndex, _skeleton, _boneLocalVector) * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3);
         Cylinder cylinder(0.2, 1.0 *_skeleton.getGBL() * bone._length ,16, toParentDir);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
@@ -226,24 +225,7 @@ void Character::draw(void)
         glBindVertexArray(0);
     }
 }
-// void Character::animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans)
-// {
-//     float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
-//     if (interpolVal > 1)
-//         interpolVal = 1;
-//     for (uint8 i = 0; i < _baseTransForm.size(); ++i)
-//     {
-//         if (mixTrans[i] == glm::mat4(0.0f))
-//             continue;
-//         glm::quat rotBase(_baseTransForm[i]);
-//         glm::quat rotMix(mixTrans[i]);
-//         glm::vec4 translateBase = _baseTransForm[i] * glm::vec4(0,0,0,1);
-//         glm::vec4 translateMix = mixTrans[i] * glm::vec4(0,0,0,1);
-//         glm::quat rot = glm::slerp(rotBase, rotMix, interpolVal);
-//         glm::vec3 trans = glm::mix(translateBase, translateMix, interpolVal);
-//         _baseTransForm[i] = glm::translate(glm::mat4(1.0f), trans) * glm::toMat4(rot);
-//     }
-// }
+
 
 
 

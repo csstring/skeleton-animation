@@ -5,8 +5,8 @@
 #include <iostream>
 #include "Animation.h"
 #include "Cube.h"
-#include "include/Controller.h"
-#include "include/BodyFactory.h"
+#include "Controller.h"
+#include "BodyFactory.h"
 
 struct AnimationData;
 class TimeNode;
@@ -34,8 +34,8 @@ class Simulator : Noncopyable
         void changeAnimation(KeyInput key);
         void update(void);
         void draw(void);
-        void addPlayer(Character* player);
-
+        void addPlayer(const std::string initAnimationName);//position, name 같은거 추가하면 될듯
+        void changeControllCharacter(void);//캐릭터 id추가하고 구분해야 할듯
     public : 
         Skeleton               _skeleton;
         std::vector<Animation> _animations;

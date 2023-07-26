@@ -4,6 +4,8 @@
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/GLM/gtc/quaternion.hpp"
 #include "include/EnumHeader.h"
+#include "include/Controller.h"
+#include "include/Character.h"
 //parent bone 파싱 넣어야함
 void EyeIK::setTargetPosition(glm::vec3 targetPosition)
 {
@@ -66,78 +68,74 @@ bool EyeIK::reachable(const std::vector<glm::mat4>& characterTranspos, std::vect
 /*
 quat -> 오일러 -> 제한 각도 확인하고 비율로 오일러 회전각 정해주고 -> quat -> rot
 */
-const std::vector<glm::mat4>& EyeIK::solveEyeIK(const std::vector<glm::mat4>& characterTranspos, const glm::mat4& worldRotation)
+const std::vector<glm::mat4>& EyeIK::solveEyeIK(
+    const std::vector<BoneLocal>& _boneLocalVector, 
+    const glm::mat4& worldRotation, 
+    const glm::mat4& worldTranslate, 
+    const Controller& controller
+)
 {
     std::vector<glm::vec3> inCharLocalPos;
     std::vector<glm::mat4> inCharLocalRot;
     std::vector<float> distance;
-    glm::vec3 headPosition;
+
     for (auto& it : _IKTranspos)
         it = glm::mat4(0.0f);
     for (uint32 i : _eyeBoneIndex)
     {
-        // glm::mat4 inCharTrans = 
-        // inCharLocalPos.push_back(characterTranspos[i] * glm::vec4(0,0,0,1));
-        // inCharLocalRot.push_back(glm::mat3(characterTranspos[i]));
+        // glm::mat4 inCharTrans = controller.getMatrixInCharLocal(i, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
+        // inCharLocalPos.push_back(inCharTrans * glm::vec4(0,0,0,1));
+        // inCharLocalRot.push_back(glm::mat3(inCharTrans));
     }
     //rotation
     //cursee를 살짝 아래보게하면 자연스러울듯
     //init head target
-    glm::vec3 tmptarget = glm::inverse(characterTranspos[_eyeBoneIndex.back()]) * glm::vec4(_targetPosition,1);
-    for (uint32 i = _bonedirection.size()-1; i < _bonedirection.size(); ++i)
-    {
-        glm::vec3 targetDir = _targetPosition - inCharLocalPos[i];
-        glm::vec3 headTopPos = inCharLocalRot[i] * glm::vec4(_bonedirection[i],1);
-        glm::vec3 curSee = inCharLocalRot[i] * glm::vec4(glm::cross(glm::vec3(1,0,0), _bonedirection[i]),1);
-        glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(targetDir));
-        glm::vec3 headMove = afterSee * headTopPos;
-        inCharLocalRot[i] = glm::toMat4(afterSee) * inCharLocalRot[i];
+    glm::mat4 charLocalToWorld = worldTranslate * worldRotation;
+    glm::vec3 targetPosInCharLocal = glm::inverse(charLocalToWorld) * glm::vec4(_targetPosition, 1);
 
-        float dis = glm::length(inCharLocalPos[i] - inCharLocalPos[i-2]);
-        headPosition.x = inCharLocalPos[i-2].x + headMove.x * dis;
-        headPosition.y = inCharLocalPos[i-2].y + headMove.y * dis;
-        headPosition.z = inCharLocalPos[i-2].z + headMove.z * dis;
-    }
+    glm::vec3 targetDir = targetPosInCharLocal - inCharLocalPos.back();
+    glm::vec3 headTopPos = inCharLocalRot.back() * glm::vec4(_bonedirection.back(),1);
+    glm::vec3 curSee = inCharLocalRot.back() * glm::vec4(glm::cross(glm::vec3(1,0,0), _bonedirection.back()),1);
+    glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(targetDir));
+    glm::vec3 headMove = afterSee * headTopPos;
+    inCharLocalRot.back() = glm::toMat4(afterSee) * inCharLocalRot.back();
+
     //inCharLocalRot[_bonedirection.size()-2] = glm::mix(inCharLocalRot[_bonedirection.size()-1], inCharLocalRot[_bonedirection.size()-3],0.5);
     //if reachable position
     //postion IK
-    if (reachable(characterTranspos, distance, headPosition) == true)//distance 구하는걸로 수정, fix me
-    {
-        glm::vec3 start = inCharLocalPos.front();
-        uint32 iterCount = 0;
-        while (glm::length(headPosition - inCharLocalPos.back()) > 0.1)
-        {
-            iterCount++;
-            if (iterCount >= 10)
-            {
-                return _IKTranspos;
-            }
-            inCharLocalPos.back() = headPosition;
-            glm::quat startBonedir;
-            for(uint16 i = _eyeBoneIndex.size()-1; i >=1; --i)
-            {
-                startBonedir = glm::vec3(inCharLocalRot[i-1] * glm::vec4(_boneVector[_eyeBoneIndex[i-1]]._direction,1));
-                float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i-1]);
-                float k = distance[i-1] / r;
-                inCharLocalPos[i-1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i-1], k);
-                positionFixLimitAngle(inCharLocalPos[i-1], inCharLocalPos[i], startBonedir,_boneVector[_eyeBoneIndex[i]], true);
-            }
+    // if (reachable(characterTranspos, distance, headPosition) == true)//distance 구하는걸로 수정, fix me
+    // {
+    //     glm::vec3 start = inCharLocalPos.front();
+    //     uint32 iterCount = 0;
+    //     while (glm::length(headPosition - inCharLocalPos.back()) > 0.1)
+    //     {
+    //         iterCount++;
+    //         if (iterCount >= 10)
+    //         {
+    //             return _IKTranspos;
+    //         }
+    //         inCharLocalPos.back() = headPosition;
+    //         glm::quat startBonedir;
+    //         for(uint16 i = _eyeBoneIndex.size()-1; i >=1; --i)
+    //         {
+    //             startBonedir = glm::vec3(inCharLocalRot[i-1] * glm::vec4(_boneVector[_eyeBoneIndex[i-1]]._direction,1));
+    //             float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i-1]);
+    //             float k = distance[i-1] / r;
+    //             inCharLocalPos[i-1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i-1], k);
+    //             positionFixLimitAngle(inCharLocalPos[i-1], inCharLocalPos[i], startBonedir,_boneVector[_eyeBoneIndex[i]], true);
+    //         }
 
-            inCharLocalPos.front() = start;
-            for(uint16 i = 0; i < _eyeBoneIndex.size()-1; ++i)
-            {
-                startBonedir = glm::vec3((inCharLocalRot[i] * glm::vec4(_boneVector[_eyeBoneIndex[i]]._direction,1)));
-                float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i+1]);
-                float k = distance[i] / r;
-                inCharLocalPos[i+1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i+1], k);
-                positionFixLimitAngle(inCharLocalPos[i], inCharLocalPos[i+1], startBonedir ,_boneVector[_eyeBoneIndex[i+1]], false);
-            }
-        }
-    }
-    //fix me rot 
-    glm::vec3 curSee = inCharLocalRot[_bonedirection.size()-2] * glm::vec4(_bonedirection[_bonedirection.size()-2],1);
-    glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(inCharLocalPos[_bonedirection.size()-2] - inCharLocalPos[_bonedirection.size()-3]));
-    inCharLocalRot[_bonedirection.size()-2] = glm::toMat4(afterSee) * inCharLocalRot[_bonedirection.size()-2];
+    //         inCharLocalPos.front() = start;
+    //         for(uint16 i = 0; i < _eyeBoneIndex.size()-1; ++i)
+    //         {
+    //             startBonedir = glm::vec3((inCharLocalRot[i] * glm::vec4(_boneVector[_eyeBoneIndex[i]]._direction,1)));
+    //             float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i+1]);
+    //             float k = distance[i] / r;
+    //             inCharLocalPos[i+1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i+1], k);
+    //             positionFixLimitAngle(inCharLocalPos[i], inCharLocalPos[i+1], startBonedir ,_boneVector[_eyeBoneIndex[i+1]], false);
+    //         }
+    //     }
+    // }
     
     for (uint32 i = 0; i < _eyeBoneIndex.size(); ++i)
     {
