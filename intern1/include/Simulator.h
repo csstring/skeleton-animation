@@ -1,46 +1,40 @@
 #pragma once
 #include "common.h"
-#include "Bone.h"
 #include "Skeleton.h"
 #include <deque>
 #include <iostream>
 #include "Animation.h"
 #include "Cube.h"
+#include "include/Controller.h"
+#include "include/BodyFactory.h"
+
 struct AnimationData;
 class TimeNode;
 class Character;
 class Cube;
-
-enum class KeyInput
-{
-    UP, LOWERBACK, REFT, RIGHT,
-    RUN, ATTACK,JUMP,STOP,CUBEFRONT,
-    CUBEBACK,CUBERIGHT,CUBELEFT,
-    CUBEUP, CUBEDOWN
-};
+enum class KeyInput;
+class Controller;
 
 class Simulator : Noncopyable
 {
     private:
-        Character* _player;
-
+        std::vector<Character*> _players;//shared ptr써야할거 같은데
+        Controller _controller;
+        BodyFactory _factory;
+        
     private :
         Animation* findAnimation(const std::string& name);
         void pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, TimeNode>>& animationDeque);
 
     public:
-        Simulator() : _player(nullptr){}
-        ~Simulator()
-        {
-            if (_player != nullptr)
-                delete _player;
-        }
+        Simulator(){}
+        ~Simulator(){}
         
         void initialize(void);
         void changeAnimation(KeyInput key);
         void update(void);
         void draw(void);
-        void setPlayer(Character* player);
+        void addPlayer(Character* player);
 
     public : 
         Skeleton               _skeleton;
@@ -48,4 +42,4 @@ class Simulator : Noncopyable
         Cube                   _cube;
 };
 
-std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref);
+// std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref);

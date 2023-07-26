@@ -5,14 +5,7 @@
 #include "include/GLM/ext.hpp"
 #include <tuple>
 
-enum class DOF{
-    RX,
-    RY,
-    RZ,
-    TX,
-    TY,
-    TZ
-};
+enum class DOF;
 
 struct Bone
 {

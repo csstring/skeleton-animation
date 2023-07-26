@@ -3,6 +3,7 @@
 #include "include/Animation.h"
 #include "include/Bone.h"
 #include "include/GLM/gtx/transform.hpp"
+#include "include/EnumHeader.h"
 #include "fstream"
 
 bool CmuFileParser::loadCmuFile(void)

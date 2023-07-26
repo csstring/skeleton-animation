@@ -1,6 +1,7 @@
 #include "include/Cylinder.h"
 #include "include/GL/glew.h"
 #include <cmath>
+#include "include/EnumHeader.h"
 //45 135
 void Cylinder::initialize(glm::vec3 color, uint32 VBC, BONEID ID)
 {

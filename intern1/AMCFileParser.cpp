@@ -6,6 +6,7 @@
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/GLM/gtx/transform.hpp"
 #include "include/Quantization.h"
+#include "include/EnumHeader.h"
 #include "fstream"
 
 void AMCFileParser::boneDataindexing(std::vector<AnimationData*>& indexVector)

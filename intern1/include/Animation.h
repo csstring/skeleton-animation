@@ -17,6 +17,9 @@ struct AnimationData
 
 class Animation
 {
+    private:
+        void getDataNode(const uint32 boneIndex, AnimationData& node, AnimationData** returnNode) const;
+        void getDataNode(const uint32 boneIndex, const AnimationData& node, const AnimationData** returnNode) const;
     public:
         explicit Animation(const char* name, float animationSpeed) : _name(name), _animationSpeed(animationSpeed)
         {
@@ -25,6 +28,7 @@ class Animation
         ~Animation(){}
 
         AnimationData* returnAnimationData(const uint32 boneIndex);
+        const AnimationData* returnAnimationData(const uint32 boneIndex) const;
         void           AnimationDataTraver(AnimationTreeTraversal& travel);
         void           findSameFrame(uint32 count);
     public:

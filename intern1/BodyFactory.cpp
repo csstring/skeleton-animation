@@ -2,7 +2,9 @@
 #include "include/Character.h"
 #include "include/Skeleton.h"
 
-Character* BodyFactory::makeCharacter(const Skeleton& _skeleton)
+Character* BodyFactory::makeCharacter(const Skeleton& _skeleton, const Controller& controller)
 {
-    return new Character(_skeleton);
+    Character* player = new Character(_skeleton, controller);
+    player->initialize();
+    return player;
 }

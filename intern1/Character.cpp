@@ -7,6 +7,8 @@
 #include "include/GLM/gtx/compatibility.hpp"
 #include "include/GLM/gtx/spline.hpp"
 #include "include/GLM/gtx/quaternion.hpp"
+#include "include/Controller.h"
+#include "include/EnumHeader.h"
 #include <queue>
 inline bool pairCompare(const std::pair<uint32, glm::quat>& a, const uint32& val)
 {
@@ -29,9 +31,6 @@ void Character::initialize(void)
     _boneLocalVector.resize(size);
     _worldTrans = glm::mat4(1.0f);
     _worldRotation = glm::mat4(1.0f);
-    _baseTransForm.resize(size);
-    _lowerTransForm.resize(size);
-    _upperTransForm.resize(size, glm::mat4(0.0f));
     boneBufferMaping();
 
     _eyeIK = new EyeIK(_skeleton.getBoneVector());
@@ -61,23 +60,6 @@ void Character::boneBufferMaping(void)
 
         glBindVertexArray(0);
     }
-}
-
-glm::mat4 Character::getMatrixInCharLocal(uint32 boneindex)
-{
-    const std::vector<Bone>& boneVector = _skeleton.getBoneVector();
-    glm::mat4 matrix(1.0f);
-    const Bone* bone = &boneVector[boneindex];
-    while (true)
-    {
-        glm::mat4 trans = glm::translate(glm::mat4(1.0f), _boneLocalVector[bone->_boneIndex].translationInBoneLocal);
-        glm::quat rot = _boneLocalVector[bone->_boneIndex].rotationInBoneLocal;
-        matrix = trans * glm::toMat4(rot) * matrix;
-        if (bone->_parentBoneIndex == -1)
-            break;
-        bone = &boneVector[bone->_parentBoneIndex];
-    }
-    return matrix;
 }
 
 void Character::getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpolT, const AnimationData* node, uint32 keyFrame)
@@ -149,7 +131,7 @@ void Character::eraseAnimation(const std::chrono::steady_clock::time_point& curT
     if (_baseAnimation.size() == 1 && 
             getAfterTimePoint(OVERLAPTIME) >= _baseAnimation.begin()->second._endTime)
     {
-        Animation* pushAnimation = _baseAnimation.front().first;
+        const Animation* pushAnimation = _baseAnimation.front().first;
         TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
         _baseAnimation.push_back({pushAnimation, node});
     }
@@ -159,28 +141,10 @@ void Character::eraseAnimation(const std::chrono::steady_clock::time_point& curT
     }
 }
 
-void Character::animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans)
-{
-    float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
-    if (interpolVal > 1)
-        interpolVal = 1;
-    for (uint8 i = 0; i < _baseTransForm.size(); ++i)
-    {
-        if (mixTrans[i] == glm::mat4(0.0f))
-            continue;
-        glm::quat rotBase(_baseTransForm[i]);
-        glm::quat rotMix(mixTrans[i]);
-        glm::vec4 translateBase = _baseTransForm[i] * glm::vec4(0,0,0,1);
-        glm::vec4 translateMix = mixTrans[i] * glm::vec4(0,0,0,1);
-        glm::quat rot = glm::slerp(rotBase, rotMix, interpolVal);
-        glm::vec3 trans = glm::mix(translateBase, translateMix, interpolVal);
-        _baseTransForm[i] = glm::translate(glm::mat4(1.0f), trans) * glm::toMat4(rot);
-    }
-}
 
 void Character::worldPositionUpdate(void)
 {
-    glm::vec3 t = _worldTrans * _worldRotation * getMatrixInCharLocal(0) * glm::vec4(0,0,0,1);
+    glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(0, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     _worldTrans = glm::translate(glm::mat4(1.0f), t);
 }
 
@@ -192,7 +156,7 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
 
     std::chrono::milliseconds  millisecondFromBegin, millisecondToEnd;
     uint64 keyFrame;
-    Animation* animation;
+    const Animation* animation;
     float interpolVal;
     //lower
     if (_baseAnimation.empty() == false)
@@ -252,7 +216,7 @@ void Character::draw(void)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
 
-        glm::mat4 toParentDir = _worldTrans * _worldRotation * getMatrixInCharLocal(bone._boneIndex) * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3);
+        glm::mat4 toParentDir = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(bone._boneIndex, _skeleton, _boneLocalVector) * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3);
         Cylinder cylinder(0.2, 1.0 *_skeleton.getGBL() * bone._length ,16, toParentDir);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
@@ -262,3 +226,24 @@ void Character::draw(void)
         glBindVertexArray(0);
     }
 }
+// void Character::animationBlending(const std::chrono::milliseconds& time, const std::vector<glm::mat4>& mixTrans)
+// {
+//     float interpolVal = static_cast<float>(time.count()) / OVERLAPTIME;
+//     if (interpolVal > 1)
+//         interpolVal = 1;
+//     for (uint8 i = 0; i < _baseTransForm.size(); ++i)
+//     {
+//         if (mixTrans[i] == glm::mat4(0.0f))
+//             continue;
+//         glm::quat rotBase(_baseTransForm[i]);
+//         glm::quat rotMix(mixTrans[i]);
+//         glm::vec4 translateBase = _baseTransForm[i] * glm::vec4(0,0,0,1);
+//         glm::vec4 translateMix = mixTrans[i] * glm::vec4(0,0,0,1);
+//         glm::quat rot = glm::slerp(rotBase, rotMix, interpolVal);
+//         glm::vec3 trans = glm::mix(translateBase, translateMix, interpolVal);
+//         _baseTransForm[i] = glm::translate(glm::mat4(1.0f), trans) * glm::toMat4(rot);
+//     }
+// }
+
+
+

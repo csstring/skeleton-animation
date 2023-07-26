@@ -5,12 +5,7 @@
 struct AnimationData;
 class Animation;
 class Skeleton;
-enum class TransFormFix
-{
-    LOWERFRONT,
-    LOWERBACK,
-    UPPERFRONT
-};
+class Controller;
 
 struct BoneLocal
 {
@@ -25,20 +20,16 @@ class Character
         bool                   _isFirstBlend;
         std::vector<uint32>    VAO, VBO, VBC;
         std::vector<BoneLocal> _boneLocalVector;
-
-        std::vector<glm::mat4> _baseTransForm;
-        std::vector<glm::mat4> _lowerTransForm;
-        std::vector<glm::mat4> _upperTransForm;
-
         glm::mat4              _worldTrans;
         glm::mat4              _worldRotation;
-
         const Skeleton&        _skeleton;
+        const Controller&      _controller;
+
 
     public:
-        std::deque<std::pair<Animation*, TimeNode>> _upperBodyAnimation;//endtime
-        std::deque<std::pair<Animation*, TimeNode>> _baseAnimation;
-        std::deque<std::pair<Animation*, TimeNode>> _lowerBodyAnimation;
+        std::deque<std::pair<const Animation*, TimeNode>> _upperBodyAnimation;//endtime
+        std::deque<std::pair<const Animation*, TimeNode>> _baseAnimation;
+        std::deque<std::pair<const Animation*, TimeNode>> _lowerBodyAnimation;
         EyeIK* _eyeIK;
 
     private :
@@ -50,7 +41,7 @@ class Character
         glm::mat4 getMatrixInCharLocal(uint32 boneindex);
         void worldPositionUpdate(void);
     public:
-        Character(const Skeleton& skeleton) : _skeleton(skeleton), _eyeIK(nullptr){};
+        Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller){};
         ~Character()
         {
             if (_eyeIK != nullptr)

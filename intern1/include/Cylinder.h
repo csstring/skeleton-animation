@@ -2,7 +2,7 @@
 #include "include/Common.h"
 #include "include/GLM/glm.hpp"
 #include <vector>
-
+enum BONEID;
 class Cylinder
 {
     public:

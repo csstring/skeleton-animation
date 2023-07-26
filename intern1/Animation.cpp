@@ -2,7 +2,7 @@
 #include "include/AnimationTreeTraversal.h"
 #include <queue>
 
-void getDataNode(const uint32 boneIndex, AnimationData& node, AnimationData** returnNode)
+void Animation::getDataNode(const uint32 boneIndex, AnimationData& node, AnimationData** returnNode) const
 {
     if (node._boneIndex == boneIndex)
     {
@@ -19,6 +19,29 @@ void getDataNode(const uint32 boneIndex, AnimationData& node, AnimationData** re
 AnimationData* Animation::returnAnimationData(const uint32 boneIndex)
 {   
     AnimationData* returnNode = NULL;
+    getDataNode(boneIndex, _rootNode, &returnNode);
+
+    return returnNode;
+}
+
+void Animation::getDataNode(const uint32 boneIndex, const AnimationData& node, const AnimationData** returnNode) const
+{
+    if (node._boneIndex == boneIndex)
+    {
+        *returnNode = &node;
+        return;
+    }
+    for (const AnimationData& childNode : node._childrens)
+    {
+        getDataNode(boneIndex, childNode, returnNode);
+    }
+    return;
+}
+
+
+const AnimationData* Animation::returnAnimationData(const uint32 boneIndex) const
+{   
+    const AnimationData* returnNode = NULL;
     getDataNode(boneIndex, _rootNode, &returnNode);
 
     return returnNode;

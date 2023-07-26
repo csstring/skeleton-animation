@@ -4,6 +4,7 @@
 #include "include/GLFW/glfw3.h"
 #include "include/Simulator.h"
 #include "include/Camera.h"
+#include "include/EnumHeader.h"
 
 void Window::initialize(void)
 {

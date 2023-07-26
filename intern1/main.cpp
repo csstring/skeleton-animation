@@ -57,7 +57,6 @@ int main()
     Simulator simulator;
     BodyFactory bodyFactory;
     fileLoad(simulator);
-    simulator.setPlayer(bodyFactory.makeCharacter(simulator._skeleton));
     simulator.initialize();
     //비슷한 지점 찾기
     //simulator._animations[4].findSameFrame(10);

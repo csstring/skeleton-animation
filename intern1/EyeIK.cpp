@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/GLM/gtc/quaternion.hpp"
+#include "include/EnumHeader.h"
 //parent bone 파싱 넣어야함
 void EyeIK::setTargetPosition(glm::vec3 targetPosition)
 {
@@ -61,22 +62,7 @@ bool EyeIK::reachable(const std::vector<glm::mat4>& characterTranspos, std::vect
     }
     return true;
 }
-glm::mat4 EyeIK::getMatrixInCharLocal(uint32 boneindex)
-{
-    const std::vector<Bone>& boneVector = _skeleton.getBoneVector();
-    glm::mat4 matrix(1.0f);
-    const Bone* bone = &boneVector[boneindex];
-    while (true)
-    {
-        glm::mat4 trans = glm::translate(glm::mat4(1.0f), _boneLocalVector[bone->_boneIndex].translationInBoneLocal);
-        glm::quat rot = _boneLocalVector[bone->_boneIndex].rotationInBoneLocal;
-        matrix = trans * glm::toMat4(rot) * matrix;
-        if (bone->_parentBoneIndex == -1)
-            break;
-        bone = &boneVector[bone->_parentBoneIndex];
-    }
-    return matrix;
-}
+
 /*
 quat -> 오일러 -> 제한 각도 확인하고 비율로 오일러 회전각 정해주고 -> quat -> rot
 */
@@ -90,9 +76,9 @@ const std::vector<glm::mat4>& EyeIK::solveEyeIK(const std::vector<glm::mat4>& ch
         it = glm::mat4(0.0f);
     for (uint32 i : _eyeBoneIndex)
     {
-        glm::mat4 inCharTrans = 
-        inCharLocalPos.push_back(characterTranspos[i] * glm::vec4(0,0,0,1));
-        inCharLocalRot.push_back(glm::mat3(characterTranspos[i]));
+        // glm::mat4 inCharTrans = 
+        // inCharLocalPos.push_back(characterTranspos[i] * glm::vec4(0,0,0,1));
+        // inCharLocalRot.push_back(glm::mat3(characterTranspos[i]));
     }
     //rotation
     //cursee를 살짝 아래보게하면 자연스러울듯

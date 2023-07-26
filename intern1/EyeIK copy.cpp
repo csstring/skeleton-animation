@@ -3,6 +3,7 @@
 #include <algorithm>
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/GLM/gtc/quaternion.hpp"
+#include "include/EnumHeader.h"
 //parent bone 파싱 넣어야함
 void EyeIK::setTargetPosition(glm::vec3 targetPosition)
 {
