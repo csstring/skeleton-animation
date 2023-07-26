@@ -1,5 +1,5 @@
 #pragma once
-#include "include/Common.h"
+#include "Common.h"
 
 const float cameraSpeed = 0.5f;
 class Camera

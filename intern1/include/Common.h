@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 #include <chrono>
-#include "include/GLM/glm.hpp"
-#include "include/GLM/gtx/string_cast.hpp"
+#include "GLM/glm.hpp"
+#include "GLM/gtx/string_cast.hpp"
 typedef signed char         int8;
 typedef signed short        int16;
 typedef signed int          int32;

@@ -1,6 +1,6 @@
 #pragma once
-#include "include/Common.h"
-#include "include/GLM/glm.hpp"
+#include "Common.h"
+#include "GLM/glm.hpp"
 #include <vector>
 
 class Line

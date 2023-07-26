@@ -2,7 +2,7 @@
 #include "common.h"
 #include <string>
 #include <vector>
-#include "include/GLM/ext.hpp"
+#include "GLM/ext.hpp"
 #include <tuple>
 
 enum class DOF;
