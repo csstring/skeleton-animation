@@ -5,11 +5,6 @@
 #include "include/EnumHeader.h"
 #include "include/Animation.h"
 
-const Character* Controller::getPlayer(void) const
-{
-    return _player;
-}
-
 void Controller::setPlayer(Character* player)
 {
     if (player == nullptr)
@@ -17,10 +12,7 @@ void Controller::setPlayer(Character* player)
     _player = player;
 }
 
-glm::mat4 Controller::getMatrixInCharLocal(
-    uint32 boneindex,
-    const Skeleton& _skeleton, 
-    std::vector<BoneLocal>& _boneLocalVector) const
+glm::mat4 Controller::getMatrixInCharLocal(uint32 boneindex,const Skeleton& _skeleton, const std::vector<BoneLocal>& _boneLocalVector) const
 {
     const std::vector<Bone>& boneVector = _skeleton.getBoneVector();
     glm::mat4 matrix(1.0f);

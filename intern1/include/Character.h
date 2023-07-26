@@ -2,11 +2,17 @@
 #include "TimeNode.h"
 #include <deque>
 #include "EyeIK.h"
-#include "BoneLocal.h"
 struct AnimationData;
 class Animation;
 class Skeleton;
 class Controller;
+
+struct BoneLocal
+{
+    glm::quat rotationInBoneLocal;
+    glm::vec3 translationInBoneLocal;
+    glm::vec3 scaleInBoneLocal;
+};
 
 class Character
 {   
