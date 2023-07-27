@@ -1,4 +1,3 @@
-#include "BodyInterface.h"
 #include "TimeNode.h"
 #include <deque>
 #include "BoneLocal.h"
@@ -7,6 +6,7 @@ class Animation;
 class Skeleton;
 class Controller;
 class EyeIK;
+
 class Character
 {   
     private:

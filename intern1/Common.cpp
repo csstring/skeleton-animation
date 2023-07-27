@@ -29,3 +29,21 @@ glm::mat4 ft_rotate(glm::vec3 start, glm::vec3 end)
     float angle = glm::acos(glm::dot(start, end));
     return glm::rotate(angle, axisNormal);
 }
+
+glm::vec3 quatToEulerDivideRatio(const glm::quat& quat, float ratio)
+{
+    glm::vec3 axis = glm::axis(quat);
+    float angle = glm::angle(quat);
+    angle *= ratio;
+    glm::quat newQuat = glm::angleAxis(angle, axis);
+
+    return glm::eulerAngles(newQuat);
+}
+
+glm::quat quatDivideRatio(const glm::quat& quat, float ratio)
+{
+    glm::vec3 axis = glm::axis(quat);
+    float angle = glm::angle(quat);
+    angle *= ratio;
+    return glm::angleAxis(angle, axis);
+}

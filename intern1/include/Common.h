@@ -39,6 +39,8 @@ void ft_assert(const std::string& exec);
 //utility
 std::vector<std::string> ft_split(const std::string& str);
 glm::mat4 ft_rotate(glm::vec3 start, glm::vec3 end);
+glm::vec3 quatToEulerDivideRatio(const glm::quat& quat, float ratio);
+glm::quat quatDivideRatio(const glm::quat& quat, float ratio);
 
 inline std::chrono::steady_clock::time_point getCurTimePoint(void)
 {

@@ -210,6 +210,8 @@ bool CmuFileParser::parserAsfDof(std::ifstream& ifs, Bone& bone)
         std::getline(ifs, buffer, '(');
         float min, max;
         ifs >> min, ifs >> max;
+        min = glm::radians(min);
+        max = glm::radians(max);
         bone._limits.push_back({dof, min, max});
         std::getline(ifs, buffer);
     }

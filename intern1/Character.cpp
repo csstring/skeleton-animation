@@ -201,7 +201,7 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     _eyeIK->setTargetPosition(eyeTarget);
 
     {
-        const std::vector<glm::mat4>& IKTrans = _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller);
+        _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller);
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK->_start);
         // animationBlending(millisecondFromBegin ,IKTrans);
     }
@@ -216,7 +216,7 @@ void Character::draw(void)
     for(const Bone& bone : boneVector)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
-        glm::mat4 toParentDir = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(bone._boneIndex, _skeleton, _boneLocalVector) * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3);
+       glm::mat4 toParentDir = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(bone._boneIndex, _skeleton, _boneLocalVector) * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3);
         Cylinder cylinder(0.2, 1.0 *_skeleton.getGBL() * bone._length ,16, toParentDir);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
