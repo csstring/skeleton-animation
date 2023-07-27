@@ -198,13 +198,9 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
 
         updateTransForm(*animation->returnAnimationData(11/*lowerback*/), millisecondFromBegin.count()*120/1000, interpolVal);
     }
-    _eyeIK->setTargetPosition(eyeTarget);
 
-    {
-        _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller);
-        millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _eyeIK->_start);
-        // animationBlending(millisecondFromBegin ,IKTrans);
-    }
+    _eyeIK->setTargetPosition(eyeTarget);
+    _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 }
 
 //up -> draw
