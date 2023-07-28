@@ -5,21 +5,21 @@ class Bone;
 class Controller;
 const float LOWERNECK_RATIO = 0.2;
 const float UPPER_RATIO = 0.35;
-const float HEAD_RATIO = 0.45;
+const float HEAD_RATIO = 1 - LOWERNECK_RATIO - UPPER_RATIO;
 class EyeIK
 {
     private:
-        bool _targetOn;
-        bool _isFirst;
-        float _blendingRatio;
-        glm::vec3 _targetPosition;
-        std::vector<glm::vec3> _bonedirection;
-        std::vector<uint8> _eyeBoneIndex;
-        std::vector<glm::mat4> _IKTranspos;
+        bool                     _targetOn;
+        bool                     _isFirst;
+        float                    _blendingRatio;
+        glm::vec3                _targetPosition;
+        std::vector<glm::vec3>   _bonedirection;
+        std::vector<uint8>       _eyeBoneIndex;
         const std::vector<Bone>& _boneVector;//지워야 할듯?
     private:
         glm::vec3 moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end, const glm::quat& toTargetDir, const glm::vec3& endBoneDir, float ratio);
         bool limitAngleCheck(const Bone& bone, const glm::quat& boneRot);
+        void blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime);
 
     public:
         std::chrono::steady_clock::time_point _callTime;

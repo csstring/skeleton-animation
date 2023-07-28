@@ -42,4 +42,6 @@ class Character
         void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget);
         void draw(void);
         void rotationY(float radian);
+        glm::mat4 getCharacterWorldPosition(void) const;
+        const std::vector<BoneLocal>& getCharLocalVector(void) const {return _boneLocalVector;};
 };

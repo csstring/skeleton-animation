@@ -21,10 +21,6 @@ class Simulator : Noncopyable
         std::vector<Character*> _players;//shared ptr써야할거 같은데
         Controller _controller;
         BodyFactory _factory;
-        
-    private :
-        Animation* findAnimation(const std::string& name);
-        void pushAnimation(Animation* pushAnimation, std::deque<std::pair<Animation*, TimeNode>>& animationDeque);
 
     public:
         Simulator(){}

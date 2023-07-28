@@ -21,6 +21,11 @@ void Character::rotationY(float radian)
     _worldRotation = glm::rotate(_worldRotation, radian, glm::vec3(0,1,0));
 }
 
+glm::mat4 Character::getCharacterWorldPosition(void) const
+{
+    return _worldTrans * _worldRotation;
+}
+
 void Character::initialize(void)
 {
     int64 size = _skeleton.getBoneVector().size();

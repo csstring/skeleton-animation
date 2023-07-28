@@ -46,7 +46,7 @@ class Cube
         {-1.0f, 1.0f, 1.0f,1.0f},
         {1.0f,-1.0f, 1.0f,1.0f},
     };
-        glm::mat4 _pos;
+    glm::mat4 _pos;
         
     public:
         Cube()

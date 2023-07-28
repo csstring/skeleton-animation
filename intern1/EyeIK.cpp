@@ -33,7 +33,6 @@ void EyeIK::initialize(void)
             break;
     }
     std::reverse(_eyeBoneIndex.begin(), _eyeBoneIndex.end());
-    _IKTranspos.resize(_boneVector.size(), glm::mat4(0.0f));
     _targetPosition = glm::vec3(10000,10000,10000);
 }
 
@@ -64,10 +63,27 @@ glm::vec3 EyeIK::moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end
     
     return (targetPos - initialPos); 
 }
-/*
-quat -> 오일러 -> 제한 각도 확인하고 비율로 오일러 회전각 정해주고 -> quat -> rot
-ratio, 
-*/
+
+void EyeIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime)
+{
+    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _callTime);
+    if (_targetOn == false && _blendingRatio <= 0)
+    {
+        _callTime = curTime;
+        return;
+    }
+    else if (_targetOn == false && _blendingRatio > 0)
+        _blendingRatio -= static_cast<float>(millisecond.count()) / OVERLAPTIME;
+    else if (_targetOn == true && _blendingRatio < 1)
+        _blendingRatio += static_cast<float>(millisecond.count()) / OVERLAPTIME;
+    if (_blendingRatio > 1) 
+        _blendingRatio = 1;
+    else if (_blendingRatio < 0) 
+        _blendingRatio = 0;
+    
+    _callTime = curTime;
+}
+
 void EyeIK::solveEyeIK(
     std::vector<BoneLocal>& _boneLocalVector, 
     const glm::mat4& worldRotation, 
@@ -111,31 +127,15 @@ void EyeIK::solveEyeIK(
             continue;
         if (limitAngleCheck(_boneVector[i], rot) == false)
         {
-            glm::vec3 deg = quatToEulerDivideRatio(rot, 1) * (180.0f / PI);
-            std::cout << glm::to_string(deg) << std::endl;
+            // glm::vec3 deg = quatToEulerDivideRatio(rot, 1) * (180.0f / PI);
+            // std::cout << glm::to_string(deg) << std::endl;
             _targetOn = false;
             break;
         }
         _targetOn = true;
     }
 
-    {
-        std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _callTime);
-        if (_targetOn == false && _blendingRatio <= 0)
-        {
-            _callTime = curTime;
-            return;
-        }
-        else if (_targetOn == false && _blendingRatio > 0)
-            _blendingRatio -= static_cast<float>(millisecond.count()) / OVERLAPTIME;
-        else if (_targetOn == true && _blendingRatio < 1)
-            _blendingRatio += static_cast<float>(millisecond.count()) / OVERLAPTIME;
-    }
-
-    if (_blendingRatio > 1) 
-        _blendingRatio = 1;
-    else if (_blendingRatio < 0) 
-        _blendingRatio = 0;
+    blendingRatioUpdate(curTime);
 
     for (uint32 i = 0; i < _eyeBoneIndex.size(); ++i)
     {
@@ -150,10 +150,7 @@ void EyeIK::solveEyeIK(
             continue;
         glm::quat mixRot = quatDivideRatio(afterSee,ratio) * _boneLocalVector[_eyeBoneIndex[i]].rotationInBoneLocal;
         glm::vec3 mixTranslate = _boneLocalVector[_eyeBoneIndex[i]].translationInBoneLocal + moveInBoneLocalPos(inCharLocalPos[i-1], inCharLocalPos[i], afterSee, _bonedirection[i], ratio);
-        std::cout << "check" << std::endl;
         _boneLocalVector[_eyeBoneIndex[i]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_eyeBoneIndex[i]].rotationInBoneLocal, mixRot, _blendingRatio);
         _boneLocalVector[_eyeBoneIndex[i]].translationInBoneLocal = glm::mix(_boneLocalVector[_eyeBoneIndex[i]].translationInBoneLocal, mixTranslate, _blendingRatio);
     }
-
-    _callTime = curTime;
 }
