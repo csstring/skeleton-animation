@@ -1,5 +1,5 @@
 #include "include/Camera.h"
-
+#include "include/GLFW/glfw3.h"
 void Camera::update(void)
 {
     _view = glm::lookAt(_cameraPos, _cameraPos+_cameraFront, _cameraUp);
@@ -7,7 +7,74 @@ void Camera::update(void)
 
 void Camera::initialize(void)
 {
-    _cameraPos = glm::vec3(0.0f,3.0f,50.0f);
-    _cameraFront = glm::vec3(0.0f,0.0f,-1.0f);
-    _cameraUp = glm::vec3(0.0f, 1.0f,0.0f);
+    updateCameraVectors();
+}
+
+void Camera::ProcessMouseScroll(float yoffset)
+{
+    _zoom -= (float)yoffset;
+    if (_zoom < 1.0f)
+        _zoom = 1.0f;
+    if (_zoom > 45.0f)
+        _zoom = 45.0f;
+}
+
+void Camera::updateCameraVectors()
+{
+    // calculate the new Front vector
+    glm::vec3 front;
+    front.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
+    front.y = sin(glm::radians(_pitch));
+    front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
+    _cameraFront = glm::normalize(front);
+    // also re-calculate the Right and Up vector
+    _cameraRight = glm::normalize(glm::cross(_cameraFront, _cameraUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    _cameraUp    = glm::normalize(glm::cross(_cameraRight, _cameraFront));
+}
+
+void Camera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPitch = true)
+{
+    xoffset *= _mouseSensitivity;
+    yoffset *= _mouseSensitivity;
+
+    _yaw   += xoffset;
+    _pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (constrainPitch)
+    {
+        if (_pitch > 89.0f)
+            _pitch = 89.0f;
+        if (_pitch < -89.0f)
+            _pitch = -89.0f;
+    }
+    updateCameraVectors();
+}
+
+void Camera::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (_isFirst)
+    {
+        _lastX = xpos;
+        _lastY = ypos;
+        _isFirst = false;
+    }
+
+    float xoffset = xpos - _lastX;
+    float yoffset = _lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    _lastX = xpos;
+    _lastY = ypos;
+
+    ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void Camera::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    ProcessMouseScroll(static_cast<float>(yoffset));
 }

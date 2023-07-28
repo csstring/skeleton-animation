@@ -33,10 +33,14 @@ void Window::initialize(void)
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
     // glfwSwapInterval(1);
-    _view = createViewMatrix();
+    glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    _camera.initialize();
 }
 
-void Window::processInput(Simulator& simulator, Camera& camera)
+void Window::processInput(Simulator& simulator)
 {
     static int currentWalkState,previousWalkState;
     static int currentBackState,previousBackState;
@@ -52,29 +56,15 @@ void Window::processInput(Simulator& simulator, Camera& camera)
 
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
-    //z축
-    // if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-    //     _view = glm::translate(_view, glm::vec3(0.0f, -0.0f, -0.3f)); 
-    // if (glfwGetKey(_window, GLFW_KEY_DOWN ) == GLFW_PRESS)
-    //     _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, 0.3f));
-    // if (glfwGetKey(_window, GLFW_KEY_W ) == GLFW_PRESS)
-    //     _view = glm::translate(_view, glm::vec3(0.0f, 0.3f, 0.0f));
-    // if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
-    //     _view = glm::translate(_view, glm::vec3(0.0f, -0.3f, 0.0f));
-    
-    //y축
-    if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-        camera._cameraPos += cameraSpeed * camera._cameraFront;
-    if (glfwGetKey(_window, GLFW_KEY_DOWN ) == GLFW_PRESS)
-        camera._cameraPos -= cameraSpeed * camera._cameraFront;
-    if (glfwGetKey(_window, GLFW_KEY_W ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, -0.5f));
-    if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, -0.0f, 0.5f));
-    if (glfwGetKey(_window, GLFW_KEY_RIGHT ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.3f, 0.0f, 0.0f));
-    if (glfwGetKey(_window, GLFW_KEY_LEFT ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(-0.3f, 0.0f, 0.0f));
+
+    if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
+        _camera._cameraPos += cameraSpeed * _camera._cameraFront;
+    else if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
+        _camera._cameraPos -= cameraSpeed * _camera._cameraFront;
+    else if (glfwGetKey(_window, GLFW_KEY_A ) == GLFW_PRESS)
+        _camera._cameraPos -= _camera._cameraRight * cameraSpeed;
+    else if (glfwGetKey(_window, GLFW_KEY_D ) == GLFW_PRESS)
+        _camera._cameraPos += _camera._cameraRight * cameraSpeed;
 
     if (currentWalkState == GLFW_PRESS && previousWalkState == GLFW_RELEASE)
     {
@@ -153,16 +143,7 @@ void Window::bufferSwap(void)
     glfwSwapBuffers(_window);
 }
 
-glm::mat4 Window::createViewMatrix()
+void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    //y
-    glm::vec3 cameraPos(0.0f, 0.0f, 100.0f);  // 카메라 위치
-    glm::vec3 targetPos(0.0f, 0.0f, 0.0f);   // 바라보는 지점
-    glm::vec3 upVector(0.0f, 1.0f, 0.0f);    // 위쪽 방향
-    //z
-    // glm::vec3 cameraPos(0.0f, 0.0f, 100.0f);  // 카메라 위치
-    // glm::vec3 targetPos(0.0f, 0.0f, 0.0f);   // 바라보는 지점
-    // glm::vec3 upVector(0.0f, 1.0f, 0.0f);    // 위쪽 방향
-    glm::mat4 viewMatrix = glm::lookAt(cameraPos, targetPos, upVector);
-    return viewMatrix;
+    glViewport(0, 0, width, height);
 }

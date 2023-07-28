@@ -47,12 +47,10 @@ void fileLoad(Simulator& simulator)
 int main() 
 {
     Window window;
-    Camera camera;
     Shader shader("/shaderSource/VertexShader.glsl","/shaderSource/FragmentShader.glsl");
     
     window.initialize();
     shader.initialize();
-    camera.initialize();
 
     Simulator simulator;
     BodyFactory bodyFactory;
@@ -67,11 +65,11 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         shader.use();
-        window.processInput(simulator, camera);
+        window.processInput(simulator);
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)WINDOW_WITH / (float)WINDOW_HEIGHT, 0.1f, 500.0f);
-        camera.update();
+        window._camera.update();
         shader.setMat4("projection", projection);
-        shader.setMat4("view", camera._view);
+        shader.setMat4("view", window._camera._view);
         simulator.update();
         simulator.draw();
         ground.draw();
