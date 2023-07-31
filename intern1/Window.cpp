@@ -33,14 +33,10 @@ void Window::initialize(void)
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
     // glfwSwapInterval(1);
-    glfwSetFramebufferSizeCallback(_window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    _camera.initialize();
+
 }
 
-void Window::processInput(Simulator& simulator)
+void Window::processInput(Simulator& simulator, Camera& camera)
 {
     static int currentWalkState,previousWalkState;
     static int currentBackState,previousBackState;
@@ -58,13 +54,13 @@ void Window::processInput(Simulator& simulator)
         glfwSetWindowShouldClose(_window, true);
 
     if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
-        _camera._cameraPos += cameraSpeed * _camera._cameraFront;
-    else if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
-        _camera._cameraPos -= cameraSpeed * _camera._cameraFront;
-    else if (glfwGetKey(_window, GLFW_KEY_A ) == GLFW_PRESS)
-        _camera._cameraPos -= _camera._cameraRight * cameraSpeed;
-    else if (glfwGetKey(_window, GLFW_KEY_D ) == GLFW_PRESS)
-        _camera._cameraPos += _camera._cameraRight * cameraSpeed;
+        camera._cameraPos += cameraSpeed * camera._cameraFront;
+    if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
+        camera._cameraPos -= cameraSpeed * camera._cameraFront;
+    if (glfwGetKey(_window, GLFW_KEY_A ) == GLFW_PRESS)
+        camera._cameraPos -= camera._cameraRight * cameraSpeed;
+    if (glfwGetKey(_window, GLFW_KEY_D ) == GLFW_PRESS)
+        camera._cameraPos += camera._cameraRight * cameraSpeed;
 
     if (currentWalkState == GLFW_PRESS && previousWalkState == GLFW_RELEASE)
     {
@@ -141,9 +137,4 @@ bool Window::isWindowClose(void)
 void Window::bufferSwap(void)
 {
     glfwSwapBuffers(_window);
-}
-
-void Window::framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
 }

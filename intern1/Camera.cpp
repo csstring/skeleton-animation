@@ -17,6 +17,7 @@ void Camera::ProcessMouseScroll(float yoffset)
         _zoom = 1.0f;
     if (_zoom > 45.0f)
         _zoom = 45.0f;
+    std::cout << "scroll chec" << std::endl;
 }
 
 void Camera::updateCameraVectors()
@@ -49,32 +50,4 @@ void Camera::ProcessMouseMovement(float xoffset, float yoffset, bool constrainPi
             _pitch = -89.0f;
     }
     updateCameraVectors();
-}
-
-void Camera::mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
-{
-    float xpos = static_cast<float>(xposIn);
-    float ypos = static_cast<float>(yposIn);
-
-    if (_isFirst)
-    {
-        _lastX = xpos;
-        _lastY = ypos;
-        _isFirst = false;
-    }
-
-    float xoffset = xpos - _lastX;
-    float yoffset = _lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    _lastX = xpos;
-    _lastY = ypos;
-
-    ProcessMouseMovement(xoffset, yoffset);
-}
-
-// glfw: whenever the mouse scroll wheel scrolls, this callback is called
-// ----------------------------------------------------------------------
-void Camera::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    ProcessMouseScroll(static_cast<float>(yoffset));
 }
