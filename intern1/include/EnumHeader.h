@@ -21,3 +21,13 @@ enum class KeyInput
     CUBEBACK,CUBERIGHT,CUBELEFT,
     CUBEUP, CUBEDOWN
 };
+
+enum BlendNode // index 접근할지 순회 돌지 고민
+{
+    BASE, UPPER, LOWER
+};
+
+enum class PlayerState
+{
+    IDLE, RUN, WALK
+};

@@ -10,8 +10,12 @@
 void Simulator::addPlayer(const std::string initAnimationName)//position, name 같은거 추가하면 될듯
 {
     Character* newPlayer = _factory.makeCharacter(_skeleton, _controller);
-    _controller.pushAnimation(initAnimationName, _animations, newPlayer->_baseAnimation);
+    Character* oldPlayer = _controller.getPlayer();
+    
     _players.push_back(newPlayer);
+    _controller.setPlayer(newPlayer);
+    _controller.pushAnimation(initAnimationName, _animations, BlendNode::BASE);
+    _controller.setPlayer(oldPlayer);
 }
 
 void Simulator::initialize(void)
@@ -50,7 +54,6 @@ void Simulator::changeControllCharacter(void)
     glm::vec3 curSee,curPos;
     curPos = curPlayer->getCharacterWorldPosition() * inCharLocalPosition * glm::vec4(0,0,0,1);
     curSee = worRot * tmpRot * glm::vec4(glm::cross(glm::vec3(1,0,0), curPlayer->getCharacterSkeleton().getBoneVector()[BONEID::THORAX]._direction),1);
-    std::cout << glm::to_string(curSee) << std::endl;
     for (Character* player : _players)
     {
         if (player == curPlayer)
@@ -60,11 +63,10 @@ void Simulator::changeControllCharacter(void)
         glm::vec3 nextEeler = glm::normalize(nextPos - curPos);
         glm::quat quat = glm::rotation(curSee, nextEeler);
         float rad = std::abs(glm::angle(quat));
-        // std::cout << glm::to_string(curSee) << std::endl;
+
         if (rad < minRad)
         {
             _controller.setPlayer(player);
-            std::cout <<" rad : " << rad << std::endl;
             minRad = rad;
         }
     }

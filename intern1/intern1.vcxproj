@@ -21,6 +21,11 @@
   <ItemGroup>
     <ClCompile Include="AMCFileParser.cpp" />
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationBlend\BaseNode.cpp" />
+    <ClCompile Include="AnimationBlend\Blender.cpp" />
+    <ClCompile Include="AnimationBlend\IBlendNode.cpp" />
+    <ClCompile Include="AnimationBlend\LowerNode.cpp" />
+    <ClCompile Include="AnimationBlend\UpperNode.cpp" />
     <ClCompile Include="AnimationCompressor.cpp" />
     <ClCompile Include="AnimationDataResize.cpp" />
     <ClCompile Include="BodyFactory.cpp" />
@@ -44,6 +49,11 @@
   <ItemGroup>
     <ClInclude Include="include\AMCFileParser.h" />
     <ClInclude Include="include\Animation.h" />
+    <ClInclude Include="include\AnimationBlend\BaseNode.h" />
+    <ClInclude Include="include\AnimationBlend\Blender.h" />
+    <ClInclude Include="include\AnimationBlend\IBlendNode.h" />
+    <ClInclude Include="include\AnimationBlend\LowerNode.h" />
+    <ClInclude Include="include\AnimationBlend\UpperNode.h" />
     <ClInclude Include="include\AnimationCompressor.h" />
     <ClInclude Include="include\AnimationDataResize.h" />
     <ClInclude Include="include\AnimationTreeTraversal.h" />

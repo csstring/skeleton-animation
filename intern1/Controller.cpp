@@ -4,6 +4,7 @@
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/EnumHeader.h"
 #include "include/Animation.h"
+#include "include/AnimationBlend/IBlendNode.h"
 
 void Controller::initialize(void)
 {
@@ -56,10 +57,11 @@ const Animation* Controller::findAnimation(const std::string& name, const std::v
     }
     return NULL;
 }
-
-void Controller::pushAnimation(const std::string& name, const std::vector<Animation>& _animations, std::deque<std::pair<const Animation*, TimeNode>>& animationDeque)
+//Nodenum 인자 받는걸로 변경
+void Controller::pushAnimation(const std::string& name, const std::vector<Animation>& _animations, BlendNode nodeNum)
 {
     const Animation* pushAnimation = findAnimation(name, _animations);
+    auto& animationDeque = _player->_blender.getBlendNode(nodeNum)->_animations;
 
     if (animationDeque.size() >= 3)
         animationDeque.pop_back();
@@ -75,8 +77,11 @@ void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _ani
 {
     if (_player == nullptr)
         return;
+
+    const auto& upper = _player->_blender.getBlendNode(BlendNode::UPPER);
+    const auto& lower = _player->_blender.getBlendNode(BlendNode::LOWER);
     if (key == KeyInput::UP)
-        this->pushAnimation("walk", _animations, _player->_baseAnimation);
+        this->pushAnimation("walk", _animations, BlendNode::BASE);
     else if (key == KeyInput::LOWERBACK)
         _player->rotationY(PI);
     else if (key == KeyInput::REFT)
@@ -84,16 +89,16 @@ void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _ani
     else if (key == KeyInput::RIGHT)
         _player->rotationY(-PI/(2*30));
     else if (key == KeyInput::STOP)
-        this->pushAnimation("idle", _animations, _player->_baseAnimation);
+        this->pushAnimation("idle", _animations, BlendNode::BASE);
     else if (key == KeyInput::RUN)
     {
-        if (_player->_baseAnimation.begin()->first->_name == "walk")
-            this->pushAnimation("run", _animations, _player->_baseAnimation);
-        else if (_player->_baseAnimation.begin()->first->_name == "run")
-            this->pushAnimation("walk", _animations, _player->_baseAnimation);
+        if (_player->_state == PlayerState::WALK)
+            this->pushAnimation("run", _animations, BlendNode::BASE);
+        else if (_player->_state == PlayerState::RUN)
+            this->pushAnimation("walk", _animations, BlendNode::BASE);
     }
-    else if (key == KeyInput::ATTACK && _player->_upperBodyAnimation.empty() == true)
-        this->pushAnimation("punch", _animations, _player->_upperBodyAnimation);
-    else if (key == KeyInput::JUMP && _player->_lowerBodyAnimation.empty() == true)
-        this->pushAnimation("runJump2", _animations, _player->_lowerBodyAnimation);
+    else if (key == KeyInput::ATTACK && upper->_animations.empty() == true)
+        this->pushAnimation("punch", _animations, BlendNode::UPPER);
+    else if (key == KeyInput::JUMP && lower->_animations.empty() == true)
+        this->pushAnimation("runJump2", _animations, BlendNode::LOWER);
 }

@@ -78,6 +78,21 @@
     <ClCompile Include="Window.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="AnimationBlend\BaseNode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationBlend\Blender.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationBlend\IBlendNode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationBlend\LowerNode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationBlend\UpperNode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AMCFileParser.h">
@@ -156,6 +171,21 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\BoneLocal.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimationBlend\BaseNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimationBlend\Blender.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimationBlend\IBlendNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimationBlend\LowerNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AnimationBlend\UpperNode.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

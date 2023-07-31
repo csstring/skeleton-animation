@@ -1,6 +1,8 @@
 #include "TimeNode.h"
 #include <deque>
 #include "BoneLocal.h"
+#include "AnimationBlend/Blender.h"
+#include "EnumHeader.h"
 struct AnimationData;
 class Animation;
 class Skeleton;
@@ -10,7 +12,6 @@ class EyeIK;
 class Character
 {   
     private:
-        bool                   _isFirstBlend;
         std::vector<uint32>    VAO, VBO, VBC;
         std::vector<BoneLocal> _boneLocalVector;
         glm::mat4              _worldTrans;
@@ -19,17 +20,14 @@ class Character
         const Controller&      _controller;
 
     public:
-        std::deque<std::pair<const Animation*, TimeNode>> _upperBodyAnimation;//endtime
-        std::deque<std::pair<const Animation*, TimeNode>> _baseAnimation;
-        std::deque<std::pair<const Animation*, TimeNode>> _lowerBodyAnimation;
+        Blender _blender;
         EyeIK* _eyeIK;
+        PlayerState _state;
 
     private :
-        void updateTransForm(const AnimationData& node, uint32 keyTime, float interpolVal);
-        void eraseAnimation(const std::chrono::steady_clock::time_point& curTime);
-        void boneBufferMaping(void);     
-        void getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpolT, const AnimationData* node, uint32 keyFrame);
+        void boneBufferMaping(void);  
         void worldPositionUpdate(void);
+        void stateChange(void);
     public:
         Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller){};
         ~Character()
