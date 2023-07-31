@@ -1,6 +1,6 @@
 #include "../include/Animation.h"
 #include "../include/AnimationBlend/UpperNode.h"
-
+#include "../include/EnumHeader.h"
 void UpperNode::eraseAnimation(const std::chrono::steady_clock::time_point& curTime)
 {
     if (_animations.empty() == false && curTime >= _animations.begin()->second._endTime)
@@ -23,6 +23,6 @@ void UpperNode::update(const std::chrono::steady_clock::time_point& curTime, std
         else
             interpolVal = static_cast<float>(millisecondFromBegin.count()) / OVERLAPTIME;
 
-        updateTransForm(*animation->returnAnimationData(11/*lowerback*/), millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector);
+        updateTransForm(*animation->returnAnimationData(BONEID::LOWERBACK), millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector);
     }
 }

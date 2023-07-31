@@ -3,7 +3,8 @@
 #include "../include/AnimationBlend/UpperNode.h"
 #include "../include/AnimationBlend/LowerNode.h"
 #include "../include/BoneLocal.h"
-
+#include "../include/Skeleton.h"
+#include "../include/IK/IKUtility.h"
 IBlendNode* Blender::getBlendNode(BlendNode nodeNum)
 {
     for (const auto& node : _blendTree)
@@ -32,4 +33,11 @@ void Blender::animationUpdate(const std::chrono::steady_clock::time_point& curTi
 {
     for (const auto& node : _blendTree)
         node.second->update(curTime, boneLocalVector);
+}
+
+void Blender::angleCheck(const Skeleton& skeleton, std::vector<BoneLocal>& boneLocalVector)
+{
+    if (limitAngleCheck(skeleton.getBoneVector()[BONEID::LOWERBACK], boneLocalVector[BONEID::LOWERBACK].rotationInBoneLocal) == true)
+        return;
+    std::cout << "error" << std::endl;
 }

@@ -18,7 +18,6 @@ class EyeIK
         const std::vector<Bone>& _boneVector;//지워야 할듯?
     private:
         glm::vec3 moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end, const glm::quat& toTargetDir, const glm::vec3& endBoneDir, float ratio);
-        bool limitAngleCheck(const Bone& bone, const glm::quat& boneRot);
         void blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime);
 
     public:

@@ -6,8 +6,8 @@
 #include "include/Controller.h"
 #include "include/Character.h"
 #include "include/Bone.h"
-// #include "include/Skeleton.h"
-//parent bone 파싱 넣어야함
+#include "include/IK/IKUtility.h"
+
 void EyeIK::setTargetPosition(glm::vec3 targetPosition)
 {
     _targetPosition = targetPosition;
@@ -34,25 +34,6 @@ void EyeIK::initialize(void)
     }
     std::reverse(_eyeBoneIndex.begin(), _eyeBoneIndex.end());
     _targetPosition = glm::vec3(10000,10000,10000);
-}
-
-bool EyeIK::limitAngleCheck(const Bone& bone, const glm::quat& boneRot)
-{
-    glm::vec3 eulerAngle = glm::eulerAngles(boneRot);
-
-    for (auto& limit : bone._limits)
-    {
-        DOF dof;
-        float min, max;
-        std::tie(dof, min, max) = limit;
-        if (dof == DOF::RX && (eulerAngle.x < min || max < eulerAngle.x))
-            return false;
-        else if (dof == DOF::RY && (eulerAngle.y < min || max < eulerAngle.y))
-            return false;
-        else if (dof == DOF::RZ && (eulerAngle.z < min || max < eulerAngle.z))
-            return false;
-    }
-    return true;
 }
 
 glm::vec3 EyeIK::moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end, const glm::quat& toTargetDir, const glm::vec3& endBoneDir, float ratio)//비율

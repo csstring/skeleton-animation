@@ -38,6 +38,7 @@
     <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="EyeIK.cpp" />
     <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="IK\IKUtility.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Quantization.cpp" />
@@ -71,6 +72,7 @@
     <ClInclude Include="include\EnumHeader.h" />
     <ClInclude Include="include\EyeIK.h" />
     <ClInclude Include="include\Ground.h" />
+    <ClInclude Include="include\IK\IKUtility.h" />
     <ClInclude Include="include\Line.h" />
     <ClInclude Include="include\Quantization.h" />
     <ClInclude Include="include\shader.h" />
