@@ -96,7 +96,8 @@ void Window::processInput(Simulator& simulator, Camera& camera)
         simulator.changeAnimation(KeyInput::DRINK);
     if (glfwGetKey(_window, GLFW_KEY_X ) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::ROLL);
-
+    if (glfwGetKey(_window, GLFW_KEY_C ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::GOLF);
     
     if (glfwGetKey(_window, GLFW_KEY_U) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::CUBEFRONT);

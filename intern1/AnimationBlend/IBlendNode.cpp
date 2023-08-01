@@ -37,7 +37,8 @@ void IBlendNode::getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpo
 void IBlendNode::updateTransForm(
     const AnimationData& node, uint32 keyFrame, float interpolVal, 
     std::vector<BoneLocal>& _boneLocalVector,
-    std::vector<BONEID> boneIds
+    std::vector<BONEID> boneIds,
+    BlendNode nodeNum 
 )
 {
     std::queue<const AnimationData*> animationQ;
@@ -63,9 +64,11 @@ void IBlendNode::updateTransForm(
         glm::quat mixR;
         glm::vec3 mixT;
         getTransFormByKeyFrame(mixR, mixT, curData, keyFrame);
-
-        _boneLocalVector[curData->_boneIndex].translationInBoneLocal = glm::mix(_boneLocalVector[curData->_boneIndex].translationInBoneLocal, mixT, interpolVal);
-        _boneLocalVector[curData->_boneIndex].rotationInBoneLocal = glm::slerp(_boneLocalVector[curData->_boneIndex].rotationInBoneLocal, mixR, interpolVal);
+        
+        if (nodeNum != BlendNode::UPPER || curData->_boneIndex != BONEID::ROOT)
+            _boneLocalVector[curData->_boneIndex].translationInBoneLocal = glm::mix(_boneLocalVector[curData->_boneIndex].translationInBoneLocal, mixT, interpolVal);
+        if (nodeNum != BlendNode::LOWER || curData->_boneIndex != BONEID::ROOT)
+            _boneLocalVector[curData->_boneIndex].rotationInBoneLocal = glm::slerp(_boneLocalVector[curData->_boneIndex].rotationInBoneLocal, mixR, interpolVal);
     }
 }
 
@@ -85,6 +88,8 @@ void IBlendNode::changeUpperState(UpperState& upperState, const std::string& nam
         upperState = UpperState::DRINK;
     if (name == "roll")
         upperState = UpperState::ROLL;
+    if (name == "golf")
+        upperState = UpperState::GOLF;
 }
 
 void IBlendNode::changeLowerState(LowerState& loswerState, const std::string& name)
@@ -103,4 +108,6 @@ void IBlendNode::changeLowerState(LowerState& loswerState, const std::string& na
         loswerState = LowerState::DRINK;
     if (name == "roll")
         loswerState = LowerState::ROLL;
+    if (name == "golf")
+        loswerState = LowerState::GOLF;
 }

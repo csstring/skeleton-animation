@@ -30,6 +30,6 @@ void LeftArmNode::update(
         else
             interpolVal = static_cast<float>(millisecondFromBegin.count()) / OVERLAPTIME;
 
-        updateTransForm(*animation->returnAnimationData(BONEID::THORAX), millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector, {BONEID::RCLAVICLE});
+        updateTransForm(*animation->returnAnimationData(BONEID::THORAX), millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector, {BONEID::RCLAVICLE}, BlendNode::LEFTARM);
     }
 }
