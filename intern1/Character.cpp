@@ -70,7 +70,6 @@ void Character::worldPositionUpdate(float deltaTime)
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(0, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     if (t.y > 0)
         t.y -= _yError * deltaTime;
-    // std::cout << glm::to_string(t) << std::endl;
     _worldTrans = glm::translate(glm::mat4(1.0f), t);
 }
 
