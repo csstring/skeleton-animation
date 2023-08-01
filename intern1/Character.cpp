@@ -65,15 +65,18 @@ void Character::boneBufferMaping(void)
     }
 }
 
-void Character::worldPositionUpdate(void)
+void Character::worldPositionUpdate(float deltaTime)
 {
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(0, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
+    if (t.y > 0)
+        t.y -= _yError * deltaTime;
+    // std::cout << glm::to_string(t) << std::endl;
     _worldTrans = glm::translate(glm::mat4(1.0f), t);
 }
 
 void Character::stateChange()
 {
-    const std::string& name = _blender.getBlendNode(BlendNode::BASE)->_animations.begin()->first->_name;
+    // const std::string& name = _blender.getBlendNode(BlendNode::BASE)->_animations.begin()->first->_name;
     //상체가 비어있거나 하체 비어있으면 베이스 애니메이션 state로 채워주기
     // if (name == "run")
     //     _state = PlayerState::RUN;
@@ -85,13 +88,21 @@ void Character::stateChange()
 
 void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget)
 {
+    std::chrono::milliseconds delta;
+    if (_yError != 0)
+        delta = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lastCallTime);
+    else 
+        delta = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curTime);
+
     _blender.eraseAnimationCall(curTime);
     stateChange();
-    worldPositionUpdate();
+    worldPositionUpdate(delta.count());
     _blender.animationUpdate(curTime, _boneLocalVector, _lowerState, _upState);
 
     _eyeIK->setTargetPosition(eyeTarget);
     _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
+
+    _lastCallTime = curTime;
 }
 
 //up -> draw

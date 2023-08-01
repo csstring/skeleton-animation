@@ -18,16 +18,18 @@ class Character
         glm::mat4              _worldRotation;
         const Skeleton&        _skeleton;
         const Controller&      _controller;
+        std::chrono::steady_clock::time_point _lastCallTime;
 
     public:
         Blender _blender;
         EyeIK* _eyeIK;
         UpperState _upState;
         LowerState _lowerState;
-        
+        float      _yError = 0.001;
+
     private :
         void boneBufferMaping(void);  
-        void worldPositionUpdate(void);
+        void worldPositionUpdate(float deltaTime);
         void stateChange(void);
     public:
         Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller){};

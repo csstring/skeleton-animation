@@ -62,7 +62,7 @@ void Controller::pushAnimation(const std::string& name, const std::vector<Animat
 {
     const Animation* pushAnimation = findAnimation(name, _animations);
     auto& animationDeque = _player->_blender.getBlendNode(nodeNum)->_animations;
-
+    //lower base animation time y error
     if (animationDeque.size() >= 3)
         animationDeque.pop_back();
     if (animationDeque.size() >= 1 &&
@@ -71,6 +71,7 @@ void Controller::pushAnimation(const std::string& name, const std::vector<Animat
 
     TimeNode node(getCurTimePoint(), getAfterTimePoint(pushAnimation->_animationMillisecond));
     animationDeque.push_back({pushAnimation, node});
+
 }
 
 void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _animations)
