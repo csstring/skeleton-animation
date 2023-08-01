@@ -92,13 +92,34 @@ void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _ani
         this->pushAnimation("idle", _animations, BlendNode::BASE);
     else if (key == KeyInput::RUN)
     {
-        if (_player->_state == PlayerState::WALK)
+        if (_player->_lowerState == LowerState::WALK)
             this->pushAnimation("run", _animations, BlendNode::BASE);
-        else if (_player->_state == PlayerState::RUN)
+        else if (_player->_lowerState == LowerState::RUN)
             this->pushAnimation("walk", _animations, BlendNode::BASE);
     }
-    else if (key == KeyInput::ATTACK && upper->_animations.empty() == true)
-        this->pushAnimation("punch", _animations, BlendNode::UPPER);
-    else if (key == KeyInput::JUMP && lower->_animations.empty() == true)
-        this->pushAnimation("runJump2", _animations, BlendNode::LOWER);
+    else if (key == KeyInput::ATTACK)
+    {
+        if (_player->_lowerState < LowerState::PUNCH)
+            this->pushAnimation("punch", _animations, BlendNode::LOWER);
+        if (_player->_upState < UpperState::PUNCH)
+            this->pushAnimation("punch", _animations, BlendNode::UPPER);
+    }
+    else if (key == KeyInput::DRINK)
+    {
+        if (_player->_upState < UpperState::DRINK)
+            this->pushAnimation("drink", _animations, BlendNode::LEFTARM);
+    }
+    else if (key == KeyInput::JUMP)
+    {
+        if (_player->_lowerState < LowerState::JUMP)
+            this->pushAnimation("runJump2", _animations, BlendNode::LOWER);
+        if (_player->_upState < UpperState::JUMP)
+            this->pushAnimation("runJump2", _animations, BlendNode::UPPER);
+    }
+    else if (key == KeyInput::ROLL && _player->_lowerState < LowerState::ROLL)
+    {
+        this->pushAnimation("roll", _animations, BlendNode::LOWER);
+        if (_player->_upState < UpperState::ROLL)
+            this->pushAnimation("roll", _animations, BlendNode::UPPER);
+    }
 }

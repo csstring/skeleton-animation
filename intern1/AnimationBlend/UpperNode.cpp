@@ -7,7 +7,12 @@ void UpperNode::eraseAnimation(const std::chrono::steady_clock::time_point& curT
         _animations.pop_front();
 }
 
-void UpperNode::update(const std::chrono::steady_clock::time_point& curTime, std::vector<BoneLocal>& _boneLocalVector)
+void UpperNode::update(
+    const std::chrono::steady_clock::time_point& curTime, 
+    std::vector<BoneLocal>& _boneLocalVector,
+    LowerState& lowerState,
+    UpperState& upperState
+)
 {
     const Animation* animation;
     float interpolVal;
@@ -16,6 +21,7 @@ void UpperNode::update(const std::chrono::steady_clock::time_point& curTime, std
     if (_animations.empty() == false) 
     {
         animation = _animations.front().first;
+        changeUpperState(upperState, animation->_name);
         millisecondToEnd = std::chrono::duration_cast<std::chrono::milliseconds>(_animations.front().second._endTime - curTime);
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _animations.front().second._startTime);
         if (millisecondToEnd.count() <= OVERLAPTIME)
@@ -23,6 +29,6 @@ void UpperNode::update(const std::chrono::steady_clock::time_point& curTime, std
         else
             interpolVal = static_cast<float>(millisecondFromBegin.count()) / OVERLAPTIME;
 
-        updateTransForm(*animation->returnAnimationData(BONEID::LOWERBACK), millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector);
+        updateTransForm(*animation->returnAnimationData(BONEID::LOWERBACK), millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector, {BONEID::RHIPJOINT, BONEID::LHIPJOINT});
     }
 }

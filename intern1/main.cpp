@@ -55,13 +55,15 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 void fileLoad(Simulator& simulator)
 {
-    std::vector<const char*> amcPathList = {"./amc/walk1.amc", "./amc/run.amc","./amc/runJump2.amc","./amc/punch.amc","./amc/idle.amc", "./amc/dance.amc"};
+    std::vector<const char*> amcPathList = {"./amc/walk1.amc", "./amc/run.amc","./amc/runJump2.amc","./amc/punch.amc","./amc/idle.amc", "./amc/dance.amc", "./amc/drink.amc", "./amc/roll.amc"};
     simulator._animations.push_back(Animation("walk", 1));
     simulator._animations.push_back(Animation("run", 1));
     simulator._animations.push_back(Animation("runJump2", 1));
     simulator._animations.push_back(Animation("punch", 1));
     simulator._animations.push_back(Animation("idle", 1));
     simulator._animations.push_back(Animation("dance", 1));
+    simulator._animations.push_back(Animation("drink", 1));
+    simulator._animations.push_back(Animation("roll", 1));
     CmuFileParser parser(asfPath,&simulator._skeleton, &simulator._animations[0]);
     parser.loadCmuFile();
 

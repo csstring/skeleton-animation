@@ -92,7 +92,12 @@ void Window::processInput(Simulator& simulator, Camera& camera)
     } else if (currentRunState == GLFW_RELEASE && previousRunState == GLFW_PRESS) {
         previousRunState = currentRunState;
     }
+    if (glfwGetKey(_window, GLFW_KEY_Z ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::DRINK);
+    if (glfwGetKey(_window, GLFW_KEY_X ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::ROLL);
 
+    
     if (glfwGetKey(_window, GLFW_KEY_U) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::CUBEFRONT);
     if (glfwGetKey(_window, GLFW_KEY_J) == GLFW_PRESS)

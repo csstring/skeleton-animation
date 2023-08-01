@@ -34,7 +34,11 @@ void IBlendNode::getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpo
     interpolT = glm::catmullRom(v0,v1,v2,v3,(keyFrame - (itT -2)->first)/((itT-1)->first - (itT -2)->first));
 }
 
-void IBlendNode::updateTransForm(const AnimationData& node, uint32 keyFrame, float interpolVal, std::vector<BoneLocal>& _boneLocalVector)
+void IBlendNode::updateTransForm(
+    const AnimationData& node, uint32 keyFrame, float interpolVal, 
+    std::vector<BoneLocal>& _boneLocalVector,
+    std::vector<BONEID> boneIds
+)
 {
     std::queue<const AnimationData*> animationQ;
     
@@ -47,7 +51,15 @@ void IBlendNode::updateTransForm(const AnimationData& node, uint32 keyFrame, flo
         const AnimationData* curData = animationQ.front();
         animationQ.pop();
         for (const AnimationData& animation : curData->_childrens)
+        {
+            auto it = std::find(boneIds.begin(), boneIds.end(), animation._boneIndex);
+            if (it != boneIds.end())
+            {
+                boneIds.erase(it);
+                continue;
+            }
             animationQ.push(&animation);
+        }
         glm::quat mixR;
         glm::vec3 mixT;
         getTransFormByKeyFrame(mixR, mixT, curData, keyFrame);
@@ -55,4 +67,40 @@ void IBlendNode::updateTransForm(const AnimationData& node, uint32 keyFrame, flo
         _boneLocalVector[curData->_boneIndex].translationInBoneLocal = glm::mix(_boneLocalVector[curData->_boneIndex].translationInBoneLocal, mixT, interpolVal);
         _boneLocalVector[curData->_boneIndex].rotationInBoneLocal = glm::slerp(_boneLocalVector[curData->_boneIndex].rotationInBoneLocal, mixR, interpolVal);
     }
+}
+
+void IBlendNode::changeUpperState(UpperState& upperState, const std::string& name)
+{
+    if (name == "idle")
+        upperState = UpperState::IDLE;
+    if (name == "run")
+        upperState = UpperState::RUN;
+    if (name == "walk")
+        upperState = UpperState::WALK;
+    if (name == "runJump2")
+        upperState = UpperState::JUMP;
+    if (name == "punch")
+        upperState = UpperState::PUNCH;
+    if (name == "drink")
+        upperState = UpperState::DRINK;
+    if (name == "roll")
+        upperState = UpperState::ROLL;
+}
+
+void IBlendNode::changeLowerState(LowerState& loswerState, const std::string& name)
+{
+    if (name == "idle")
+        loswerState = LowerState::IDLE;
+    if (name == "run")
+        loswerState = LowerState::RUN;
+    if (name == "walk")
+        loswerState = LowerState::WALK;
+    if (name == "runJump2")
+        loswerState = LowerState::JUMP;
+    if (name == "punch")
+        loswerState = LowerState::PUNCH;
+    if (name == "drink")
+        loswerState = LowerState::DRINK;
+    if (name == "roll")
+        loswerState = LowerState::ROLL;
 }

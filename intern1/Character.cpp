@@ -74,12 +74,13 @@ void Character::worldPositionUpdate(void)
 void Character::stateChange()
 {
     const std::string& name = _blender.getBlendNode(BlendNode::BASE)->_animations.begin()->first->_name;
-    if (name == "run")
-        _state = PlayerState::RUN;
-    if (name == "idle")
-        _state = PlayerState::IDLE;
-    if (name == "walk")
-        _state = PlayerState::WALK;
+    //상체가 비어있거나 하체 비어있으면 베이스 애니메이션 state로 채워주기
+    // if (name == "run")
+    //     _state = PlayerState::RUN;
+    // if (name == "idle")
+    //     _state = PlayerState::IDLE;
+    // if (name == "walk")
+    //     _state = PlayerState::WALK;
 }
 
 void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget)
@@ -87,7 +88,7 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     _blender.eraseAnimationCall(curTime);
     stateChange();
     worldPositionUpdate();
-    _blender.animationUpdate(curTime, _boneLocalVector);
+    _blender.animationUpdate(curTime, _boneLocalVector, _lowerState, _upState);
 
     _eyeIK->setTargetPosition(eyeTarget);
     _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);

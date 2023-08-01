@@ -32,8 +32,8 @@ class Animation
         void           AnimationDataTraver(AnimationTreeTraversal& travel);
         void           findSameFrame(uint32 count);
     public:
-        uint64 _animationMillisecond;
-        float _animationSpeed;
+        uint64         _animationMillisecond;
+        float          _animationSpeed;
         AnimationData  _rootNode;
         std::string    _name;
 };

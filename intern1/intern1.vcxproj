@@ -24,6 +24,7 @@
     <ClCompile Include="AnimationBlend\BaseNode.cpp" />
     <ClCompile Include="AnimationBlend\Blender.cpp" />
     <ClCompile Include="AnimationBlend\IBlendNode.cpp" />
+    <ClCompile Include="AnimationBlend\LeftArmNode.cpp" />
     <ClCompile Include="AnimationBlend\LowerNode.cpp" />
     <ClCompile Include="AnimationBlend\UpperNode.cpp" />
     <ClCompile Include="AnimationCompressor.cpp" />
@@ -53,6 +54,7 @@
     <ClInclude Include="include\AnimationBlend\BaseNode.h" />
     <ClInclude Include="include\AnimationBlend\Blender.h" />
     <ClInclude Include="include\AnimationBlend\IBlendNode.h" />
+    <ClInclude Include="include\AnimationBlend\LeftArmNode.h" />
     <ClInclude Include="include\AnimationBlend\LowerNode.h" />
     <ClInclude Include="include\AnimationBlend\UpperNode.h" />
     <ClInclude Include="include\AnimationCompressor.h" />

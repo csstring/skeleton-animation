@@ -22,8 +22,9 @@ class Character
     public:
         Blender _blender;
         EyeIK* _eyeIK;
-        PlayerState _state;
-
+        UpperState _upState;
+        LowerState _lowerState;
+        
     private :
         void boneBufferMaping(void);  
         void worldPositionUpdate(void);
