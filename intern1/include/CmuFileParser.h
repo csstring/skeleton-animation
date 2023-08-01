@@ -2,9 +2,10 @@
 #include "common.h"
 #include <string>
 class Skeleton;
-class Bone;
+struct Bone;
 class Animation;
 
+static const char* asfPath = "./asf/02.asf";
 class CmuFileParser : Noncopyable
 {
     public : 

@@ -1,8 +1,8 @@
 #pragma once
-#include "include/Common.h"
-#include "include/GLM/glm.hpp"
+#include "Common.h"
+#include "GLM/glm.hpp"
 #include <vector>
-
+enum BONEID;
 class Cylinder
 {
     public:
@@ -24,7 +24,7 @@ class Cylinder
             _numVerticesTotal = _numVerticesSide + _numVerticesTopBottom * 2;
         }
         ~Cylinder(){}
-        void initialize();
+        void initialize(glm::vec3 color, uint32 VBC, BONEID ID);
         void render(uint32 vbo) const;
     private:
 };

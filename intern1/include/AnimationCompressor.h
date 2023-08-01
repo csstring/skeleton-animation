@@ -1,20 +1,24 @@
 #pragma once
 
-#include "include/Common.h"
+#include "Common.h"
 #include <vector>
 #include <utility>
-class Animation;
 
+class Animation;
+struct AnimationData;
 class AnimationCompressor
 {
     private:
-        std::vector<uint32> getCompressKeyFrame();
+        void getCompressKeyFrame(std::vector<uint32>& frameList);
         std::pair<float, int32> findFramePoint(std::vector<uint32> frameList, uint32 index);
+        void dataSwap(AnimationData* node, std::vector<uint32>& frameList);
+    
     public:
         AnimationCompressor(){}
         ~AnimationCompressor(){}
-        std::vector<uint32> getCompressedData(Animation* animation, float errorRange);      
+        void CompressData(Animation* animation, float errorRange);
+    
     private:
         float _errorRange;
-        std::vector<glm::quat> _KeyFrameData;
+        std::vector<std::pair<uint32,glm::quat>>* _KeyFrameData;
 };

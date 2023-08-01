@@ -2,6 +2,9 @@
 #include "include/Window.h"
 #include "include/GL/glew.h"
 #include "include/GLFW/glfw3.h"
+#include "include/Simulator.h"
+#include "include/Camera.h"
+#include "include/EnumHeader.h"
 
 void Window::initialize(void)
 {
@@ -26,28 +29,102 @@ void Window::initialize(void)
         ft_assert("glew init failed");
 
     clearColorSetUp();
-    glfwSwapInterval(3);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
+    // glfwSwapInterval(1);
+
 }
 
-void Window::processInput(void)
+void Window::processInput(Simulator& simulator, Camera& camera)
 {
+    static int currentWalkState,previousWalkState;
+    static int currentBackState,previousBackState;
+    static int currentRunState,previousRunState;
+    static int currentAddCharState,previousAddCharState;
+    static int currentCharChangeState,previousCharChangeState;
+
+    currentWalkState = glfwGetKey(_window, GLFW_KEY_KP_8);
+    currentBackState = glfwGetKey(_window, GLFW_KEY_KP_5);
+    currentRunState = glfwGetKey(_window, GLFW_KEY_LEFT_SHIFT);
+    currentAddCharState = glfwGetKey(_window, GLFW_KEY_P);
+    currentCharChangeState = glfwGetKey(_window, GLFW_KEY_SPACE);
+
     if(glfwGetKey(_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(_window, true);
-    if (glfwGetKey(_window, GLFW_KEY_UP) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, -1.0f)); 
-    if (glfwGetKey(_window, GLFW_KEY_DOWN ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 0.0f, 1.0f));
-    if (glfwGetKey(_window, GLFW_KEY_RIGHT ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(1.0f, 0.0f, 0.0f));
-    if (glfwGetKey(_window, GLFW_KEY_LEFT ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(-1.0f, 0.0f, 0.0f));
-    if (glfwGetKey(_window, GLFW_KEY_W ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, 1.0f, 0.0f));
+
+    if (glfwGetKey(_window, GLFW_KEY_W) == GLFW_PRESS)
+        camera._cameraPos += cameraSpeed * camera._cameraFront;
     if (glfwGetKey(_window, GLFW_KEY_S ) == GLFW_PRESS)
-        _view = glm::translate(_view, glm::vec3(0.0f, -1.0f, 0.0f));
+        camera._cameraPos -= cameraSpeed * camera._cameraFront;
+    if (glfwGetKey(_window, GLFW_KEY_A ) == GLFW_PRESS)
+        camera._cameraPos -= camera._cameraRight * cameraSpeed;
+    if (glfwGetKey(_window, GLFW_KEY_D ) == GLFW_PRESS)
+        camera._cameraPos += camera._cameraRight * cameraSpeed;
+
+    if (currentWalkState == GLFW_PRESS && previousWalkState == GLFW_RELEASE)
+    {
+        simulator.changeAnimation(KeyInput::UP);
+        previousWalkState = currentWalkState;
+    } else if (currentWalkState == GLFW_RELEASE && previousWalkState == GLFW_PRESS) {
+        previousWalkState = currentWalkState;
+        simulator.changeAnimation(KeyInput::STOP);
+    }
+    if (currentBackState == GLFW_PRESS && previousBackState == GLFW_RELEASE)
+    {
+        previousBackState = currentBackState;
+    } else if (currentBackState == GLFW_RELEASE && previousBackState == GLFW_PRESS) {
+        previousBackState = currentBackState;
+        simulator.changeAnimation(KeyInput::LOWERBACK);
+    }
+    if (glfwGetKey(_window, GLFW_KEY_KP_4 ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::REFT);
+    if (glfwGetKey(_window, GLFW_KEY_KP_6 ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::RIGHT);
+    if (glfwGetKey(_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(_window, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::ATTACK);
+    if (glfwGetKey(_window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS || glfwGetKey(_window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::JUMP);
+    if (currentRunState == GLFW_PRESS && previousRunState == GLFW_RELEASE)
+    {
+        simulator.changeAnimation(KeyInput::RUN);
+        previousRunState = currentRunState;
+    } else if (currentRunState == GLFW_RELEASE && previousRunState == GLFW_PRESS) {
+        previousRunState = currentRunState;
+    }
+    if (glfwGetKey(_window, GLFW_KEY_Z ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::DRINK);
+    if (glfwGetKey(_window, GLFW_KEY_X ) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::ROLL);
+
+    
+    if (glfwGetKey(_window, GLFW_KEY_U) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEFRONT);
+    if (glfwGetKey(_window, GLFW_KEY_J) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEBACK);
+    if (glfwGetKey(_window, GLFW_KEY_H) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBERIGHT);
+    if (glfwGetKey(_window, GLFW_KEY_K) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBELEFT);
+    if (glfwGetKey(_window, GLFW_KEY_Y) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEUP);
+    if (glfwGetKey(_window, GLFW_KEY_I) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::CUBEDOWN);
+
+    if (currentAddCharState == GLFW_PRESS && previousAddCharState == GLFW_RELEASE)
+    {
+        simulator.addPlayer("idle");
+        previousAddCharState = currentAddCharState;
+    } else if (currentAddCharState == GLFW_RELEASE && previousAddCharState == GLFW_PRESS) {
+        previousAddCharState = currentAddCharState;
+    }
+    if (currentCharChangeState == GLFW_PRESS && previousCharChangeState == GLFW_RELEASE)
+    {
+        simulator.changeControllCharacter();
+        previousCharChangeState = currentCharChangeState;
+    } else if (currentCharChangeState == GLFW_RELEASE && previousCharChangeState == GLFW_PRESS) {
+        previousCharChangeState = currentCharChangeState;
+    }
 }
 
 void Window::clearColorSetUp(float r, float g, float b, float a)

@@ -18,6 +18,71 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AMCFileParser.cpp" />
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationBlend\BaseNode.cpp" />
+    <ClCompile Include="AnimationBlend\Blender.cpp" />
+    <ClCompile Include="AnimationBlend\IBlendNode.cpp" />
+    <ClCompile Include="AnimationBlend\LeftArmNode.cpp" />
+    <ClCompile Include="AnimationBlend\LowerNode.cpp" />
+    <ClCompile Include="AnimationBlend\UpperNode.cpp" />
+    <ClCompile Include="AnimationCompressor.cpp" />
+    <ClCompile Include="AnimationDataResize.cpp" />
+    <ClCompile Include="BodyFactory.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Character.cpp" />
+    <ClCompile Include="CmuFileParser.cpp" />
+    <ClCompile Include="Common.cpp" />
+    <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Cube.cpp" />
+    <ClCompile Include="Cylinder.cpp" />
+    <ClCompile Include="EyeIK.cpp" />
+    <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="IK\IKUtility.cpp" />
+    <ClCompile Include="Line.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Quantization.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="Simulator.cpp" />
+    <ClCompile Include="Skeleton.cpp" />
+    <ClCompile Include="Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\AMCFileParser.h" />
+    <ClInclude Include="include\Animation.h" />
+    <ClInclude Include="include\AnimationBlend\BaseNode.h" />
+    <ClInclude Include="include\AnimationBlend\Blender.h" />
+    <ClInclude Include="include\AnimationBlend\IBlendNode.h" />
+    <ClInclude Include="include\AnimationBlend\LeftArmNode.h" />
+    <ClInclude Include="include\AnimationBlend\LowerNode.h" />
+    <ClInclude Include="include\AnimationBlend\UpperNode.h" />
+    <ClInclude Include="include\AnimationCompressor.h" />
+    <ClInclude Include="include\AnimationDataResize.h" />
+    <ClInclude Include="include\AnimationTreeTraversal.h" />
+    <ClInclude Include="include\BodyFactory.h" />
+    <ClInclude Include="include\BodyInterface.h" />
+    <ClInclude Include="include\Bone.h" />
+    <ClInclude Include="include\BoneLocal.h" />
+    <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\Character.h" />
+    <ClInclude Include="include\CmuFileParser.h" />
+    <ClInclude Include="include\Common.h" />
+    <ClInclude Include="include\Controller.h" />
+    <ClInclude Include="include\Cube.h" />
+    <ClInclude Include="include\Cylinder.h" />
+    <ClInclude Include="include\EnumHeader.h" />
+    <ClInclude Include="include\EyeIK.h" />
+    <ClInclude Include="include\Ground.h" />
+    <ClInclude Include="include\IK\IKUtility.h" />
+    <ClInclude Include="include\Line.h" />
+    <ClInclude Include="include\Quantization.h" />
+    <ClInclude Include="include\shader.h" />
+    <ClInclude Include="include\Simulator.h" />
+    <ClInclude Include="include\Skeleton.h" />
+    <ClInclude Include="include\TimeNode.h" />
+    <ClInclude Include="include\Window.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -139,43 +204,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="AMCFileParser.cpp" />
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="AnimationCompressor.cpp" />
-    <ClCompile Include="AnimationDataMatrixSetup.cpp" />
-    <ClCompile Include="AnimationDataResize.cpp" />
-    <ClCompile Include="CmuFileParser.cpp" />
-    <ClCompile Include="Common.cpp" />
-    <ClCompile Include="Cylinder.cpp" />
-    <ClCompile Include="Ground.cpp" />
-    <ClCompile Include="Line.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Quantization.cpp" />
-    <ClCompile Include="shader.cpp" />
-    <ClCompile Include="Simulator.cpp" />
-    <ClCompile Include="Skeleton.cpp" />
-    <ClCompile Include="Window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\AMCFileParser.h" />
-    <ClInclude Include="include\Animation.h" />
-    <ClInclude Include="include\AnimationCompressor.h" />
-    <ClInclude Include="include\AnimationDataMatrixSetup.h" />
-    <ClInclude Include="include\AnimationDataResize.h" />
-    <ClInclude Include="include\AnimationTreeTraversal.h" />
-    <ClInclude Include="include\Bone.h" />
-    <ClInclude Include="include\CmuFileParser.h" />
-    <ClInclude Include="include\Common.h" />
-    <ClInclude Include="include\Cylinder.h" />
-    <ClInclude Include="include\Ground.h" />
-    <ClInclude Include="include\Line.h" />
-    <ClInclude Include="include\Quantization.h" />
-    <ClInclude Include="include\shader.h" />
-    <ClInclude Include="include\Simulator.h" />
-    <ClInclude Include="include\Skeleton.h" />
-    <ClInclude Include="include\Window.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

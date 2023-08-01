@@ -2,20 +2,22 @@
 #include "Common.h"
 
 struct GLFWwindow;
+class Simulator;
+class Camera;
 class Window : Noncopyable
 {
     public :
-        explicit    Window(void) : _window(nullptr), _view(glm::mat4(1.0f)){}
+        explicit    Window(void) : _window(nullptr){}
                    ~Window(void){}
                    
         void        initialize(void);
-        void        processInput(void);
+        void        processInput(Simulator& simulator, Camera& camera);
         void        clearColorSetUp(float r = 0, float g = 0, float b = 0, float a = 0);
         bool        isWindowClose(void);
         void        bufferSwap(void);
-
-        glm::mat4   _view;//fixme
+        void        framebuffer_size_callback(GLFWwindow* window, int width, int height);
+    public :
+        GLFWwindow* _window;
 
     private :
-        GLFWwindow* _window;
 };

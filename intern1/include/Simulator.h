@@ -1,34 +1,41 @@
 #pragma once
 #include "common.h"
-#include "Bone.h"
-#include <vector>
 #include "Skeleton.h"
+#include <deque>
 #include <iostream>
-class Animation;
+#include "Animation.h"
+#include "Cube.h"
+#include "Controller.h"
+#include "BodyFactory.h"
+
 struct AnimationData;
+class TimeNode;
+class Character;
+class Cube;
+enum class KeyInput;
+class Controller;
 
 class Simulator : Noncopyable
 {
     private:
-        Skeleton*              _skeleton;
-        Animation*             _animation;
-        std::vector<uint32>    VAO, VBO, VBC;
-        uint32                 _keyCount;
-        std::vector<glm::mat4> _transForm;
-        std::vector<uint32>    _compresskeyFrame[4];//애니메이션 개수 만큼 배열 되어야 할듯
-
-        void updateTransForm(const AnimationData& node, glm::mat4 wolrdTrans, float* keyArray);
+        std::vector<Character*> _players;//shared ptr써야할거 같은데
+        Controller _controller;
+        BodyFactory _factory;
 
     public:
-        Simulator(Skeleton* skeleton, Animation* animation) : _skeleton(skeleton), _animation(animation){}
+        Simulator(){}
         ~Simulator(){}
+        
         void initialize(void);
-
-        //getter
-        uint32 getTotalKeyCount(void){return _keyCount;};
-
-        void setupModelMatrix(void);
-        void animationDataMaping(void);
-        void update(uint32 keyTime, uint32 animationIndex);
-        void draw(uint32 animationTime,uint32 shaderPrograms);
+        void changeAnimation(KeyInput key);
+        void update(void);
+        void draw(void);
+        void addPlayer(const std::string initAnimationName);//position, name 같은거 추가하면 될듯
+        void changeControllCharacter(void);//캐릭터 id추가하고 구분해야 할듯
+    public : 
+        Skeleton               _skeleton;
+        std::vector<Animation> _animations;
+        Cube                   _cube;
 };
+
+// std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref);

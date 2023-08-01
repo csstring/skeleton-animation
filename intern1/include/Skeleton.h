@@ -16,10 +16,10 @@ class Skeleton
         void setProgramName(std::string programname) {_programName = programname;};
         
         //getter
-        bool getIsDeg(void){ return _isDeg;};
-        float getGBL(void){ return _globalLengthMultiplier;};
+        bool getIsDeg(void) const { return _isDeg;};
+        float getGBL(void) const { return _globalLengthMultiplier;};
         std::vector<Bone>& getBoneVector(void){return _boneVector;};
-
+        const std::vector<Bone>& getBoneVector(void) const {return _boneVector;};
         int32 findBoneIndex(const std::string& name) const;
 
     private:
@@ -28,4 +28,5 @@ class Skeleton
         float             _mass;
         float             _globalLengthMultiplier;
         std::vector<Bone> _boneVector;
+        
 };

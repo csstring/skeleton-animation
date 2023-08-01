@@ -1,6 +1,6 @@
 #pragma once
 #include "Common.h"
-#include "include/GLM/ext.hpp"
+#include "GLM/ext.hpp"
 
 class Shader : Noncopyable
 {   

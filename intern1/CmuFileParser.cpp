@@ -3,6 +3,7 @@
 #include "include/Animation.h"
 #include "include/Bone.h"
 #include "include/GLM/gtx/transform.hpp"
+#include "include/EnumHeader.h"
 #include "fstream"
 
 bool CmuFileParser::loadCmuFile(void)
@@ -192,7 +193,6 @@ bool CmuFileParser::parseAsfBoneData(std::ifstream& ifs)
 bool CmuFileParser::parserAsfDof(std::ifstream& ifs, Bone& bone)
 {
     std::string buffer;
-    int dofCount = 0;
 
     while (ifs >> buffer)
     {
@@ -204,10 +204,17 @@ bool CmuFileParser::parserAsfDof(std::ifstream& ifs, Bone& bone)
         else if (buffer == "tx") bone._dof.push_back(DOF::TX);
         else if (buffer == "ty") bone._dof.push_back(DOF::TY);
         else if (buffer == "tz") bone._dof.push_back(DOF::TZ);
-        dofCount++;
     }
-    while (dofCount--)//thorw limits
+    for (DOF dof : bone._dof)
+    {
+        std::getline(ifs, buffer, '(');
+        float min, max;
+        ifs >> min, ifs >> max;
+        min = glm::radians(min);
+        max = glm::radians(max);
+        bone._limits.push_back({dof, min, max});
         std::getline(ifs, buffer);
+    }
     
     return true;
 }
@@ -238,6 +245,7 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
         if (boneIndex == 0)
         {
             Bone& bone = _skeleton->getBoneVector()[animationData->_boneIndex];
+            bone._parentBoneIndex = -1;
             glm::vec3 axis = bone._axis;
             
             glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));
@@ -255,9 +263,9 @@ bool CmuFileParser::parseAsfHierarchy(std::ifstream& ifs)
         for (int i =0; i < v.size(); ++i)
         {
             animationData->_childrens[i]._boneIndex = _skeleton->findBoneIndex(v[i]);
-            animationData->_childrens[i]._parentPointer = animationData;
 
             Bone& bone = _skeleton->getBoneVector()[animationData->_childrens[i]._boneIndex];
+            bone._parentBoneIndex = boneIndex;
             glm::vec3 axis = bone._axis;
 //mat4 fixme
             glm::mat4 rotX = glm::rotate(axis[0], glm::vec3(1.0f,0.0f,0.0f));
