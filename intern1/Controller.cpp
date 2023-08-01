@@ -123,4 +123,9 @@ void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _ani
         if (_player->_upState < UpperState::ROLL)
             this->pushAnimation("roll", _animations, BlendNode::UPPER);
     }
+    else if (key == KeyInput::GOLF && _player->_upState < UpperState::GOLF)
+    {
+        this->pushAnimation("golf", _animations, BlendNode::UPPER);
+        this->pushAnimation("golf", _animations, BlendNode::LOWER);
+    }
 }

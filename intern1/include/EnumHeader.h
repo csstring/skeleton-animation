@@ -19,7 +19,7 @@ enum class KeyInput
     UP, LOWERBACK, REFT, RIGHT,
     RUN, ATTACK,JUMP,STOP,CUBEFRONT,
     CUBEBACK,CUBERIGHT,CUBELEFT,
-    CUBEUP, CUBEDOWN, DRINK, ROLL
+    CUBEUP, CUBEDOWN, DRINK, ROLL, GOLF
 };
 
 enum BlendNode // index 접근할지 순회 돌지 고민
@@ -35,10 +35,10 @@ enum class PlayerState
 //강한 공격 추가 하면 drink 다음으로
 enum class UpperState
 {
-    IDLE, RUN, WALK, JUMP, PUNCH, DRINK, ROLL
+    IDLE, RUN, WALK, JUMP, PUNCH, DRINK, ROLL , GOLF
 };
 
 enum class LowerState
 {
-    DRINK, IDLE, PUNCH, WALK, RUN, ROLL, JUMP=5
+    DRINK, IDLE, PUNCH, WALK, RUN, ROLL, JUMP=5, GOLF
 };

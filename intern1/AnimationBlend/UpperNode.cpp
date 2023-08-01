@@ -29,6 +29,9 @@ void UpperNode::update(
         else
             interpolVal = static_cast<float>(millisecondFromBegin.count()) / OVERLAPTIME;
 
-        updateTransForm(*animation->returnAnimationData(BONEID::LOWERBACK), millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector, {BONEID::RHIPJOINT, BONEID::LHIPJOINT});
+        updateTransForm(
+            animation->_rootNode, 
+            millisecondFromBegin.count()*120/1000, interpolVal, 
+            _boneLocalVector, {BONEID::RHIPJOINT, BONEID::LHIPJOINT}, BlendNode::UPPER);
     }
 }

@@ -142,10 +142,14 @@ bool AMCFileParser::loadAMCFile(void)
                 matrix = glm::rotate(glm::radians(180.0f), glm::vec3(0.0f,1.0f,0.0f)) * matrix;
                 localTransV = glm::rotate(glm::radians(180.0f), glm::vec3(0.0f,1.0f,0.0f)) * glm::vec4(localTransV,1);
             }
-            // else if (_animation->_name == "punch")
-            // {
-            //     matrix = glm::rotate(glm::radians(90.0f), glm::vec3(1.0f,0.0f,0.0f)) * matrix;
-            // }
+            else if (_animation->_name == "punch")
+            {
+                matrix = glm::rotate(glm::radians(90.0f), glm::vec3(0.0f,1.0f,0.0f)) * matrix;
+            }
+            else if (_animation->_name == "golf")
+            {
+                matrix = glm::rotate(glm::radians(-90.0f), glm::vec3(0.0f,1.0f,0.0f)) * matrix;
+            }
         }
         glm::quat localRot = bone._c * glm::quat_cast(matrix) * bone._invC;
         animationData->_localRotation.push_back({animationTime, localRot});

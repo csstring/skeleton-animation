@@ -33,7 +33,7 @@ void BaseNode::update(
         changeUpperState(upperState, animation->_name);
         changeLowerState(lowerState, animation->_name);
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _animations.begin()->second._startTime);
-        updateTransForm(animation->_rootNode, millisecondFromBegin.count()*120/1000, 1, _boneLocalVector, {});
+        updateTransForm(animation->_rootNode, millisecondFromBegin.count()*120/1000, 1, _boneLocalVector, {}, BlendNode::BASE);
     }
     if (_animations.size() >= 2)
     {
@@ -41,6 +41,6 @@ void BaseNode::update(
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _animations[1].second._startTime);
         interpolVal = static_cast<float>(millisecondFromBegin.count()) / OVERLAPTIME;
 
-        updateTransForm(animation->_rootNode, millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector, {});
+        updateTransForm(animation->_rootNode, millisecondFromBegin.count()*120/1000, interpolVal, _boneLocalVector, {}, BlendNode::BASE);
     }
 }
