@@ -1,12 +1,12 @@
-#include "include/EyeIK.h"
+#include "../include/IK/EyeIK.h"
 #include <algorithm>
-#include "include/GLM/gtx/quaternion.hpp"
-#include "include/GLM/gtc/quaternion.hpp"
-#include "include/EnumHeader.h"
-#include "include/Controller.h"
-#include "include/Character.h"
-#include "include/Bone.h"
-#include "include/IK/IKUtility.h"
+#include "../include/GLM/gtx/quaternion.hpp"
+#include "../include/GLM/gtc/quaternion.hpp"
+#include "../include/EnumHeader.h"
+#include "../include/Controller.h"
+#include "../include/Character.h"
+#include "../include/Bone.h"
+#include "../include/IK/IKUtility.h"
 
 void EyeIK::setTargetPosition(glm::vec3 targetPosition)
 {

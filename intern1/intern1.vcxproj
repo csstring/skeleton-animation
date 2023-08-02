@@ -37,8 +37,8 @@
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="Cylinder.cpp" />
-    <ClCompile Include="EyeIK.cpp" />
     <ClCompile Include="Ground.cpp" />
+    <ClCompile Include="IK\EyeIK.cpp" />
     <ClCompile Include="IK\IKUtility.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
@@ -72,7 +72,7 @@
     <ClInclude Include="include\Cube.h" />
     <ClInclude Include="include\Cylinder.h" />
     <ClInclude Include="include\EnumHeader.h" />
-    <ClInclude Include="include\EyeIK.h" />
+    <ClInclude Include="include\IK\EyeIK.h" />
     <ClInclude Include="include\Ground.h" />
     <ClInclude Include="include\IK\IKUtility.h" />
     <ClInclude Include="include\Line.h" />

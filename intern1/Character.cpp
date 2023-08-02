@@ -7,7 +7,7 @@
 #include "include/GLM/gtx/compatibility.hpp"
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/Controller.h"
-#include "include/EyeIK.h"
+#include "include/IK/EyeIK.h"
 #include <queue>
 #include "include/AnimationBlend/Blender.h"
 #include "include/AnimationBlend/IBlendNode.h"

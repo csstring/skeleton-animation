@@ -1,6 +1,6 @@
 #pragma once
-#include "Common.h"
-#include "BoneLocal.h"
+#include "../Common.h"
+#include "../BoneLocal.h"
 class Bone;
 class Controller;
 const float LOWERNECK_RATIO = 0.2;
