@@ -8,6 +8,7 @@
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/Controller.h"
 #include "include/IK/EyeIK.h"
+#include "include/IK/FootIK.h"
 #include <queue>
 #include "include/AnimationBlend/Blender.h"
 #include "include/AnimationBlend/IBlendNode.h"
@@ -37,7 +38,9 @@ void Character::initialize(void)
 
     _blender.initialize();
     _eyeIK = new EyeIK(_skeleton.getBoneVector());
-    _eyeIK->initialize();
+    _eyeIK->initialize(BONEID::HEAD, BONEID::UPPERBACK);
+    _footIK = new FootIK(_skeleton.getBoneVector());
+    _footIK->initialize(BONEID::RFOOT, BONEID::ROOT);
 }
 
 void Character::boneBufferMaping(void)
@@ -98,9 +101,10 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     worldPositionUpdate(delta.count());
     _blender.animationUpdate(curTime, _boneLocalVector, _lowerState, _upState);
 
-    _eyeIK->setTargetPosition(eyeTarget);
-    _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
-
+    // _eyeIK->setTargetPosition(eyeTarget);
+    // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
+    _footIK->setTargetPosition(eyeTarget);
+    _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
     _lastCallTime = curTime;
 }
 
@@ -114,7 +118,7 @@ void Character::draw(void)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
         glm::mat4 toParentDir = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(bone._boneIndex, _skeleton, _boneLocalVector) * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3);
-        Cylinder cylinder(0.2, 1.0 *_skeleton.getGBL() * bone._length ,16, toParentDir);
+        Cylinder cylinder(0.2, 1.0f *_skeleton.getGBL() * bone._length ,16, toParentDir);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
         // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);

@@ -1,5 +1,4 @@
 #include "../include/IK/EyeIK.h"
-#include <algorithm>
 #include "../include/GLM/gtx/quaternion.hpp"
 #include "../include/GLM/gtc/quaternion.hpp"
 #include "../include/EnumHeader.h"
@@ -7,34 +6,7 @@
 #include "../include/Character.h"
 #include "../include/Bone.h"
 #include "../include/IK/IKUtility.h"
-
-void EyeIK::setTargetPosition(glm::vec3 targetPosition)
-{
-    _targetPosition = targetPosition;
-}
-
-void EyeIK::initialize(void)
-{
-    const Bone* curBone = nullptr;
-    for (const Bone& bone : _boneVector)
-    {
-        if (bone._boneIndex == BONEID::HEAD)
-        {
-            curBone = &bone;
-            break;
-        }
-    }
-    while (true)
-    {
-        _eyeBoneIndex.push_back(curBone->_boneIndex);
-        _bonedirection.push_back(curBone->_direction);
-        curBone = &_boneVector[curBone->_parentBoneIndex];
-        if (curBone->_boneIndex == BONEID::UPPERBACK)
-            break;
-    }
-    std::reverse(_eyeBoneIndex.begin(), _eyeBoneIndex.end());
-    _targetPosition = glm::vec3(10000,10000,10000);
-}
+//init HEAD, UPPERBACK
 
 glm::vec3 EyeIK::moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end, const glm::quat& toTargetDir, const glm::vec3& endBoneDir, float ratio)//비율
 {
@@ -65,7 +37,7 @@ void EyeIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& cur
     _callTime = curTime;
 }
 
-void EyeIK::solveEyeIK(
+void EyeIK::solveIK(
     std::vector<BoneLocal>& _boneLocalVector, 
     const glm::mat4& worldRotation, 
     const glm::mat4& worldTranslate, 
@@ -75,7 +47,7 @@ void EyeIK::solveEyeIK(
     std::vector<glm::vec3> inCharLocalPos;
     std::vector<glm::mat4> inCharLocalRot;
 
-    for (uint32 i : _eyeBoneIndex)
+    for (uint32 i : _boneIndexVec)
     {
         glm::mat4 inCharTrans = controller.getMatrixInCharLocal(i, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
         inCharLocalPos.push_back(inCharTrans * glm::vec4(0,0,0,1));
@@ -95,7 +67,7 @@ void EyeIK::solveEyeIK(
     glm::vec3 curSee = inCharLocalRot.back() * glm::vec4(glm::cross(glm::vec3(1,0,0), _bonedirection.back()),1);
     glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(targetDir));
 
-    for (uint32 i : _eyeBoneIndex)
+    for (uint32 i : _boneIndexVec)
     {
         glm::quat rot;
         if (i == BONEID::LOWERNECK)
@@ -118,20 +90,20 @@ void EyeIK::solveEyeIK(
 
     blendingRatioUpdate(curTime);
 
-    for (uint32 i = 0; i < _eyeBoneIndex.size(); ++i)
+    for (uint32 i = 0; i < _boneIndexVec.size(); ++i)
     {
         float ratio;
-        if (_eyeBoneIndex[i] == BONEID::LOWERNECK)
+        if (_boneIndexVec[i] == BONEID::LOWERNECK)
             ratio = LOWERNECK_RATIO;
-        else if (_eyeBoneIndex[i] == BONEID::UPPERNECK)
+        else if (_boneIndexVec[i] == BONEID::UPPERNECK)
             ratio = UPPER_RATIO;
-        else if (_eyeBoneIndex[i] == BONEID::HEAD)
+        else if (_boneIndexVec[i] == BONEID::HEAD)
             ratio = HEAD_RATIO;
-        else if (_eyeBoneIndex[i] == BONEID::THORAX)
+        else if (_boneIndexVec[i] == BONEID::THORAX)
             continue;
-        glm::quat mixRot = quatDivideRatio(afterSee,ratio) * _boneLocalVector[_eyeBoneIndex[i]].rotationInBoneLocal;
-        glm::vec3 mixTranslate = _boneLocalVector[_eyeBoneIndex[i]].translationInBoneLocal + moveInBoneLocalPos(inCharLocalPos[i-1], inCharLocalPos[i], afterSee, _bonedirection[i], ratio);
-        _boneLocalVector[_eyeBoneIndex[i]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_eyeBoneIndex[i]].rotationInBoneLocal, mixRot, _blendingRatio);
-        _boneLocalVector[_eyeBoneIndex[i]].translationInBoneLocal = glm::mix(_boneLocalVector[_eyeBoneIndex[i]].translationInBoneLocal, mixTranslate, _blendingRatio);
+        glm::quat mixRot = quatDivideRatio(afterSee,ratio) * _boneLocalVector[_boneIndexVec[i]].rotationInBoneLocal;
+        glm::vec3 mixTranslate = _boneLocalVector[_boneIndexVec[i]].translationInBoneLocal + moveInBoneLocalPos(inCharLocalPos[i-1], inCharLocalPos[i], afterSee, _bonedirection[i], ratio);
+        _boneLocalVector[_boneIndexVec[i]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[i]].rotationInBoneLocal, mixRot, _blendingRatio);
+        _boneLocalVector[_boneIndexVec[i]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[i]].translationInBoneLocal, mixTranslate, _blendingRatio);
     }
 }

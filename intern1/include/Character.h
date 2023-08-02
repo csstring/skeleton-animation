@@ -8,7 +8,7 @@ class Animation;
 class Skeleton;
 class Controller;
 class EyeIK;
-
+class FootIK;
 class Character
 {   
     private:
@@ -23,6 +23,7 @@ class Character
     public:
         Blender _blender;
         EyeIK* _eyeIK;
+        FootIK* _footIK;
         UpperState _upState;
         LowerState _lowerState;
         float      _yError = 0.001;

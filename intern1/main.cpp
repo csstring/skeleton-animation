@@ -118,7 +118,7 @@ int main()
         shader.setMat4("view", _camera._view);
         simulator.update();
         simulator.draw();
-        ground.draw();
+        // ground.draw();
         window.bufferSwap();
         glfwPollEvents();
     }
