@@ -1,6 +1,6 @@
 #pragma once
-#include "include/Common.h"
-#include "include/Cube.h"
+#include "Common.h"
+#include "Cube.h"
 #include <deque>
 class Animation;
 class Skeleton;

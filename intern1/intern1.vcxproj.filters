@@ -51,9 +51,6 @@
     <ClCompile Include="Cylinder.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="EyeIK.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Ground.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="AnimationBlend\LeftArmNode.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="IK\EyeIK.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,9 +149,6 @@
     <ClInclude Include="include\EnumHeader.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="include\EyeIK.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="include\Ground.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -198,6 +195,9 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\AnimationBlend\LeftArmNode.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IK\EyeIK.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
