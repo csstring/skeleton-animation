@@ -11,6 +11,7 @@ class FootIK : public IKInterface
         explicit FootIK(const std::vector<Bone>& boneVector) : IKInterface(boneVector){};
         ~FootIK(){};
         void findGround(void);
+        bool reachable(const std::vector<glm::vec3>& inCharacterPos, std::vector<float>& distance, glm::vec3 footPosition);
         void setGroundNormal(glm::vec3);
         virtual void solveIK(
             std::vector<BoneLocal>& _boneLocalVector, 
