@@ -7,7 +7,7 @@
 #include "Cube.h"
 #include "Controller.h"
 #include "BodyFactory.h"
-
+#include "Ground.h"
 struct AnimationData;
 class TimeNode;
 class Character;
@@ -36,6 +36,7 @@ class Simulator : Noncopyable
         Skeleton               _skeleton;
         std::vector<Animation> _animations;
         Cube                   _cube;
+        Ground                 _ground;
 };
 
 // std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref);

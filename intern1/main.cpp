@@ -104,8 +104,6 @@ int main()
     simulator.initialize();
     //비슷한 지점 찾기
     //simulator._animations[4].findSameFrame(10);
-    Ground ground;
-    ground.initialize();
     while (window.isWindowClose() == false)
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -118,7 +116,6 @@ int main()
         shader.setMat4("view", _camera._view);
         simulator.update();
         simulator.draw();
-        // ground.draw();
         window.bufferSwap();
         glfwPollEvents();
     }
