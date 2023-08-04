@@ -29,10 +29,23 @@ void Ground::update(void)
 {
     for (auto& it : _groundVertex)
         it = _rot * it;
-    glm::vec3 point0 = _groundVertex[0];
-    glm::vec3 point1 = _groundVertex[1];
-    _normal = glm::normalize(glm::cross(point0, point1));
+    glm::vec4 center(0.0f);
+    for (const auto& it : _groundVertex)
+        center += it;
+    center /= 4;
+    glm::vec3 point0 = glm::normalize(_groundVertex[0] - center);
+    glm::vec3 point1 = glm::normalize(_groundVertex[1] - center);
+    _normal = glm::cross(point0, point1);
     _rot = glm::mat4(1.0f);
+}
+
+glm::vec3 Ground::getCenter(void) const
+{
+    glm::vec4 center(0.0f);
+    for (const auto& it : _groundVertex)
+        center += it;
+    center /= 4;
+    return center;
 }
 
 void Ground::draw(void) //깊이버퍼 이상한데?

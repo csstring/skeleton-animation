@@ -6,6 +6,8 @@
 class FootIK : public IKInterface
 {
     private:
+        void positionFixLimitAngle(glm::vec3& start, glm::vec3& end, const Bone& endBone, bool backOrFront);
+    private:
         glm::vec3 _groundNormal;
     public:
         explicit FootIK(const std::vector<Bone>& boneVector) : IKInterface(boneVector){};

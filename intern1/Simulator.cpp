@@ -86,11 +86,11 @@ void Simulator::changeAnimation(KeyInput key)
     //     _cube._pos = glm::translate(_cube._pos, glm::vec3(0.1,0,0));
     // else if (key == KeyInput::CUBELEFT)
     //     _cube._pos = glm::translate(_cube._pos, glm::vec3(-0.1,0,0));
-    // else if (key == KeyInput::CUBEUP)
-    //     _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0.1,0));
-    // else if (key == KeyInput::CUBEDOWN)
-    //     _cube._pos = glm::translate(_cube._pos, glm::vec3(0,-0.1,0));
-    if (key == KeyInput::CUBEBACK)//j
+    if (key == KeyInput::CUBEUP)
+        _ground._rot = glm::translate(_ground._rot, glm::vec3(0,0.1,0));
+    else if (key == KeyInput::CUBEDOWN)
+        _ground._rot = glm::translate(_ground._rot, glm::vec3(0,-0.1,0));
+    else if (key == KeyInput::CUBEBACK)//j
         _ground._rot = _ground._rot * glm::rotate(glm::radians(1.0f), glm::vec3(-1,0,0));
     else if (key == KeyInput::CUBEFRONT)//u
         _ground._rot = _ground._rot * glm::rotate(glm::radians(1.0f), glm::vec3(1,0,0));

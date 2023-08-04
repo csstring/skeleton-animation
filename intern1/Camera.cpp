@@ -17,7 +17,6 @@ void Camera::ProcessMouseScroll(float yoffset)
         _zoom = 1.0f;
     if (_zoom > 45.0f)
         _zoom = 45.0f;
-    std::cout << "scroll chec" << std::endl;
 }
 
 void Camera::updateCameraVectors()

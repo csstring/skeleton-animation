@@ -27,12 +27,49 @@ bool FootIK::reachable(const std::vector<glm::vec3>& inCharacterPos, std::vector
     {
         end = inCharacterPos[i];
         distance.push_back(glm::length(start - end));
-        curDistance += distance.back();
         start = end;
     }
+    curDistance = distance[0] + distance[1];
+    if (curDistance < targetDistance)
+        return false;
     return true;
 }
+//inv_c 통해서 0,0,0 axis로 치환하고 각도 제한 적용
+void FootIK::positionFixLimitAngle(glm::vec3& start, glm::vec3& end, const Bone& endBone, bool backWard)
+{
+    glm::vec3 initialDirection = endBone._direction;
+    glm::vec3 targetDirection = glm::normalize(end - start);
+    glm::quat rotation = glm::rotation(initialDirection, targetDirection);
+    glm::vec3 eulerAngle = glm::eulerAngles(rotation);
 
+    for (auto& limit : endBone._limits)
+    {
+        DOF dof;
+        float min, max;
+        std::tie(dof, min, max) = limit;
+        if (dof == DOF::RX)
+            eulerAngle.x = glm::clamp(eulerAngle.x, glm::radians(min), glm::radians(max));
+        else if (dof == DOF::RY)
+            eulerAngle.y = glm::clamp(eulerAngle.y, glm::radians(min), glm::radians(max));
+        else if (dof == DOF::RZ)
+            eulerAngle.z = glm::clamp(eulerAngle.z, glm::radians(min), glm::radians(max));
+    }
+
+    rotation = glm::quat(eulerAngle);
+    glm::vec3 correctPos = rotation * initialDirection * glm::length(end - start);
+
+    if (backWard == true) //backward end to start
+    {
+        glm::vec3 startMove = start + correctPos;
+        start = start + (end - startMove);
+    }
+    else //forward start to end
+    {
+        end = start + correctPos;
+    }
+}
+
+//오차 범위 몇으로 줄건지?
 void FootIK::solveIK(
     std::vector<BoneLocal>& _boneLocalVector, 
     const glm::mat4& worldRotation, 
@@ -42,10 +79,9 @@ void FootIK::solveIK(
 {
     this->_blendingRatio = 1;//default
 
-    std::vector<glm::vec3> inCharLocalPos, copyPos;
+    std::vector<glm::vec3> inCharLocalPos;
     std::vector<glm::mat4> inCharLocalRot;
     std::vector<glm::mat4> inCharTrans;
-    glm::vec3 targetPosInBoneLocal;
     std::vector<float> distance;
 
     for (uint32 i : _boneIndexVec)
@@ -55,46 +91,54 @@ void FootIK::solveIK(
         inCharLocalRot.push_back(glm::mat3(inCharTrans.back()));
     }
 
-        glm::mat4 charLocalToWorld = worldTranslate * worldRotation;
-        glm::vec3 targetPosInCharLocal = glm::inverse(charLocalToWorld) * glm::vec4(_targetPosition, 1);
-        ////////////////////////////////////////////
-        _groundNormal = glm::inverse(charLocalToWorld) * glm::vec4(_groundNormal,0);
-        glm::vec3 parentDir = glm::normalize(inCharLocalPos[2] - inCharLocalPos[3]);
-        glm::vec3 axis = glm::normalize(glm::cross(_groundNormal, parentDir));
-        glm::vec3 groundDir = glm::normalize(glm::cross(axis, _groundNormal));
-        glm::vec3 Pos3InChar = inCharLocalPos[3];//tmp
+    glm::mat4 charLocalToWorld = worldTranslate * worldRotation;
+    glm::vec3 targetPosInCharLocal = glm::inverse(charLocalToWorld) * glm::vec4(_targetPosition, 1);
+    targetPosInCharLocal.x = inCharLocalPos[3].x;
+    targetPosInCharLocal.z = inCharLocalPos[3].z;
+    ////////////////////////////////////////////
+    _groundNormal = glm::inverse(charLocalToWorld) * glm::vec4(_groundNormal,0);
+    glm::vec3 parentDir = glm::normalize(inCharLocalPos[2] - inCharLocalPos[3]);
+    glm::vec3 axis = glm::normalize(glm::cross(_groundNormal, parentDir));
+    glm::vec3 groundDir = glm::normalize(glm::cross(axis, _groundNormal));
+    glm::vec3 Pos3InChar = targetPosInCharLocal;//tmp
 
-        float distance2 = glm::length(inCharLocalPos[2] - inCharLocalPos[3]);
-        glm::vec3 footPosInChar = Pos3InChar + groundDir * distance2;
+    float distance2 = glm::length(inCharLocalPos[2] - inCharLocalPos[3]);
+    glm::vec3 footPosInChar = Pos3InChar + groundDir * distance2;
 
-    if (reachable(inCharLocalPos, distance, footPosInChar) == true)//distance 구하는걸로 수정, fix me
+    if (reachable(inCharLocalPos, distance, footPosInChar) == false)//distance 구하는걸로 수정, fix me
+        return;
+
+    glm::vec3 start = inCharLocalPos.front();
+    uint32 iterCount = 0;
+    while (glm::length(footPosInChar - inCharLocalPos[2]) > 0.1)
     {
-        glm::vec3 start = inCharLocalPos.front();
-        uint32 iterCount = 0;
-        while (glm::length(footPosInChar - inCharLocalPos[2]) > 0.1)
+        iterCount++;
+        if (iterCount >= 10)
         {
-            iterCount++;
-            if (iterCount >= 10)
-            {
-                break;
-            }
-            inCharLocalPos[2] = footPosInChar;
-            for(uint16 i = _boneIndexVec.size()-2; i >=1; --i)
-            {
-                float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i-1]);
-                float k = distance[i-1] / r;
-                inCharLocalPos[i-1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i-1], k);
-            }
+            std::cout << "Fook ik length val : " << glm::length(footPosInChar - inCharLocalPos[2]) << std::endl;
+            break;;
+        }
+            
+        inCharLocalPos[2] = footPosInChar;
+        for(uint16 i = _boneIndexVec.size()-2; i >=1; --i)
+        {
+            float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i-1]);
+            float k = distance[i-1] / r;
+            inCharLocalPos[i-1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i-1], k);
+            positionFixLimitAngle(inCharLocalPos[i-1], inCharLocalPos[i], _boneVector[_boneIndexVec[i]], true);
+        }
 
-            inCharLocalPos.front() = start;
-            for(uint16 i = 0; i < _boneIndexVec.size()-2; ++i)
-            {
-                float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i+1]);
-                float k = distance[i] / r;
-                inCharLocalPos[i+1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i+1], k);
-            }
+        inCharLocalPos.front() = start;
+        for(uint16 i = 0; i < _boneIndexVec.size()-2; ++i)
+        {
+            float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i+1]);
+            float k = distance[i] / r;
+            inCharLocalPos[i+1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i+1], k);
+            positionFixLimitAngle(inCharLocalPos[i], inCharLocalPos[i+1], _boneVector[_boneIndexVec[i+1]], false);
         }
     }
+
+    inCharLocalPos[3] = targetPosInCharLocal;
     glm::vec3 inCharDir3 = glm::normalize(inCharLocalPos[3] - inCharLocalPos[2]);
     glm::vec3 inCharDir2 = glm::normalize(inCharLocalPos[2] - inCharLocalPos[1]);
     glm::vec3 inCharDir1 = glm::normalize(inCharLocalPos[1] - inCharLocalPos[0]);
@@ -108,28 +152,25 @@ void FootIK::solveIK(
     trans1 = glm::translate(glm::mat4(1.0f), inCharLocalPos[1]) * inCharLocalRot[1];
     trans0 = glm::translate(glm::mat4(1.0f), inCharLocalPos[0]) * inCharLocalRot[0];
 
-    glm::vec3 bonePos3, bonePos2, bonePos1, bonePos0;
-    glm::quat boneRot3, boneRot2, boneRot1, boneRot0;
+    glm::vec3 bonePos3, bonePos2, bonePos1;
+    glm::quat boneRot3, boneRot2, boneRot1;
 
     bonePos3 = glm::inverse(trans2) * glm::vec4(inCharLocalPos[3], 1);
     bonePos2 = glm::inverse(trans1) * glm::vec4(inCharLocalPos[2], 1);
     bonePos1 = glm::inverse(trans0) * glm::vec4(inCharLocalPos[1], 1);
-    bonePos0 = inCharLocalPos[0];//??
 
     boneRot3 = glm::quat(glm::inverse(trans2) * inCharLocalRot[3]);
     boneRot2 = glm::quat(glm::inverse(trans1) * inCharLocalRot[2]);
     boneRot1 = glm::quat(glm::inverse(trans0) * inCharLocalRot[1]);
-    boneRot0 = inCharLocalRot[0];//??
 
     _boneLocalVector[_boneIndexVec[3]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[3]].translationInBoneLocal,bonePos3, _blendingRatio);
     _boneLocalVector[_boneIndexVec[2]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[2]].translationInBoneLocal,bonePos2, _blendingRatio);
     _boneLocalVector[_boneIndexVec[1]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[1]].translationInBoneLocal,bonePos1, _blendingRatio);
-    // _boneLocalVector[_boneIndexVec[0]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[0]].translationInBoneLocal,bonePos0, _blendingRatio);
 
     _boneLocalVector[_boneIndexVec[3]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[3]].rotationInBoneLocal, boneRot3, _blendingRatio);
     _boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal, boneRot2, _blendingRatio);
     _boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal, boneRot1, _blendingRatio);
-    // _boneLocalVector[_boneIndexVec[0]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[0]].rotationInBoneLocal, boneRot0, _blendingRatio);
+    
 }
 
 /*

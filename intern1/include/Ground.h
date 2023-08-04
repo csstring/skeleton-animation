@@ -13,6 +13,7 @@ class Ground
         void initialize(void);
         void draw(void);
         void update(void);
+        glm::vec3 getCenter(void) const;
         glm::mat4 _rot;
         glm::vec3 _normal;
 };
