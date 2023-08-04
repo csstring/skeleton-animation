@@ -5,10 +5,11 @@
 struct BoneLocal;
 class Animation;
 class Skeleton;
+
 class Blender
 {
     private:
-        std::vector<std::pair<BlendNode, IBlendNode*>> _blendTree;
+        std::vector<IBlendNode*> _blendTree;
     public:
         Blender(){};
         ~Blender(){};

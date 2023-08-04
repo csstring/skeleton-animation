@@ -19,6 +19,7 @@ class Character
         glm::mat4              _worldRotation;
         const Skeleton&        _skeleton;
         const Controller&      _controller;
+        bool                   _isFirst;
         std::chrono::steady_clock::time_point _lastCallTime;
 
     public:
@@ -34,7 +35,7 @@ class Character
         void worldPositionUpdate(float deltaTime);
         void stateChange(void);
     public:
-        Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller){};
+        Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller), _isFirst(true){};
         ~Character()
         {
             if (_eyeIK != nullptr)

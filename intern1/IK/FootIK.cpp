@@ -9,15 +9,7 @@
 //0 rhipjoint 1 rfemur 2 rtibia 3 rfoot
 void FootIK::findGround(void)
 {
-    glm::vec3 normal(0, 1, -0.4);
-    glm::vec3 groundPos(0,-10,0);
-    // _groundVec = glm::normalize(groundPos - _targetPosition);
-    glm::quat rot = glm::rotation(glm::vec3(1,0,0), groundPos - _targetPosition);
-    //??
-    _groundNormal = glm::normalize(normal);
-    // _groundNormal = glm::cross(glm::cross(glm::normalize(_targetPosition- groundPos), normal), glm::normalize(_targetPosition));
-    // std::cout << "target : " << glm::to_string(_targetPosition) << std::endl;
-    // std::cout << "nomal : " << glm::to_string(_groundNormal) << std::endl;
+
 }
 
 void FootIK::setGroundNormal(glm::vec3 normal)
@@ -48,7 +40,6 @@ void FootIK::solveIK(
     const Controller& controller,
     const std::chrono::steady_clock::time_point& curTime)
 {
-    // findGround();
     this->_blendingRatio = 1;//default
 
     std::vector<glm::vec3> inCharLocalPos, copyPos;

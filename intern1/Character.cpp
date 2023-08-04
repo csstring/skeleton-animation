@@ -74,13 +74,13 @@ void Character::worldPositionUpdate(float deltaTime)
     glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     if (t.y > -10)//fix me lastcall
     {
-        t.y -= _yError * 1;
-        root.y -= _yError * 1;
+        t.y -= _yError * deltaTime;
+        root.y -= _yError * deltaTime;
     }
     else if (t.y < -10)
     {
-        t.y += _yError * 1;
-        root.y += _yError * 1;
+        t.y += _yError * deltaTime;
+        root.y += _yError * deltaTime;
     }
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }
@@ -100,6 +100,11 @@ void Character::stateChange()
 void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, const Ground& ground)
 {
     std::chrono::milliseconds delta;
+    if (_isFirst == true)
+    {
+        _isFirst = false;
+        _lastCallTime = curTime;
+    }
     if (_yError != 0)
         delta = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lastCallTime);
     else 
@@ -112,9 +117,9 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
 
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
-    
-    _footIK->setGroundNormal(ground._normal);
-    _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
+
+    // _footIK->setGroundNormal(ground._normal);
+    // _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
     _lastCallTime = curTime;
 }
 

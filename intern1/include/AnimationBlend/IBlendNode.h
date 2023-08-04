@@ -10,7 +10,17 @@ class IBlendNode
 {
     private:
     public:
-        IBlendNode(){};
+        IBlendNode(BlendNode nodeNum): _nodeNum(nodeNum)
+        {
+            if (nodeNum == BlendNode::BASE)
+                _parentIndex = -1;
+            if (nodeNum == BlendNode::UPPER)
+                _parentIndex = 0;
+            if (nodeNum == BlendNode::LOWER)
+                _parentIndex = 0;
+            if (nodeNum == BlendNode::LEFTARM)
+                _parentIndex = 1;
+        };
         virtual ~IBlendNode(){};
 
         void getTransFormByKeyFrame(glm::quat& interpolR, glm::vec3& interpolT, const AnimationData* node, uint32 keyFrame);
@@ -23,7 +33,10 @@ class IBlendNode
             std::vector<BoneLocal>& _boneLocalVector,
             LowerState& lowerState,
             UpperState& upperState) = 0;
-    
-    public: 
+        
+    public:
+        const BlendNode _nodeNum;
+        int32    _parentIndex;
+        uint32   _state;
         std::deque<std::pair<const Animation*, TimeNode>> _animations;
 };
