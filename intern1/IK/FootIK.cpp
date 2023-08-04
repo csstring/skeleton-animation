@@ -47,7 +47,7 @@ void FootIK::solveIK(
     std::vector<glm::mat4> inCharTrans;
     glm::vec3 targetPosInBoneLocal;
     std::vector<float> distance;
-    std::cout << glm::to_string(_groundNormal) << std::endl;
+
     for (uint32 i : _boneIndexVec)
     {
         inCharTrans.push_back(controller.getMatrixInCharLocal(i, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector));
@@ -130,8 +130,6 @@ void FootIK::solveIK(
     _boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal, boneRot2, _blendingRatio);
     _boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal, boneRot1, _blendingRatio);
     // _boneLocalVector[_boneIndexVec[0]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[0]].rotationInBoneLocal, boneRot0, _blendingRatio);
-
-
 }
 
 /*

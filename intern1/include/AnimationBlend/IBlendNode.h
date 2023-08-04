@@ -8,7 +8,6 @@
 struct BoneLocal;
 class IBlendNode
 {
-    private:
     public:
         IBlendNode(BlendNode nodeNum): _nodeNum(nodeNum)
         {
@@ -36,7 +35,7 @@ class IBlendNode
         
     public:
         const BlendNode _nodeNum;
-        int32    _parentIndex;
-        uint32   _state;
+        int32           _parentIndex;
+        uint32          _state;
         std::deque<std::pair<const Animation*, TimeNode>> _animations;
 };

@@ -22,5 +22,4 @@ class Blender
             UpperState& upperState
         );
         void eraseAnimationCall(const std::chrono::steady_clock::time_point& curTime);
-        void angleCheck(const Skeleton& skeleton, std::vector<BoneLocal>& boneLocalVector);
 };

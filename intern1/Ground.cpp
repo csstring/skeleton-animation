@@ -3,7 +3,7 @@
 
 void Ground::initialize(void)
 {
-    _groundVertex = {{100.0f,-10.0f,100.0f,1.0f},{100.0f,-10.0f,-100.0f,1.0f},{-100.0f,-10.0f,100.0f,1.0f}, {-100.0f,-10.0f,-100.0f,1.0f}};
+    _groundVertex = {{10.0f,-10.0f,10.0f,1.0f},{10.0f,-10.0f,-10.0f,1.0f},{-10.0f,-10.0f,10.0f,1.0f}, {-10.0f,-10.0f,-10.0f,1.0f}};
     glGenVertexArrays(1, &_VAO);
     glBindVertexArray(_VAO);
 

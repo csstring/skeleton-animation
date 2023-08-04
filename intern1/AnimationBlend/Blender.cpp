@@ -48,10 +48,3 @@ void Blender::animationUpdate(
         }
     }
 }
-
-void Blender::angleCheck(const Skeleton& skeleton, std::vector<BoneLocal>& boneLocalVector)
-{
-    // if (limitAngleCheck(skeleton.getBoneVector()[BONEID::LOWERBACK], boneLocalVector[BONEID::LOWERBACK].rotationInBoneLocal) == true)
-    //     return;
-    // std::cout << "error" << std::endl;
-}
