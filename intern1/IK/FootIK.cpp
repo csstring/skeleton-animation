@@ -42,6 +42,32 @@ void FootIK::positionFixLimitAngle(glm::vec3& start, glm::vec3& end, const Bone&
     glm::quat rotation = glm::rotation(initialDirection, targetDirection);
     glm::vec3 eulerAngle = glm::eulerAngles(rotation);
 
+    glm::vec3 angleMin, angleMax;
+    std::vector<DOF> dofs;
+
+    for (auto& limit : endBone._limits)
+    {
+        DOF dof;
+        float min, max;
+        std::tie(dof, min, max) = limit;
+        dofs.push_back(dof);
+        if (dof == DOF::RX)
+        {
+            angleMin.x = min;
+            angleMax.x = max;
+        }
+        else if (dof == DOF::RX)
+        {
+            angleMin.y = min;
+            angleMax.y = max;
+        }
+        else if (dof == DOF::RX)
+        {
+            angleMin.z = min;
+            angleMax.z = max;
+        }
+    }
+
     for (auto& limit : endBone._limits)
     {
         DOF dof;
