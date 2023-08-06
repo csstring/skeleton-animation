@@ -5,6 +5,7 @@
 #include "include/Cube.h"
 #include "include/EnumHeader.h"
 #include "include/GLM/gtx/quaternion.hpp"
+#include "include/GLM/gtx/transform.hpp"
 // #include "include/GLM/gtc/quaternion.hpp"
 // const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
 void Simulator::addPlayer(const std::string initAnimationName)//position, name 같은거 추가하면 될듯
@@ -24,6 +25,7 @@ void Simulator::initialize(void)
     _controller.initialize();
     _cube.cubeSizeChange(0.1);
     _cube.initialize();
+    _ground.initialize();
     _controller.setPlayer(_players.front());
 }
 
@@ -33,6 +35,7 @@ void Simulator::draw(void)
         player->draw();
     _cube.draw();
     _controller.draw();
+    _ground.draw();
 }
 
 void Simulator::update(void)
@@ -40,8 +43,9 @@ void Simulator::update(void)
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
     _cube.update();
     _controller.update();
+    _ground.update();
     for (Character* player : _players)
-        player->update(curTime, _cube._pos * _cube._vertex[0]);
+        player->update(curTime, _cube._pos * _cube._vertex[0], _ground);
 }
 //현재 캐릭터가 보고있는 방향?
 void Simulator::changeControllCharacter(void)
@@ -74,18 +78,26 @@ void Simulator::changeControllCharacter(void)
 
 void Simulator::changeAnimation(KeyInput key)
 {
-    if (key == KeyInput::CUBEBACK)
-        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0,0.1));
-    else if (key == KeyInput::CUBEFRONT)
-        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0,-0.1));
-    else if (key == KeyInput::CUBERIGHT)
-        _cube._pos = glm::translate(_cube._pos, glm::vec3(0.1,0,0));
-    else if (key == KeyInput::CUBELEFT)
-        _cube._pos = glm::translate(_cube._pos, glm::vec3(-0.1,0,0));
-    else if (key == KeyInput::CUBEUP)
-        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0.1,0));
+    // if (key == KeyInput::CUBEBACK)
+    //     _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0,0.1));
+    // else if (key == KeyInput::CUBEFRONT)
+    //     _cube._pos = glm::translate(_cube._pos, glm::vec3(0,0,-0.1));
+    // else if (key == KeyInput::CUBERIGHT)
+    //     _cube._pos = glm::translate(_cube._pos, glm::vec3(0.1,0,0));
+    // else if (key == KeyInput::CUBELEFT)
+    //     _cube._pos = glm::translate(_cube._pos, glm::vec3(-0.1,0,0));
+    if (key == KeyInput::CUBEUP)
+        _ground._rot = glm::translate(_ground._rot, glm::vec3(0,0.1,0));
     else if (key == KeyInput::CUBEDOWN)
-        _cube._pos = glm::translate(_cube._pos, glm::vec3(0,-0.1,0));
+        _ground._rot = glm::translate(_ground._rot, glm::vec3(0,-0.1,0));
+    else if (key == KeyInput::CUBEBACK)//j
+        _ground._rot = _ground._rot * glm::rotate(glm::radians(1.0f), glm::vec3(-1,0,0));
+    else if (key == KeyInput::CUBEFRONT)//u
+        _ground._rot = _ground._rot * glm::rotate(glm::radians(1.0f), glm::vec3(1,0,0));
+    else if (key == KeyInput::CUBERIGHT)//k
+        _ground._rot = _ground._rot * glm::rotate(glm::radians(1.0f), glm::vec3(0,0,1));
+    else if (key == KeyInput::CUBELEFT)//h
+        _ground._rot = _ground._rot * glm::rotate(glm::radians(1.0f), glm::vec3(0,0,-1));
     else
         _controller.controllPlayer(key, _animations);
 }

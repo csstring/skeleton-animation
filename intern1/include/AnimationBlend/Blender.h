@@ -5,10 +5,11 @@
 struct BoneLocal;
 class Animation;
 class Skeleton;
+
 class Blender
 {
     private:
-        std::vector<std::pair<BlendNode, IBlendNode*>> _blendTree;
+        std::vector<IBlendNode*> _blendTree;
     public:
         Blender(){};
         ~Blender(){};
@@ -21,5 +22,4 @@ class Blender
             UpperState& upperState
         );
         void eraseAnimationCall(const std::chrono::steady_clock::time_point& curTime);
-        void angleCheck(const Skeleton& skeleton, std::vector<BoneLocal>& boneLocalVector);
 };

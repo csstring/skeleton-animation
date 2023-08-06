@@ -65,9 +65,9 @@ void IBlendNode::updateTransForm(
         glm::vec3 mixT;
         getTransFormByKeyFrame(mixR, mixT, curData, keyFrame);
         
-        if (nodeNum != BlendNode::UPPER || curData->_boneIndex != BONEID::ROOT)
+        // if (nodeNum != BlendNode::UPPER || curData->_boneIndex != BONEID::ROOT)
             _boneLocalVector[curData->_boneIndex].translationInBoneLocal = glm::mix(_boneLocalVector[curData->_boneIndex].translationInBoneLocal, mixT, interpolVal);
-        if (nodeNum != BlendNode::LOWER || curData->_boneIndex != BONEID::ROOT)
+        // if (nodeNum != BlendNode::LOWER || curData->_boneIndex != BONEID::ROOT)
             _boneLocalVector[curData->_boneIndex].rotationInBoneLocal = glm::slerp(_boneLocalVector[curData->_boneIndex].rotationInBoneLocal, mixR, interpolVal);
     }
 }
@@ -90,6 +90,7 @@ void IBlendNode::changeUpperState(UpperState& upperState, const std::string& nam
         upperState = UpperState::ROLL;
     if (name == "golf")
         upperState = UpperState::GOLF;
+    _state = static_cast<int32>(upperState);
 }
 
 void IBlendNode::changeLowerState(LowerState& loswerState, const std::string& name)
@@ -110,4 +111,5 @@ void IBlendNode::changeLowerState(LowerState& loswerState, const std::string& na
         loswerState = LowerState::ROLL;
     if (name == "golf")
         loswerState = LowerState::GOLF;
+    _state = static_cast<int32>(loswerState);
 }

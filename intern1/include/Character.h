@@ -8,7 +8,8 @@ class Animation;
 class Skeleton;
 class Controller;
 class EyeIK;
-
+class FootIK;
+class Ground;
 class Character
 {   
     private:
@@ -18,11 +19,13 @@ class Character
         glm::mat4              _worldRotation;
         const Skeleton&        _skeleton;
         const Controller&      _controller;
+        bool                   _isFirst;
         std::chrono::steady_clock::time_point _lastCallTime;
 
     public:
         Blender _blender;
         EyeIK* _eyeIK;
+        FootIK* _footIK;
         UpperState _upState;
         LowerState _lowerState;
         float      _yError = 0.001;
@@ -32,7 +35,7 @@ class Character
         void worldPositionUpdate(float deltaTime);
         void stateChange(void);
     public:
-        Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller){};
+        Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller), _isFirst(true){};
         ~Character()
         {
             if (_eyeIK != nullptr)
@@ -40,7 +43,7 @@ class Character
         };
         void initialize(void);
         const Skeleton& getCharacterSkeleton(void) const {return _skeleton;};
-        void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget);
+        void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, const Ground& ground);
         void draw(void);
         void rotationY(float radian);
         glm::mat4 getCharacterWorldPosition(void) const;

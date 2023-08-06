@@ -39,6 +39,8 @@
     <ClCompile Include="Cylinder.cpp" />
     <ClCompile Include="Ground.cpp" />
     <ClCompile Include="IK\EyeIK.cpp" />
+    <ClCompile Include="IK\FootIK.cpp" />
+    <ClCompile Include="IK\IKInterface.cpp" />
     <ClCompile Include="IK\IKUtility.cpp" />
     <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
@@ -74,6 +76,8 @@
     <ClInclude Include="include\EnumHeader.h" />
     <ClInclude Include="include\IK\EyeIK.h" />
     <ClInclude Include="include\Ground.h" />
+    <ClInclude Include="include\IK\FootIK.h" />
+    <ClInclude Include="include\IK\IKInterface.h" />
     <ClInclude Include="include\IK\IKUtility.h" />
     <ClInclude Include="include\Line.h" />
     <ClInclude Include="include\Quantization.h" />

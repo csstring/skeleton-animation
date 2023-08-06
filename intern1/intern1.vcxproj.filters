@@ -99,6 +99,12 @@
     <ClCompile Include="IK\EyeIK.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="IK\IKInterface.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="IK\FootIK.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\AMCFileParser.h">
@@ -198,6 +204,12 @@
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="include\IK\EyeIK.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IK\IKInterface.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IK\FootIK.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>

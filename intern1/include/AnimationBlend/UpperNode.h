@@ -6,7 +6,7 @@ class BoneLocal;
 class UpperNode : public IBlendNode
 {
     public:
-        UpperNode(){};
+        UpperNode(BlendNode nodeNum):IBlendNode(nodeNum){};
         virtual ~UpperNode(){};
 
         virtual void eraseAnimation(const std::chrono::steady_clock::time_point& curTime) override final;

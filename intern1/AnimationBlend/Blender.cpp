@@ -11,8 +11,8 @@ IBlendNode* Blender::getBlendNode(BlendNode nodeNum)
 {
     for (const auto& node : _blendTree)
     {
-        if (node.first == nodeNum)
-            return node.second;
+        if (node->_nodeNum == nodeNum)
+            return node;
     }
     return nullptr;
 }
@@ -20,15 +20,15 @@ IBlendNode* Blender::getBlendNode(BlendNode nodeNum)
 void Blender::eraseAnimationCall(const std::chrono::steady_clock::time_point& curTime)
 {
     for (const auto& node : _blendTree)
-        node.second->eraseAnimation(curTime);
+        node->eraseAnimation(curTime);
 }
 
 void Blender::initialize(void)
 {
-    _blendTree.push_back({BlendNode::BASE, new BaseNode()});
-    _blendTree.push_back({BlendNode::LOWER, new LowerNode()});
-    _blendTree.push_back({BlendNode::UPPER, new UpperNode()});
-    _blendTree.push_back({BlendNode::LEFTARM, new LeftArmNode()});
+    _blendTree.push_back(new BaseNode(BlendNode::BASE));
+    _blendTree.push_back(new UpperNode(BlendNode::UPPER));
+    _blendTree.push_back(new LowerNode(BlendNode::LOWER));
+    _blendTree.push_back(new LeftArmNode(BlendNode::LEFTARM));
 }
 
 void Blender::animationUpdate(
@@ -39,12 +39,12 @@ void Blender::animationUpdate(
 )
 {
     for (const auto& node : _blendTree)
-        node.second->update(curTime, boneLocalVector, lowerState, upperState);
-}
-
-void Blender::angleCheck(const Skeleton& skeleton, std::vector<BoneLocal>& boneLocalVector)
-{
-    // if (limitAngleCheck(skeleton.getBoneVector()[BONEID::LOWERBACK], boneLocalVector[BONEID::LOWERBACK].rotationInBoneLocal) == true)
-    //     return;
-    // std::cout << "error" << std::endl;
+    {
+        node->update(curTime, boneLocalVector, lowerState, upperState);
+        if (node->_parentIndex >= 1 && _blendTree[node->_parentIndex]->_state > node->_state)
+        {
+            node->_animations.clear();
+            node->_state = 0;
+        }
+    }
 }

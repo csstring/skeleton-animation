@@ -5,7 +5,10 @@
 void LeftArmNode::eraseAnimation(const std::chrono::steady_clock::time_point& curTime)
 {
     if (_animations.empty() == false && curTime >= _animations.begin()->second._endTime)
+    {
+        _state = 0;
         _animations.pop_front();
+    }
 }
 
 void LeftArmNode::update(

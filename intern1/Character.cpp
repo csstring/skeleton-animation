@@ -8,10 +8,11 @@
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/Controller.h"
 #include "include/IK/EyeIK.h"
+#include "include/IK/FootIK.h"
 #include <queue>
 #include "include/AnimationBlend/Blender.h"
 #include "include/AnimationBlend/IBlendNode.h"
-
+#include "include/Ground.h"
 void Character::rotationY(float radian)
 {
     _worldRotation = glm::rotate(_worldRotation, radian, glm::vec3(0,1,0));
@@ -37,7 +38,9 @@ void Character::initialize(void)
 
     _blender.initialize();
     _eyeIK = new EyeIK(_skeleton.getBoneVector());
-    _eyeIK->initialize();
+    _eyeIK->initialize(BONEID::HEAD, BONEID::UPPERBACK);
+    _footIK = new FootIK(_skeleton.getBoneVector());
+    _footIK->initialize(BONEID::RFOOT, BONEID::ROOT);
 }
 
 void Character::boneBufferMaping(void)
@@ -67,10 +70,19 @@ void Character::boneBufferMaping(void)
 
 void Character::worldPositionUpdate(float deltaTime)
 {
-    glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(0, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
-    if (t.y > 0)
-        t.y -= _yError * deltaTime;
-    _worldTrans = glm::translate(glm::mat4(1.0f), t);
+    glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
+    glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
+    // if (t.y > -10)//fix me lastcall
+    // {
+    //     t.y -= _yError * deltaTime;
+    //     root.y -= _yError * deltaTime;
+    // }
+    // else if (t.y < -10)
+    // {
+    //     t.y += _yError * deltaTime;
+    //     root.y += _yError * deltaTime;
+    // }
+    _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }
 
 void Character::stateChange()
@@ -85,9 +97,14 @@ void Character::stateChange()
     //     _state = PlayerState::WALK;
 }
 
-void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget)
+void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, const Ground& ground)
 {
     std::chrono::milliseconds delta;
+    if (_isFirst == true)
+    {
+        _isFirst = false;
+        _lastCallTime = curTime;
+    }
     if (_yError != 0)
         delta = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _lastCallTime);
     else 
@@ -98,9 +115,12 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     worldPositionUpdate(delta.count());
     _blender.animationUpdate(curTime, _boneLocalVector, _lowerState, _upState);
 
-    _eyeIK->setTargetPosition(eyeTarget);
-    _eyeIK->solveEyeIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
+    // _eyeIK->setTargetPosition(eyeTarget);
+    // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
+    _footIK->setGroundNormal(ground._normal);
+    _footIK->setTargetPosition(ground.getCenter());
+    _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
     _lastCallTime = curTime;
 }
 
@@ -114,7 +134,7 @@ void Character::draw(void)
     {
         glBindVertexArray(VAO[bone._boneIndex]);
         glm::mat4 toParentDir = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(bone._boneIndex, _skeleton, _boneLocalVector) * ft_rotate(glm::vec3(0.0,0.0,1.0), -bone._direction);// * glm::inverse(test3);
-        Cylinder cylinder(0.2, 1.0 *_skeleton.getGBL() * bone._length ,16, toParentDir);
+        Cylinder cylinder(0.2, 1.0f *_skeleton.getGBL() * bone._length ,16, toParentDir);
         cylinder.initialize(color, VBC[bone._boneIndex], static_cast<BONEID>(bone._boneIndex));
         cylinder.render(VBO[bone._boneIndex]);
         // Line line(0.7 *_skeleton.getGBL() * bone._length, toParentDir);
