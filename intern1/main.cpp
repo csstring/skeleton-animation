@@ -20,13 +20,6 @@ std::chrono::system_clock::time_point start;
 std::chrono::duration<double>sec;
 const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
 Camera      _camera;
-physx::PxDefaultAllocator gAllocator;
-physx::PxDefaultErrorCallback gErrorCallback;
-physx::PxFoundation* gFoundation = nullptr;
-physx::PxPhysics* gPhysics = nullptr;
-physx::PxScene* gScene = nullptr;
-physx::PxRigidDynamic* gCylinderActor = nullptr; // Actor for the cylinder
-physx::PxRigidStatic* gBoxActor = nullptr; // Actor for the box
 
 
 using namespace physx;
@@ -68,17 +61,11 @@ void CreateBox(const glm::vec3& dimensions, const glm::vec3& position) {
 
     // Create shape
     PxShape* shape = gPhysics->createShape(box, *material);
-
     // Create actor
     gBoxActor = gPhysics->createRigidStatic(PxTransform(position.x, position.y, position.z));
     gBoxActor->attachShape(*shape);
     gScene->addActor(*gBoxActor);
 }
-
-void UpdateCylinderPosition(const glm::vec3& position) {
-    gCylinderActor->setGlobalPose(PxTransform(position.x, position.y, position.z));
-}
-
 void SimulateAndCheckCollisions() {
     // Step simulation
     gScene->simulate(1.0f / 60.0f);
@@ -87,18 +74,18 @@ void SimulateAndCheckCollisions() {
     // Check for collisions
     PxContactPairHeader pairsHeader;
     PxContactPair pairs;
-    // PxU32 nbPairs = gScene->getNpContactPairHeaderStreamCount();
-    // PxContactStreamIterator iter(gScene->getNpContactPairHeaderStream());
+    PxU32 nbPairs = gScene->getNpContactPairHeaderStreamCount();
+    PxContactStreamIterator iter(gScene->getNpContactPairHeaderStream());
 
-    // while(iter.hasNextPair()) {
-    //     iter.nextPair(pairsHeader);
-    //     if((pairsHeader.actors[0] == gCylinderActor && pairsHeader.actors[1] == gBoxActor) ||
-    //        (pairsHeader.actors[0] == gBoxActor && pairsHeader.actors[1] == gCylinderActor)) {
-    //         // Collision between cylinder and box detected
-    //         std::cout << "Collision detected between cylinder and box!" << std::endl;
-    //         break;
-    //     }
-    // }
+    while(iter.hasNextPair()) {
+        iter.nextPair(pairsHeader);
+        if((pairsHeader.actors[0] == gCylinderActor && pairsHeader.actors[1] == gBoxActor) ||
+           (pairsHeader.actors[0] == gBoxActor && pairsHeader.actors[1] == gCylinderActor)) {
+            // Collision between cylinder and box detected
+            std::cout << "Collision detected between cylinder and box!" << std::endl;
+            break;
+        }
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -171,11 +158,10 @@ int main()
     _camera.initialize();
     shader.initialize();
 
-    //camera mouse call
-    // glfwSetFramebufferSizeCallback(window._window, framebuffer_size_callback);
-    // glfwSetCursorPosCallback(window._window, mouse_callback);
-    // glfwSetScrollCallback(window._window, scroll_callback);
-    // glfwSetInputMode(window._window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    InitializePhysX();
+
+    CreateCylinder(10.0f, 20.0f, glm::vec3(0.0f, 0.0f, 0.0f));
+    CreateBox(glm::vec3(5.0f, 5.0f, 5.0f), glm::vec3(10.0f, 10.0f, 10.0f));
 
     Simulator simulator;
     BodyFactory bodyFactory;
@@ -197,15 +183,10 @@ int main()
         simulator.draw();
         window.bufferSwap();
         glfwPollEvents();
+        SimulateAndCheckCollisions();
     }
 
-    InitializePhysX();
-
-    CreateCylinder(1.0f, 2.0f, glm::vec3(0.0f, 0.0f, 0.0f));
-    CreateBox(glm::vec3(5.0f, 5.0f, 5.0f), glm::vec3(10.0f, 10.0f, 10.0f));
-
     // Simulate and check collisions
-    SimulateAndCheckCollisions();
 
     // Release resources
     gScene->release();
