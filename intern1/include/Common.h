@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <chrono>
-#include "physx/PxPhysicsAPI.h"
 #include "GLM/glm.hpp"
 #include "GLM/gtx/string_cast.hpp"
 typedef signed char         int8;
@@ -51,16 +50,4 @@ inline std::chrono::steady_clock::time_point getCurTimePoint(void)
 inline std::chrono::steady_clock::time_point getAfterTimePoint(float time)
 {
     return std::chrono::steady_clock::now() + std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(time/1000));
-}
-
-physx::PxDefaultAllocator gAllocator;
-physx::PxDefaultErrorCallback gErrorCallback;
-physx::PxFoundation* gFoundation = nullptr;
-physx::PxPhysics* gPhysics = nullptr;
-physx::PxScene* gScene = nullptr;
-physx::PxRigidDynamic* gCylinderActor = nullptr; // Actor for the cylinder
-physx::PxRigidStatic* gBoxActor = nullptr; // Actor for the box
-
-void UpdateCylinderPosition(const glm::vec3& position) {
-    gCylinderActor->setGlobalPose(physx::PxTransform(position.x, position.y, position.z));
 }

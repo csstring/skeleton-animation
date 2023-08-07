@@ -51,3 +51,34 @@ void Cube::cubeSizeChange(float size)
         _vertex[i].z *= size;
     }
 }
+
+/*
+std::vector<glm::vec4> CreateCubeVertices(const glm::vec3& dimensions, const glm::vec3& position) {
+    float halfWidth = dimensions.x / 2.0f;
+    float halfHeight = dimensions.y / 2.0f;
+    float halfDepth = dimensions.z / 2.0f;
+
+    std::vector<glm::vec4> vertices;
+    vertices.reserve(36);
+
+    int indices[] = {0, 1, 2, 3, 0, 4, 5, 6, 5, 1, 7, 6, 4, 3, 5, 4, 5, 7, 2, 1, 6, 3, 2, 7};
+
+    glm::vec3 cubeVertices[8];
+    cubeVertices[0] = {position.x - halfWidth, position.y - halfHeight, position.z - halfDepth};
+    cubeVertices[1] = {position.x - halfWidth, position.y - halfHeight, position.z + halfDepth};
+    cubeVertices[2] = {position.x - halfWidth, position.y + halfHeight, position.z + halfDepth};
+    cubeVertices[3] = {position.x - halfWidth, position.y + halfHeight, position.z - halfDepth};
+    cubeVertices[4] = {position.x + halfWidth, position.y - halfHeight, position.z - halfDepth};
+    cubeVertices[5] = {position.x + halfWidth, position.y - halfHeight, position.z + halfDepth};
+    cubeVertices[6] = {position.x + halfWidth, position.y + halfHeight, position.z + halfDepth};
+    cubeVertices[7] = {position.x + halfWidth, position.y + halfHeight, position.z - halfDepth};
+
+    for (int i = 0; i < 24; i += 3) {
+        vertices.push_back(glm::vec4(cubeVertices[indices[i]], 1.0f));
+        vertices.push_back(glm::vec4(cubeVertices[indices[i + 1]], 1.0f));
+        vertices.push_back(glm::vec4(cubeVertices[indices[i + 2]], 1.0f));
+    }
+
+    return vertices;
+}
+*/

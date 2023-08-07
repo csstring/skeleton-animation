@@ -87,7 +87,6 @@ void FootIK::positionFixLimitAngleForWard(glm::vec3& start, glm::vec3& end, glm:
     end = start + correctPos;
 }
 
-//오차 범위 몇으로 줄건지?
 void FootIK::solveIK(
     std::vector<BoneLocal>& _boneLocalVector, 
     const glm::mat4& worldRotation, 
@@ -199,88 +198,3 @@ void FootIK::solveIK(
     _boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal, boneRot1, _blendingRatio);
     
 }
-
-/*
-const std::vector<glm::mat4>& EyeIK::solveEyeIK(const std::vector<glm::mat4>& characterTranspos, const glm::mat4& worldRotation)
-{
-
-    if (reachable(characterTranspos, distance, headPosition) == true)//distance 구하는걸로 수정, fix me
-    {
-        glm::vec3 start = IKpos.front();
-        uint32 iterCount = 0;
-        while (glm::length(headPosition - IKpos.back()) > 0.1)
-        {
-            iterCount++;
-            if (iterCount >= 10)
-            {
-                return _IKTranspos;
-            }
-            IKpos.back() = headPosition;
-            glm::quat startBonedir;
-            for(uint16 i = _eyeBoneIndex.size()-1; i >=1; --i)
-            {
-                startBonedir = glm::vec3(IKrot[i-1] * glm::vec4(_boneVector[_eyeBoneIndex[i-1]]._direction,1));
-                float r = glm::length(IKpos[i] - IKpos[i-1]);
-                float k = distance[i-1] / r;
-                IKpos[i-1] = glm::mix(IKpos[i], IKpos[i-1], k);
-                positionFixLimitAngle(IKpos[i-1], IKpos[i], startBonedir,_boneVector[_eyeBoneIndex[i]], true);
-            }
-
-            IKpos.front() = start;
-            for(uint16 i = 0; i < _eyeBoneIndex.size()-1; ++i)
-            {
-                startBonedir = glm::vec3((IKrot[i] * glm::vec4(_boneVector[_eyeBoneIndex[i]]._direction,1)));
-                float r = glm::length(IKpos[i] - IKpos[i+1]);
-                float k = distance[i] / r;
-                IKpos[i+1] = glm::mix(IKpos[i], IKpos[i+1], k);
-                positionFixLimitAngle(IKpos[i], IKpos[i+1], startBonedir ,_boneVector[_eyeBoneIndex[i+1]], false);
-            }
-        }
-    }
-    //fix me rot 
-    glm::vec3 curSee = IKrot[_bonedirection.size()-2] * glm::vec4(_bonedirection[_bonedirection.size()-2],1);
-    glm::quat afterSee = glm::rotation(glm::normalize(curSee), glm::normalize(IKpos[_bonedirection.size()-2] - IKpos[_bonedirection.size()-3]));
-    IKrot[_bonedirection.size()-2] = glm::toMat4(afterSee) * IKrot[_bonedirection.size()-2];
-    
-    for (uint32 i = 0; i < _eyeBoneIndex.size(); ++i)
-    {
-        glm::mat4 translate = glm::translate(glm::mat4(1.0f), IKpos[i]);
-        _IKTranspos[_eyeBoneIndex[i]] = translate * IKrot[i];
-    }
-    return _IKTranspos;
-}
-
-void EyeIK::positionFixLimitAngle(glm::vec3& start, glm::vec3& end, const glm::quat& startBonedir, const Bone& endBone, bool backOrFront)
-{
-    glm::vec3 initialDirection = startBonedir * endBone._direction;
-    glm::vec3 targetDirection = glm::normalize(end - start);
-    glm::quat rotation = glm::rotation(initialDirection, targetDirection);
-    glm::vec3 eulerAngle = glm::eulerAngles(rotation);
-
-    for (auto& limit : endBone._limits)
-    {
-        DOF dof;
-        float min, max;
-        std::tie(dof, min, max) = limit;
-        if (dof == DOF::RX)
-            eulerAngle.x = glm::clamp(eulerAngle.x, glm::radians(min), glm::radians(max));
-        else if (dof == DOF::RY)
-            eulerAngle.y = glm::clamp(eulerAngle.y, glm::radians(min), glm::radians(max));
-        else if (dof == DOF::RZ)
-            eulerAngle.z = glm::clamp(eulerAngle.z, glm::radians(min), glm::radians(max));
-    }
-
-    rotation = glm::quat(eulerAngle);
-    glm::vec3 correctPos = rotation * initialDirection * glm::length(end - start);
-
-    if (backOrFront == true)
-    {
-        glm::vec3 startMove = start + correctPos;
-        start = start + (end - startMove);
-    }
-    else 
-    {
-        end = start + correctPos;
-    }
-}
-*/
