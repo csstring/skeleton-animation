@@ -118,9 +118,9 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
-    _footIK->setGroundNormal(ground._normal);
-    _footIK->setTargetPosition(ground.getCenter());
-    _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
+    // _footIK->setGroundNormal(ground._normal);
+    // _footIK->setTargetPosition(ground.getCenter());
+    // _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
     _lastCallTime = curTime;
 }
 
