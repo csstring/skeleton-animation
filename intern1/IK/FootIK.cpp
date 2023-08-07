@@ -35,72 +35,56 @@ bool FootIK::reachable(const std::vector<glm::vec3>& inCharacterPos, std::vector
     return true;
 }
 
-void FootIK::positionFixLimitAngle(glm::vec3& start, glm::vec3& end, glm::vec3 startBoneDir,const Bone& endBone, bool backWard)
+void FootIK::positionFixLimitAngleBackWard(glm::vec3& start, glm::vec3& end, glm::vec3 endBoneDir,const Bone& endBone)
+{
+    glm::vec3 initialDirection = glm::normalize(end - start);
+    glm::vec3 targetDirection = glm::normalize(endBoneDir);
+    glm::quat rotation = glm::rotation(initialDirection, targetDirection);
+    glm::vec3 eulerAngle = glm::eulerAngles(rotation);
+
+    for (auto& limit : endBone._limits)
+    {
+        DOF dof;
+        float min, max;
+        std::tie(dof, min, max) = limit;
+        if (dof == DOF::RX)
+            eulerAngle.x = glm::clamp(eulerAngle.x, min, max);
+        else if (dof == DOF::RY)
+            eulerAngle.y = glm::clamp(eulerAngle.y, min, max);
+        else if (dof == DOF::RZ)
+            eulerAngle.z = glm::clamp(eulerAngle.z, min, max);
+    }
+    rotation = glm::quat(eulerAngle);
+
+    glm::vec3 correctPos = glm::inverse(rotation) * targetDirection * glm::length(end - start);
+
+    start = end - correctPos;
+
+}
+
+void FootIK::positionFixLimitAngleForWard(glm::vec3& start, glm::vec3& end, glm::vec3 startBoneDir,const Bone& endBone)
 {
     glm::vec3 initialDirection = glm::normalize(startBoneDir);
     glm::vec3 targetDirection = glm::normalize(end - start);
     glm::quat rotation = glm::rotation(initialDirection, targetDirection);
     glm::vec3 eulerAngle = glm::eulerAngles(rotation);
 
-    // for (auto& limit : endBone._limits)
-    // {
-    //     DOF dof;
-    //     float min, max;
-    //     std::tie(dof, min, max) = limit;
-    //     if (dof == DOF::RX)
-    //         eulerAngle.x = glm::clamp(eulerAngle.x, glm::radians(min), glm::radians(max));
-    //     else if (dof == DOF::RY)
-    //         eulerAngle.y = glm::clamp(eulerAngle.y, glm::radians(min), glm::radians(max));
-    //     else if (dof == DOF::RZ)
-    //         eulerAngle.z = glm::clamp(eulerAngle.z, glm::radians(min), glm::radians(max));
-    // }
-    // rotation = glm::quat(eulerAngle);
-    for (auto& limit : endBone._limits) 
+    for (auto& limit : endBone._limits)
     {
         DOF dof;
         float min, max;
         std::tie(dof, min, max) = limit;
-
-        glm::quat minQuat, maxQuat;
-        if (dof == DOF::RX) {
-            minQuat = glm::angleAxis(glm::radians(min), glm::vec3(1.0f, 0.0f, 0.0f));
-            maxQuat = glm::angleAxis(glm::radians(max), glm::vec3(1.0f, 0.0f, 0.0f));
-        } else if (dof == DOF::RY) {
-            minQuat = glm::angleAxis(glm::radians(min), glm::vec3(0.0f, 1.0f, 0.0f));
-            maxQuat = glm::angleAxis(glm::radians(max), glm::vec3(0.0f, 1.0f, 0.0f));
-        } else if (dof == DOF::RZ) {
-            minQuat = glm::angleAxis(glm::radians(min), glm::vec3(0.0f, 0.0f, 1.0f));
-            maxQuat = glm::angleAxis(glm::radians(max), glm::vec3(0.0f, 0.0f, 1.0f));
-        }
-
-        float dotMin = glm::dot(rotation, minQuat);
-        float dotMax = glm::dot(rotation, maxQuat);
-
-        if(dotMin < 0.0f) minQuat = -minQuat;
-        if(dotMax < 0.0f) maxQuat = -maxQuat;
-
-        if (dotMin < dotMax) {
-            if(dotMin < 0.0f) {
-                rotation = glm::slerp(rotation, minQuat, -dotMin);
-            }
-        } else {
-            if(dotMax < 0.0f) {
-                rotation = glm::slerp(rotation, maxQuat, -dotMax);
-            }
-        }
+        if (dof == DOF::RX)
+            eulerAngle.x = glm::clamp(eulerAngle.x, min, max);
+        else if (dof == DOF::RY)
+            eulerAngle.y = glm::clamp(eulerAngle.y, min, max);
+        else if (dof == DOF::RZ)
+            eulerAngle.z = glm::clamp(eulerAngle.z, min, max);
     }
+    rotation = glm::quat(eulerAngle);
+
     glm::vec3 correctPos = rotation * initialDirection * glm::length(end - start);
-
-    if (backWard == true) //backward end to start
-    {
-        glm::vec3 startMove = start + correctPos;
-        start = start + (end - startMove);
-    }
-    else //forward start to end
-    {
-        glm::vec3 copy = end;
-        end = start + correctPos;
-    }
+    end = start + correctPos;
 }
 
 //오차 범위 몇으로 줄건지?
@@ -147,19 +131,24 @@ void FootIK::solveIK(
     while (glm::length(footPosInChar - inCharLocalPos[2]) > 0.1)
     {
         iterCount++;
-        if (iterCount >= 10)
+        if (iterCount >= 30)
         {
             std::cout << "Fook ik length val : " << glm::length(footPosInChar - inCharLocalPos[2]) << std::endl;
-            break;
+            return;
         }
             
         inCharLocalPos[2] = footPosInChar;
+        glm::vec3 BoneDir;
         for(uint16 i = _boneIndexVec.size()-2; i >=1; --i)
         {
             float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i-1]);
             float k = distance[i-1] / r;
             inCharLocalPos[i-1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i-1], k);
-            // positionFixLimitAngle(inCharLocalPos[i-1], inCharLocalPos[i], _boneVector[_boneIndexVec[i]], true);
+            if (i == _boneIndexVec.size()-1)
+                BoneDir = Pos3InChar - inCharLocalPos[i];
+            else
+                BoneDir = inCharLocalPos[i+1] - inCharLocalPos[i];
+            positionFixLimitAngleBackWard(inCharLocalPos[i-1], inCharLocalPos[i], BoneDir ,_boneVector[_boneIndexVec[i+1]]);
         }
 
         inCharLocalPos.front() = start;
@@ -168,17 +157,11 @@ void FootIK::solveIK(
             float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i+1]);
             float k = distance[i] / r;
             inCharLocalPos[i+1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i+1], k);
-            
-            glm::vec3 startBoneDir;
             if (i == 0)
-            {
-                startBoneDir = inCharLocalRot[i] * glm::vec4(_boneVector[_boneIndexVec[0]]._direction,0);
-            }
+                BoneDir = inCharLocalRot[i] * glm::vec4(_boneVector[_boneIndexVec[0]]._direction,0);
             else
-            {
-                startBoneDir = inCharLocalPos[i] - inCharLocalPos[i-1];
-            }
-            positionFixLimitAngle(inCharLocalPos[i], inCharLocalPos[i+1], startBoneDir, _boneVector[_boneIndexVec[i+1]], false);
+                BoneDir = inCharLocalPos[i] - inCharLocalPos[i-1];
+            positionFixLimitAngleForWard(inCharLocalPos[i], inCharLocalPos[i+1], BoneDir, _boneVector[_boneIndexVec[i+1]]);
         }
     }
 
