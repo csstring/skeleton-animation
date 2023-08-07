@@ -8,6 +8,7 @@ class FootIK : public IKInterface
     private:
         void positionFixLimitAngleForWard(glm::vec3& start, glm::vec3& end, glm::vec3 startBoneDir,const Bone& endBone);
         void positionFixLimitAngleBackWard(glm::vec3& start, glm::vec3& end, glm::vec3 endBoneDir,const Bone& endBone);
+    
     private:
         glm::vec3 _groundNormal;
     public:

@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include "physx/PxPhysicsAPI.h"
 #include "GLM/glm.hpp"
 #include "GLM/gtx/string_cast.hpp"
 typedef signed char         int8;
