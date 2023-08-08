@@ -11,7 +11,7 @@ class CollisionCube
         physx::PxRigidStatic* gCubeActor = nullptr;
         
     public:
-        CollisionCube(glm::vec3 dimensions, glm::vec3 position) : _cube(dimensions,position)
+        CollisionCube(glm::vec3 dimensions, glm::vec3 position, glm::vec3 color = glm::vec3(0,1,0)) : _cube(dimensions,position, color)
         {
             _position = position;
             _dimensions = dimensions;

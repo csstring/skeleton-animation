@@ -49,6 +49,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physx.cpp" />
     <ClCompile Include="Quantization.cpp" />
+    <ClCompile Include="Scene.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="Simulator.cpp" />
     <ClCompile Include="Skeleton.cpp" />
@@ -89,6 +90,7 @@
     <ClInclude Include="include\IK\IKUtility.h" />
     <ClInclude Include="include\Physx.h" />
     <ClInclude Include="include\Quantization.h" />
+    <ClInclude Include="include\Scene.h" />
     <ClInclude Include="include\shader.h" />
     <ClInclude Include="include\Simulator.h" />
     <ClInclude Include="include\Skeleton.h" />
@@ -200,7 +202,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\schoe\Desktop\project_git\intern1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\USER\Desktop\intern1\intern1\lib;C:\Users\schoe\Desktop\project_git\intern1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glew32.lib;glfw3_mt.lib;LowLevel_static_64.lib;LowLevelAABB_static_64.lib;LowLevelDynamics_static_64.lib;PhysX_64.lib;PhysXCharacterKinematic_static_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXExtensions_static_64.lib;PhysXFoundation_64.lib;PhysXPvdSDK_static_64.lib;PhysXTask_static_64.lib;PhysXVehicle_static_64.lib;PhysXVehicle2_static_64.lib;PVDRuntime_64.lib;SceneQuery_static_64.lib;SimulationController_static_64.lib;SnippetRender_static_64.lib;SnippetUtils_static_64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

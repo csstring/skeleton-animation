@@ -11,6 +11,7 @@
 #include "Body/Ground.h"
 #include "Physx.h"
 #include "Body/CollisionCube.h"
+#include "include/Scene.h"
 struct AnimationData;
 class TimeNode;
 class Character;
@@ -40,6 +41,7 @@ class Simulator : Noncopyable
         std::vector<Animation> _animations;
         CollisionCube          _cube;
         Ground                 _ground;
+        Scene                  _scene;
 };
 
 // std::ostream& operator<<(std::ostream& os, const std::pair<Animation*, TimeNode>& ref);

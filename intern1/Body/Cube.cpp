@@ -15,7 +15,7 @@ void Cube::initialize(void)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     std::vector<glm::vec3> colors;
-    colors.resize(_vertex.size(), glm::vec3(0,1,0));
+    colors.resize(_vertex.size(), _color);
     glGenBuffers(1, &_VCO);
     glBindBuffer(GL_ARRAY_BUFFER, _VCO);
     glEnableVertexAttribArray(1);	
@@ -62,23 +62,29 @@ std::vector<glm::vec4> Cube::CreateCubeVertices(const glm::vec3& dimensions, con
     std::vector<glm::vec4> vertices;
     vertices.reserve(36);
 
-    int indices[] = {0, 1, 2, 3, 0, 4, 5, 6, 5, 1, 7, 6, 4, 3, 5, 4, 5, 7, 2, 1, 6, 3, 2, 7};
+    glm::vec4 cubeVertices[8] = {
+        {position.x - halfWidth, position.y - halfHeight, position.z - halfDepth, 1.0f},
+        {position.x - halfWidth, position.y - halfHeight, position.z + halfDepth, 1.0f},
+        {position.x - halfWidth, position.y + halfHeight, position.z + halfDepth, 1.0f},
+        {position.x - halfWidth, position.y + halfHeight, position.z - halfDepth, 1.0f},
+        {position.x + halfWidth, position.y - halfHeight, position.z - halfDepth, 1.0f},
+        {position.x + halfWidth, position.y - halfHeight, position.z + halfDepth, 1.0f},
+        {position.x + halfWidth, position.y + halfHeight, position.z + halfDepth, 1.0f},
+        {position.x + halfWidth, position.y + halfHeight, position.z - halfDepth, 1.0f}
+    };
 
-    glm::vec3 cubeVertices[8];
-    cubeVertices[0] = {position.x - halfWidth, position.y - halfHeight, position.z - halfDepth};
-    cubeVertices[1] = {position.x - halfWidth, position.y - halfHeight, position.z + halfDepth};
-    cubeVertices[2] = {position.x - halfWidth, position.y + halfHeight, position.z + halfDepth};
-    cubeVertices[3] = {position.x - halfWidth, position.y + halfHeight, position.z - halfDepth};
-    cubeVertices[4] = {position.x + halfWidth, position.y - halfHeight, position.z - halfDepth};
-    cubeVertices[5] = {position.x + halfWidth, position.y - halfHeight, position.z + halfDepth};
-    cubeVertices[6] = {position.x + halfWidth, position.y + halfHeight, position.z + halfDepth};
-    cubeVertices[7] = {position.x + halfWidth, position.y + halfHeight, position.z - halfDepth};
+    int indices[] = {
+        1, 5, 6,  6, 2, 1,  // Front face
+        4, 0, 3,  3, 7, 4,  // Back face
+        0, 1, 2,  2, 3, 0,  // Left face
+        5, 4, 7,  7, 6, 5,  // Right face
+        2, 6, 7,  7, 3, 2,  // Top face
+        5, 1, 0,  0, 4, 5   // Bottom face
+    };
 
-    for (int i = 0; i < 24; i += 3) {
-        vertices.push_back(glm::vec4(cubeVertices[indices[i]], 1.0f));
-        vertices.push_back(glm::vec4(cubeVertices[indices[i + 1]], 1.0f));
-        vertices.push_back(glm::vec4(cubeVertices[indices[i + 2]], 1.0f));
+    for (int i = 0; i < 36; i++) {
+        vertices.push_back(cubeVertices[indices[i]]);
     }
 
-    return vertices;
+    return vertices;;
 }
