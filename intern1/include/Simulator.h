@@ -1,29 +1,32 @@
 #pragma once
-#include "common.h"
+
+#include "Common.h"
 #include "Skeleton.h"
 #include <deque>
 #include <iostream>
 #include "Animation.h"
-#include "Cube.h"
+#include "Body/Cube.h"
 #include "Controller.h"
-#include "BodyFactory.h"
-#include "Ground.h"
+#include "Body/BodyFactory.h"
+#include "Body/Ground.h"
+#include "Physx.h"
+#include "Body/CollisionCube.h"
 struct AnimationData;
 class TimeNode;
 class Character;
 class Cube;
 enum class KeyInput;
 class Controller;
-
+class CollisionCube;
 class Simulator : Noncopyable
 {
     private:
         std::vector<Character*> _players;//shared ptr써야할거 같은데
         Controller _controller;
         BodyFactory _factory;
-
+        Physx _physx;
     public:
-        Simulator(){}
+        Simulator(): _cube(glm::vec3(1.0f), glm::vec3(0.0f)){}
         ~Simulator(){}
         
         void initialize(void);
@@ -35,7 +38,7 @@ class Simulator : Noncopyable
     public : 
         Skeleton               _skeleton;
         std::vector<Animation> _animations;
-        Cube                   _cube;
+        CollisionCube          _cube;
         Ground                 _ground;
 };
 

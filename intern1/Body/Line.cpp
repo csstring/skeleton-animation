@@ -1,5 +1,5 @@
-#include "include/Line.h"
-#include "include/GL/glew.h"
+#include "../include/Body/Line.h"
+#include "../include/GL/glew.h"
 
 void Line::initialize(glm::vec3 color, uint32 VBC)
 {

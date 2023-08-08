@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "Common.h"
 #include <string>
 #include <vector>
 #include "GLM/ext.hpp"
@@ -10,7 +10,7 @@ enum class DOF;
 struct Bone
 {
     uint32           _boneIndex;
-    int32           _parentBoneIndex;
+    int32            _parentBoneIndex;
     std::string      _boneName;
     float            _length;
     glm::vec3        _direction;

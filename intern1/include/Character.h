@@ -10,6 +10,7 @@ class Controller;
 class EyeIK;
 class FootIK;
 class Ground;
+class CollisionCylinder;
 class Character
 {   
     private:
@@ -23,6 +24,7 @@ class Character
         std::chrono::steady_clock::time_point _lastCallTime;
 
     public:
+        CollisionCylinder* _collisionMesh;
         Blender _blender;
         EyeIK* _eyeIK;
         FootIK* _footIK;
@@ -33,9 +35,11 @@ class Character
     private :
         void boneBufferMaping(void);  
         void worldPositionUpdate(float deltaTime);
-        void stateChange(void);
+
     public:
-        Character(const Skeleton& skeleton, const Controller& controller) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller), _isFirst(true){};
+        Character(
+            const Skeleton& skeleton, const Controller& controller, CollisionCylinder* collisionMesh
+        ) : _skeleton(skeleton), _eyeIK(nullptr), _controller(controller), _isFirst(true), _collisionMesh(collisionMesh){};
         ~Character()
         {
             if (_eyeIK != nullptr)

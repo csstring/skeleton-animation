@@ -1,8 +1,8 @@
-#include "include/Cylinder.h"
-#include "include/GL/glew.h"
+#include "../include/Body/Cylinder.h"
+#include "../include/GL/glew.h"
 #include <cmath>
-#include "include/EnumHeader.h"
-//45 135
+#include "../include/EnumHeader.h"
+
 void Cylinder::initialize(glm::vec3 color, uint32 VBC, BONEID ID)
 {
     const float angleStep = 2.0f * PI / static_cast<float>(_numSlices);
@@ -61,6 +61,7 @@ void Cylinder::initialize(glm::vec3 color, uint32 VBC, BONEID ID)
         colors[leftEyePoint-2] = glm::vec3(1,0,0);
         colors[leftEyePoint-1] = glm::vec3(1,0,0);
     }
+    _buffer = _vertices;
     glBindBuffer(GL_ARRAY_BUFFER, VBC);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * colors.size(), colors.data(), GL_STATIC_DRAW);
 }

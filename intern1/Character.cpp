@@ -3,7 +3,7 @@
 #include "include/TimeNode.h"
 #include "include/Animation.h"
 #include "include/GL/glew.h"
-#include "include/Cylinder.h"
+#include "include/Body/Cylinder.h"
 #include "include/GLM/gtx/compatibility.hpp"
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/Controller.h"
@@ -12,7 +12,8 @@
 #include <queue>
 #include "include/AnimationBlend/Blender.h"
 #include "include/AnimationBlend/IBlendNode.h"
-#include "include/Ground.h"
+#include "include/Body/Ground.h"
+#include "include/Body/CollisionCylinder.h"
 void Character::rotationY(float radian)
 {
     _worldRotation = glm::rotate(_worldRotation, radian, glm::vec3(0,1,0));
@@ -82,20 +83,8 @@ void Character::worldPositionUpdate(float deltaTime)
     //     t.y += _yError * deltaTime;
     //     root.y += _yError * deltaTime;
     // }
-    UpdateCylinderPosition(root);//physx
+    // UpdateCylinderPosition(root);//physx
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
-}
-
-void Character::stateChange()
-{
-    // const std::string& name = _blender.getBlendNode(BlendNode::BASE)->_animations.begin()->first->_name;
-    //상체가 비어있거나 하체 비어있으면 베이스 애니메이션 state로 채워주기
-    // if (name == "run")
-    //     _state = PlayerState::RUN;
-    // if (name == "idle")
-    //     _state = PlayerState::IDLE;
-    // if (name == "walk")
-    //     _state = PlayerState::WALK;
 }
 
 void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, const Ground& ground)
@@ -112,9 +101,9 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
         delta = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - curTime);
 
     _blender.eraseAnimationCall(curTime);
-    stateChange();
     worldPositionUpdate(delta.count());
     _blender.animationUpdate(curTime, _boneLocalVector, _lowerState, _upState);
+    _collisionMesh->update(_worldTrans);
 
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
@@ -130,7 +119,7 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
 void Character::draw(void)
 {
     const std::vector<Bone>& boneVector = _skeleton.getBoneVector();
-
+    _collisionMesh->draw();
     glm::vec3 color(0.9412, 0.7922, 0.2549);
     for(const Bone& bone : boneVector)
     {

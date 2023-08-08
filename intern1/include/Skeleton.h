@@ -2,9 +2,11 @@
 #include <string>
 #include <vector>
 #include "Bone.h"
+#include "EnumHeader.h"
 
 class Skeleton
 {
+    private:
     public:
         Skeleton() : _isDeg(false){};
         ~Skeleton(){};
@@ -21,7 +23,9 @@ class Skeleton
         std::vector<Bone>& getBoneVector(void){return _boneVector;};
         const std::vector<Bone>& getBoneVector(void) const {return _boneVector;};
         int32 findBoneIndex(const std::string& name) const;
-
+        float getSkeletonHeight(void);
+        float getSkeletonWidth(void);
+        glm::vec3 getCharLocalPosition(BONEID boneID);
     private:
         std::string       _programName;
         bool              _isDeg;

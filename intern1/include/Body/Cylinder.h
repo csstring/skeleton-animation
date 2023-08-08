@@ -1,6 +1,6 @@
 #pragma once
-#include "Common.h"
-#include "GLM/glm.hpp"
+#include "../Common.h"
+#include "../GLM/glm.hpp"
 #include <vector>
 enum BONEID;
 class Cylinder
@@ -14,6 +14,7 @@ class Cylinder
         uint32 _numVerticesTopBottom;
         uint32 _numVerticesTotal;
         std::vector<glm::vec4> _vertices;
+        std::vector<glm::vec4> _buffer;
     public:
         Cylinder(
             float radius, float height, uint32 numSilices, glm::mat4 transForm

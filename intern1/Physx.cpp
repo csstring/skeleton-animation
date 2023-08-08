@@ -1,53 +1,34 @@
 #include "include/Physx.h"
-
+#include "include/ContactCallBack.h"
 using namespace physx;
-void Physx::UpdateCylinderPosition(const glm::vec3& position) 
+
+PxFilterFlags MyCustomFilterShader(PxFilterObjectAttributes attributes0,
+                                   PxFilterData filterData0,
+                                   PxFilterObjectAttributes attributes1,
+                                   PxFilterData filterData1,
+                                   PxPairFlags& pairFlags,
+                                   const void* constantBlock,
+                                   PxU32 constantBlockSize)
 {
-    gCylinderActor->setGlobalPose(PxTransform(position.x, position.y, position.z));
+    // Enable resolved collision and trigger the contact callback
+    pairFlags = PxPairFlag::eCONTACT_DEFAULT | PxPairFlag::eNOTIFY_TOUCH_FOUND;
+
+    return PxFilterFlag::eDEFAULT; // Or you can return other filter flags depending on your needs
 }
 
 void Physx::Initialize(void) 
 {
     gFoundation = PxCreateFoundation(PX_PHYSICS_VERSION, gAllocator, gErrorCallback);
     gPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *gFoundation, PxTolerancesScale());
-
+    _contactCallback = new ContactCallBack();
     // Create a scene
     PxSceneDesc sceneDesc(gPhysics->getTolerancesScale());
-    sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+    sceneDesc.gravity = PxVec3(0.0f, 0.0f, 0.0f);
     sceneDesc.cpuDispatcher = PxDefaultCpuDispatcherCreate(1);
-    sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+    sceneDesc.filterShader = MyCustomFilterShader;
     gScene = gPhysics->createScene(sceneDesc);
-}
+    gScene->setSimulationEventCallback(_contactCallback);
 
-void Physx::CreateCylinder(float radius, float halfHeight, const glm::vec3& position) {
-    // Create material
-    PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-
-    // Create capsule geometry
-    PxCapsuleGeometry capsule(radius, halfHeight);
-
-    // Create shape
-    PxShape* shape = gPhysics->createShape(capsule, *material);
-
-    // Create actor
-    gCylinderActor = gPhysics->createRigidDynamic(PxTransform(position.x, position.y, position.z));
-    gCylinderActor->attachShape(*shape);
-    gScene->addActor(*gCylinderActor);
-}
-
-void Physx::CreateBox(const glm::vec3& dimensions, const glm::vec3& position) {
-    // Create material
-    PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-
-    // Create box geometry
-    PxBoxGeometry box(dimensions.x / 2, dimensions.y / 2, dimensions.z / 2);
-
-    // Create shape
-    PxShape* shape = gPhysics->createShape(box, *material);
-    // Create actor
-    gBoxActor = gPhysics->createRigidStatic(PxTransform(position.x, position.y, position.z));
-    gBoxActor->attachShape(*shape);
-    gScene->addActor(*gBoxActor);
 }
 
 void Physx::SimulateAndCheckCollisions() {
@@ -71,3 +52,19 @@ void Physx::SimulateAndCheckCollisions() {
     //     }
     // }
 }
+
+/*
+PxFilterFlags MyCustomFilterShader(PxFilterObjectAttributes attributes0,
+                                   PxFilterData filterData0,
+                                   PxFilterObjectAttributes attributes1,
+                                   PxFilterData filterData1,
+                                   PxPairFlags& pairFlags,
+                                   const void* constantBlock,
+                                   PxU32 constantBlockSize)
+{
+    // Enable resolved collision and trigger the contact callback
+    pairFlags = PxPairFlag::eCONTACT_DEFAULT | PxPairFlag::eNOTIFY_CONTACT_POINTS;
+
+    return PxFilterFlag::eDEFAULT; // Or you can return other filter flags depending on your needs
+}
+*/

@@ -1,6 +1,6 @@
 #pragma once
 #include "Common.h"
-#include "Cube.h"
+#include "Body/Cube.h"
 #include <deque>
 class Animation;
 class Skeleton;
@@ -15,7 +15,7 @@ class Controller
         const Animation* findAnimation(const std::string& name, const std::vector<Animation>& _animations);
     
     public:
-        Controller() : _player(nullptr){};
+        Controller() : _player(nullptr), _targetCharterCube(glm::vec3(0.3f), glm::vec3(0.0f)){};
         ~Controller(){};
         void initialize(void);
         void draw(void);

@@ -1,8 +1,9 @@
-#include "include/Cube.h"
-#include "include/GL/glew.h"
+#include "../include/Body/Cube.h"
+#include "../include/GL/glew.h"
 
 void Cube::initialize(void)
 {
+    _vertex = CreateCubeVertices(_dimenstion, _position);
     glGenVertexArrays(1, &_VAO);
     glBindVertexArray(_VAO);
 
@@ -23,6 +24,7 @@ void Cube::initialize(void)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     glBindVertexArray(0);
+    _buffer = _vertex;
 }
 
 void Cube::update(void)
@@ -52,8 +54,7 @@ void Cube::cubeSizeChange(float size)
     }
 }
 
-/*
-std::vector<glm::vec4> CreateCubeVertices(const glm::vec3& dimensions, const glm::vec3& position) {
+std::vector<glm::vec4> Cube::CreateCubeVertices(const glm::vec3& dimensions, const glm::vec3& position) {
     float halfWidth = dimensions.x / 2.0f;
     float halfHeight = dimensions.y / 2.0f;
     float halfDepth = dimensions.z / 2.0f;
@@ -81,4 +82,3 @@ std::vector<glm::vec4> CreateCubeVertices(const glm::vec3& dimensions, const glm
 
     return vertices;
 }
-*/

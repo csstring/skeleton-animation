@@ -1,5 +1,5 @@
-#include "include/Ground.h"
-#include "include/GL/glew.h"
+#include "../include/Body/Ground.h"
+#include "../include/GL/glew.h"
 
 void Ground::initialize(void)
 {

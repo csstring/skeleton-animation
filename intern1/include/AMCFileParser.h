@@ -1,5 +1,5 @@
 #pragma once
-#include "common.h"
+#include "Common.h"
 #include <string>
 class Skeleton;
 class Animation;
