@@ -50,9 +50,9 @@ bool FootIK::isOffGroundCheck(
     glm::vec3 Dir =  glm::normalize(glm::cross(childDir, axis));
 
     physx::PxVec3 lightDir(Dir.x, Dir.y, Dir.z);
-    physx::PxReal maxDistance = 0.5;
+    physx::PxReal maxDistance = 1;
     physx::PxRaycastBuffer hitTibia, hitFoot;
-    const float Epsilon = 0.2;
+    const float Epsilon = 0;
     glm::vec3 epsilonDir = Dir * Epsilon;
     physx::PxVec3 pxTibiaPos(tibiaPos.x - epsilonDir.x, tibiaPos.y - epsilonDir.y, tibiaPos.z - epsilonDir.z);
     physx::PxVec3 pxFootPos(footPos.x - epsilonDir.x, footPos.y - epsilonDir.y, footPos.z - epsilonDir.z);
@@ -92,37 +92,7 @@ bool FootIK::isOffGroundCheck(
 //대각선 거리라 내적으로 직선거리구하기?
 //발바닥 위치 + 거리*방향 *2 구하고 레이케스트
 //타겟 위치 노발 구하고 캐릭터 로컬로 들고오기
-/*
-target world pos : vec3(-0.811038, 2.251688, 2.230527)
-ground world Normal : vec3(-0.000000, 0.710437, 0.703761)
-target local pos : vec3(-0.811038, 2.251688, 2.230527)
-ground local Normal : vec3(-0.000000, 0.710437, 0.703761)
-foot off start
-target world pos : vec3(-0.576477, 0.051622, 2.180995)
-ground world Normal : vec3(0.000000, 0.771396, 0.636355)
-target local pos : vec3(-0.764931, 2.444895, 2.016890)
-ground local Normal : vec3(0.000000, 0.771396, 0.636355)
-foot off start
-target world pos : vec3(0.535311, -0.807713, -1.594536)
-ground world Normal : vec3(-0.000000, 0.543445, -0.839445)
-target local pos : vec3(-0.115942, 1.722417, 2.660568)
-ground local Normal : vec3(0.000001, 0.543445, 0.839445)
-foot off start
-target world pos : vec3(0.220190, 0.500000, -0.472788)
-ground world Normal : vec3(0.000000, 1.000000, 0.000000)
-target local pos : vec3(0.122334, 3.149579, 1.338408)
-ground local Normal : vec3(0.000000, 1.000000, 0.000000)
-foot off start
-target world pos : vec3(0.027744, 0.229195, 1.520590)
-ground world Normal : vec3(0.000000, 0.921504, 0.388368)
-target local pos : vec3(0.353474, 2.920651, -1.230909)
-ground local Normal : vec3(-0.000000, 0.921504, -0.388368)
-foot off start
-target world pos : vec3(-0.182413, 0.500000, 0.427163)
-ground world Normal : vec3(0.000000, 1.000000, 0.000000)
-target local pos : vec3(0.344508, 3.193881, -1.244723)
-ground local Normal : vec3(0.000000, 1.000000, 0.000000)
-*/
+
 void FootIK::findTargetObject(
     const std::vector<glm::vec3>& inCharLocalPos, 
     physx::PxScene* gScene, 
@@ -135,8 +105,8 @@ void FootIK::findTargetObject(
 
     glm::vec3 moveDir = glm::normalize(footPos - tibiaPos);//fix, normal 
     float moveDistance = glm::length(footPos - tibiaPos);
-    glm::vec3 targetPos = footPos + 1.0f * moveDistance * tmpMoveDir;//fix
-    targetPos.y += 10;//fix
+    glm::vec3 targetPos = footPos + 4.5f * moveDistance * tmpMoveDir;//fix
+    targetPos.y += 30;//fix
 
     physx::PxVec3 lightDir(0, -1, 0);
     physx::PxReal maxDistance = 30;
@@ -149,16 +119,18 @@ void FootIK::findTargetObject(
     {
         glm::vec3 worldTarget(hit.block.position.x, hit.block.position.y, hit.block.position.z);
         glm::vec3 worldNormal(hit.block.normal.x, hit.block.normal.y, hit.block.normal.z);
-        std::cout << "inchar move dir " << glm::to_string(glm::vec4(tmpMoveDir,0)) << std::endl;
         _targetPosition = glm::inverse(charLocalToWorld) * glm::vec4(worldTarget,1);
         _groundNormal = glm::inverse(charLocalToWorld) * glm::vec4(worldNormal, 0);
         _targetOn = true;
-        std::cout << "world foot pos : " << glm::to_string(footPos) << std::endl;
-        std::cout << "world origin pos : " << glm::to_string(targetPos) << std::endl;
-        std::cout << "target world pos : " << glm::to_string(worldTarget) << std::endl;
-        std::cout << "ground world Normal : " << glm::to_string(worldNormal) << std::endl;
-        std::cout << "target local pos : " << glm::to_string(_targetPosition) << std::endl;
-        std::cout << "ground local Normal : " << glm::to_string(_groundNormal) << std::endl;
+        std::cout << hit.getNbAnyHits() << std::endl;
+        // std::cout << "inchar move dir " << glm::to_string(glm::vec4(tmpMoveDir,0)) << std::endl;
+        // std::cout << "world foot pos : " << glm::to_string(glm::inverse(charLocalToWorld) * glm::vec4(footPos,1)) << std::endl;
+        // std::cout << "local foot pos : " << glm::to_string(footPos) << std::endl;
+        // std::cout << "world origin pos : " << glm::to_string(targetPos) << std::endl;
+        // std::cout << "target world pos : " << glm::to_string(worldTarget) << std::endl;
+        // std::cout << "ground world Normal : " << glm::to_string(worldNormal) << std::endl;
+        // std::cout << "target local pos : " << glm::to_string(_targetPosition) << std::endl;
+        // std::cout << "ground local Normal : " << glm::to_string(_groundNormal) << std::endl;
     }
 }
 /*
@@ -181,9 +153,9 @@ bool FootIK::reachable(const std::vector<glm::vec3>& inCharacterPos, std::vector
     curDistance = distance[0] + distance[1];
     if (curDistance < targetDistance)
     {
-        std::cout << "reach test fail!!" << std::endl;
-        std::cout << "leg length : " << curDistance << std::endl;
-        std::cout << "target length : " << targetDistance << std::endl;
+        // std::cout << "reach test fail!!" << std::endl;
+        // std::cout << "leg length : " << curDistance << std::endl;
+        // std::cout << "target length : " << targetDistance << std::endl;
         return true;
         // return false;
     }
@@ -273,7 +245,7 @@ void FootIK::solveIK(
     if (isOffGroundCheck(inCharLocalPos, gScene, charLocalToWorld) == true && _targetOn == false && _blendingRatio <= 0)
     {
         glm::vec3 origin = charLocalToWorld * glm::vec4(0,0,0,1);
-        glm::mat4 rootTrans = controller.getMatrixInCharLocal(BONEID::ROOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
+        glm::mat4 rootTrans = charLocalToWorld * controller.getMatrixInCharLocal(BONEID::ROOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
         glm::vec3 rootPos = rootTrans * glm::vec4(0,0,0,1);
         glm::vec3 moveDir = glm::normalize(rootPos - origin);
         findTargetObject(inCharLocalPos, gScene, charLocalToWorld, moveDir);
@@ -297,7 +269,7 @@ void FootIK::solveIK(
     if (reachable(inCharLocalPos, distance, footPosInChar) == false)
         return;
 
-    std::cout << "leg ik start " << std::endl;
+    // std::cout << "leg ik start " << std::endl;
     glm::vec3 start = inCharLocalPos.front();
     uint32 iterCount = 0;
     while (glm::length(footPosInChar - inCharLocalPos[2]) > 0.1)
@@ -316,11 +288,11 @@ void FootIK::solveIK(
             float r = glm::length(inCharLocalPos[i] - inCharLocalPos[i-1]);
             float k = distance[i-1] / r;
             inCharLocalPos[i-1] = glm::mix(inCharLocalPos[i], inCharLocalPos[i-1], k);
-            if (i == _boneIndexVec.size()-1)
+            if (i == _boneIndexVec.size()-1)//????
                 BoneDir = _targetPosition - inCharLocalPos[i];
             else
                 BoneDir = inCharLocalPos[i+1] - inCharLocalPos[i];
-            positionFixLimitAngleBackWard(inCharLocalPos[i-1], inCharLocalPos[i], BoneDir ,_boneVector[_boneIndexVec[i+1]]);
+            // positionFixLimitAngleBackWard(inCharLocalPos[i-1], inCharLocalPos[i], BoneDir ,_boneVector[_boneIndexVec[i+1]]);
         }
 
         inCharLocalPos.front() = start;
@@ -333,7 +305,7 @@ void FootIK::solveIK(
                 BoneDir = inCharLocalRot[i] * glm::vec4(_boneVector[_boneIndexVec[0]]._direction,0);
             else
                 BoneDir = inCharLocalPos[i] - inCharLocalPos[i-1];
-            positionFixLimitAngleForWard(inCharLocalPos[i], inCharLocalPos[i+1], BoneDir, _boneVector[_boneIndexVec[i+1]]);
+            // positionFixLimitAngleForWard(inCharLocalPos[i], inCharLocalPos[i+1], BoneDir, _boneVector[_boneIndexVec[i+1]]);
         }
     }
 
@@ -381,9 +353,9 @@ void FootIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& cu
         return;
     }
     else if (_targetOn == false && _blendingRatio > 0)
-        _blendingRatio -= static_cast<float>(millisecond.count()) / 1000.0f;
+        _blendingRatio -= static_cast<float>(millisecond.count()) / 100.0f;
     else if (_targetOn == true && _blendingRatio < 1.0f)
-        _blendingRatio += static_cast<float>(millisecond.count()) / 1000.0f;
+        _blendingRatio += static_cast<float>(millisecond.count()) / 600.0f;
     if (_blendingRatio >= 1.0f)
     {
         _blendingRatio = 1;
