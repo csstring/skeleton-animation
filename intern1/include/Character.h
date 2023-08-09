@@ -47,7 +47,7 @@ class Character
         };
         void initialize(void);
         const Skeleton& getCharacterSkeleton(void) const {return _skeleton;};
-        void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, const Ground& ground);
+        void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, physx::PxScene* gScene);
         void draw(void);
         void rotationY(float radian);
         glm::mat4 getCharacterWorldPosition(void) const;

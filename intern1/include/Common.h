@@ -7,6 +7,7 @@
 #include "GLM/glm.hpp"
 #include "GLM/gtx/string_cast.hpp"
 #include "physx/PxPhysicsAPI.h"
+#include <ostream>
 typedef signed char         int8;
 typedef signed short        int16;
 typedef signed int          int32;
@@ -52,3 +53,5 @@ inline std::chrono::steady_clock::time_point getAfterTimePoint(float time)
 {
     return std::chrono::steady_clock::now() + std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(time/1000));
 }
+
+std::string ft_to_string(const physx::PxVec3& vec);

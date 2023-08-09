@@ -14,7 +14,9 @@ void Simulator::addPlayer(const std::string initAnimationName)//position, name ê
     float radius = _skeleton.getSkeletonWidth();
     float height = _skeleton.getSkeletonHeight();
     glm::vec3 rFoot = _skeleton.getCharLocalPosition(BONEID::RFOOT) - _skeleton.getCharLocalPosition(BONEID::ROOT);
-    CollisionCylinder* collisionMesh = _factory.makeCollisionCylinder(_physx.gScene, _physx.gPhysics, radius, height, glm::vec3(0,rFoot.y,0));
+    //fix me
+    // CollisionCylinder* collisionMesh = _factory.makeCollisionCylinder(_physx.gScene, _physx.gPhysics, 1000, 1000, glm::vec3(0,rFoot.y,0));
+    CollisionCylinder* collisionMesh = nullptr;
     Character* newPlayer = _factory.makeCharacter(_skeleton, _controller, collisionMesh);
     Character* oldPlayer = _controller.getPlayer();
     
@@ -33,6 +35,11 @@ void Simulator::initialize(void)
     _ground.initialize();
     _controller.setPlayer(_players.front());
     _scene.initialize(_physx.gPhysics, _physx.gScene);
+
+    //tmp
+    // physx::PxMaterial* material = _physx.gPhysics->createMaterial(0.5f, 0.5f, 0.5f);
+    // physx::PxRigidStatic* plane = PxCreatePlane(*_physx.gPhysics, physx::PxPlane(0,1,0,0), *material);
+    // _physx.gScene->addActor(*plane)
 }
 
 void Simulator::draw(void)
@@ -54,7 +61,7 @@ void Simulator::update(void)
     // _ground.update();
     for (Character* player : _players)
     {
-        player->update(curTime, _cube._position , _ground);
+        player->update(curTime, _cube._position , _physx.gScene);
     }
 
     _physx.gScene->simulate(1.0f / 60.0f);

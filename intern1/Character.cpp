@@ -73,21 +73,21 @@ void Character::worldPositionUpdate(float deltaTime)
 {
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
-    // if (t.y > -10)//fix me lastcall
-    // {
-    //     t.y -= _yError * deltaTime;
-    //     root.y -= _yError * deltaTime;
-    // }
-    // else if (t.y < -10)
-    // {
-    //     t.y += _yError * deltaTime;
-    //     root.y += _yError * deltaTime;
-    // }
+    if (t.y > -10)//fix me lastcall
+    {
+        // t.y -= _yError * deltaTime;
+        root.y -= _yError * deltaTime;
+    }
+    else if (t.y < -10)
+    {
+        // t.y += _yError * deltaTime;
+        root.y += _yError * deltaTime;
+    }
     // UpdateCylinderPosition(root);//physx
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }
 
-void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, const Ground& ground)
+void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, physx::PxScene* gScene)
 {
     std::chrono::milliseconds delta;
     if (_isFirst == true)
@@ -103,14 +103,12 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     _blender.eraseAnimationCall(curTime);
     worldPositionUpdate(delta.count());
     _blender.animationUpdate(curTime, _boneLocalVector, _lowerState, _upState);
-    _collisionMesh->update(_worldTrans);
+    // _collisionMesh->update(_worldTrans);
 
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
-    // _footIK->setGroundNormal(ground._normal);
-    // _footIK->setTargetPosition(ground.getCenter());
-    // _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
+    _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
 
     _lastCallTime = curTime;
 }
@@ -119,7 +117,7 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
 void Character::draw(void)
 {
     const std::vector<Bone>& boneVector = _skeleton.getBoneVector();
-    _collisionMesh->draw();
+    // _collisionMesh->draw();
     glm::vec3 color(0.9412, 0.7922, 0.2549);
     for(const Bone& bone : boneVector)
     {

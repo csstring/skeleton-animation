@@ -42,7 +42,9 @@ void EyeIK::solveIK(
     const glm::mat4& worldRotation, 
     const glm::mat4& worldTranslate, 
     const Controller& controller,
-    const std::chrono::steady_clock::time_point& curTime)
+    const std::chrono::steady_clock::time_point& curTime,
+    physx::PxScene* gScene
+)
 {
     std::vector<glm::vec3> inCharLocalPos;
     std::vector<glm::mat4> inCharLocalRot;

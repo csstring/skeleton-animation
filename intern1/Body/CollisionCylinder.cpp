@@ -35,7 +35,6 @@ void CollisionCylinder::initialize(physx::PxPhysics* gPhysics, physx::PxScene* g
 
     gCylinderActor = gPhysics->createRigidDynamic(physx::PxTransform(_position.x, _position.y, _position.z));
     gCylinderActor->attachShape(*shape);
-    shape->release();
     gScene->addActor(*gCylinderActor);
 }
 //collision update fix me
