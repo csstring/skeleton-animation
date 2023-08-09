@@ -31,7 +31,7 @@ class Character
         UpperState _upState;
         LowerState _lowerState;
         float      _yError = 0.001;
-
+        float      _groundHight = -10;
     private :
         void boneBufferMaping(void);  
         void worldPositionUpdate(float deltaTime);

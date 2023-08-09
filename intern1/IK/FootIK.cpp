@@ -33,6 +33,11 @@ foot hit dis : 0
 foot hit pos : PxVec3(-0.593691, -9.801931, 0.508981)
 */
 //발바닥 조인트 두개 다 검사
+void FootIK::setCharGroundHight(float& charGroundHight)
+{
+    charGroundHight = _groundHight;
+}
+
 bool FootIK::isOffGroundCheck(
     const std::vector<glm::vec3>& inCharLocalPos, 
     physx::PxScene* gScene, 
@@ -60,7 +65,8 @@ bool FootIK::isOffGroundCheck(
     // std::cout << "foot ray dir : " << glm::to_string(Dir) << std::endl;
     bool tibiaHit = gScene->raycast(pxTibiaPos, lightDir,maxDistance, hitTibia);
     bool footHit = gScene->raycast(pxFootPos, lightDir,maxDistance, hitFoot);
-
+//////////////////////////////////////////////////////
+return true;    
     // if (tibiaHit)
     // {
     //     std::cout << "tibiad  pos : " << ft_to_string(pxTibiaPos) << std::endl;
@@ -109,20 +115,36 @@ void FootIK::findTargetObject(
     targetPos.y += 30;//fix
 
     physx::PxVec3 lightDir(0, -1, 0);
-    physx::PxReal maxDistance = 30;
-    physx::PxRaycastBuffer hit;
+    physx::PxReal maxDistance = 100;
+
+    const int MAX_HITS = 8;
+    physx::PxRaycastHit hitBuffer[MAX_HITS];
+    physx::PxRaycastBuffer hitInfo(hitBuffer, MAX_HITS);
+    // physx::PxRaycastBuffer hit;
     physx::PxVec3 origin(targetPos.x , targetPos.y, targetPos.z);
 
-    bool hitCheck = gScene->raycast(origin, lightDir, maxDistance, hit);
+    bool hitCheck = gScene->raycast(origin, lightDir, maxDistance, hitInfo);
     
     if (hitCheck == true)
     {
-        glm::vec3 worldTarget(hit.block.position.x, hit.block.position.y, hit.block.position.z);
-        glm::vec3 worldNormal(hit.block.normal.x, hit.block.normal.y, hit.block.normal.z);
-        _targetPosition = glm::inverse(charLocalToWorld) * glm::vec4(worldTarget,1);
-        _groundNormal = glm::inverse(charLocalToWorld) * glm::vec4(worldNormal, 0);
-        _targetOn = true;
-        std::cout << hit.getNbAnyHits() << std::endl;
+        std::cout << hitInfo.nbTouches << std::endl;
+        float curHight = _groundHight;
+        for (physx::PxU32 i = 0; i < hitInfo.nbTouches; i++)
+        {
+            const physx::PxRaycastHit &hit = hitInfo.touches[i];
+            // Process hit here
+            std::cout << hit.position.y << std::endl;
+            if (hit.position.y > curHight)
+            {
+                glm::vec3 worldTarget(hit.position.x, hit.position.y, hit.position.z);
+                glm::vec3 worldNormal(hit.normal.x, hit.normal.y, hit.normal.z);
+                _targetPosition = glm::inverse(charLocalToWorld) * glm::vec4(worldTarget,1);
+                _groundNormal = glm::inverse(charLocalToWorld) * glm::vec4(worldNormal, 0);
+                
+                _targetOn = true;
+                _groundHight = hit.position.y;
+            }
+        }
         // std::cout << "inchar move dir " << glm::to_string(glm::vec4(tmpMoveDir,0)) << std::endl;
         // std::cout << "world foot pos : " << glm::to_string(glm::inverse(charLocalToWorld) * glm::vec4(footPos,1)) << std::endl;
         // std::cout << "local foot pos : " << glm::to_string(footPos) << std::endl;

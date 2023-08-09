@@ -19,6 +19,7 @@ class FootIK : public IKInterface
     private:
         glm::vec3 _groundNormal;
         bool      _isOffGround;
+        float     _groundHight = -10;    
     public:
         explicit FootIK(const std::vector<Bone>& boneVector) : IKInterface(boneVector)
         {
@@ -34,4 +35,5 @@ class FootIK : public IKInterface
             const std::chrono::steady_clock::time_point& curTime,
             physx::PxScene* gScene
         ) override final;
+        void setCharGroundHight(float& charGroundHight);
 };

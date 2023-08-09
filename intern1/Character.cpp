@@ -73,12 +73,12 @@ void Character::worldPositionUpdate(float deltaTime)
 {
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
-    if (t.y > -10)//fix me lastcall
+    if (t.y > _groundHight)//fix me lastcall
     {
         // t.y -= _yError * deltaTime;
         root.y -= _yError * deltaTime;
     }
-    else if (t.y < -10)
+    else if (t.y < _groundHight)
     {
         // t.y += _yError * deltaTime;
         root.y += _yError * deltaTime;
@@ -109,7 +109,7 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
     _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-
+    _footIK->setCharGroundHight(_groundHight);
     _lastCallTime = curTime;
 }
 
