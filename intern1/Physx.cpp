@@ -68,3 +68,55 @@ PxFilterFlags MyCustomFilterShader(PxFilterObjectAttributes attributes0,
     return PxFilterFlag::eDEFAULT; // Or you can return other filter flags depending on your needs
 }
 */
+
+// void FootIK::positionFixLimitAngleBackWard(glm::vec3& start, glm::vec3& end, glm::vec3 endBoneDir,const Bone& endBone)
+// {
+//     glm::vec3 initialDirection = glm::normalize(end - start);
+//     glm::vec3 targetDirection = glm::normalize(endBoneDir);
+//     glm::quat rotation = glm::rotation(initialDirection, targetDirection);
+//     glm::vec3 eulerAngle = glm::eulerAngles(rotation);
+
+//     for (auto& limit : endBone._limits)
+//     {
+//         DOF dof;
+//         float min, max;
+//         std::tie(dof, min, max) = limit;
+//         if (dof == DOF::RX)
+//             eulerAngle.x = glm::clamp(eulerAngle.x, min, max);
+//         else if (dof == DOF::RY)
+//             eulerAngle.y = glm::clamp(eulerAngle.y, min, max);
+//         else if (dof == DOF::RZ)
+//             eulerAngle.z = glm::clamp(eulerAngle.z, min, max);
+//     }
+//     rotation = glm::quat(eulerAngle);
+
+//     glm::vec3 correctPos = glm::inverse(rotation) * targetDirection * glm::length(end - start);
+
+//     start = end - correctPos;
+
+// }
+
+// void FootIK::positionFixLimitAngleForWard(glm::vec3& start, glm::vec3& end, glm::vec3 startBoneDir,const Bone& endBone)
+// {
+//     glm::vec3 initialDirection = glm::normalize(startBoneDir);
+//     glm::vec3 targetDirection = glm::normalize(end - start);
+//     glm::quat rotation = glm::rotation(initialDirection, targetDirection);
+//     glm::vec3 eulerAngle = glm::eulerAngles(rotation);
+
+//     for (auto& limit : endBone._limits)
+//     {
+//         DOF dof;
+//         float min, max;
+//         std::tie(dof, min, max) = limit;
+//         if (dof == DOF::RX)
+//             eulerAngle.x = glm::clamp(eulerAngle.x, min, max);
+//         else if (dof == DOF::RY)
+//             eulerAngle.y = glm::clamp(eulerAngle.y, min, max);
+//         else if (dof == DOF::RZ)
+//             eulerAngle.z = glm::clamp(eulerAngle.z, min, max);
+//     }
+//     rotation = glm::quat(eulerAngle);
+
+//     glm::vec3 correctPos = rotation * initialDirection * glm::length(end - start);
+//     end = start + correctPos;
+// }

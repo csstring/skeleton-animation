@@ -52,4 +52,5 @@ class Character
         void rotationY(float radian);
         glm::mat4 getCharacterWorldPosition(void) const;
         const std::vector<BoneLocal>& getCharLocalVector(void) const {return _boneLocalVector;};
+        void setTestLegIK(glm::vec3 position);
 };

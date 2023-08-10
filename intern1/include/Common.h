@@ -18,8 +18,6 @@ typedef unsigned int        uint32;
 typedef unsigned long       uint64;        
 
 const float PI = 3.141592;
-const int WINDOW_WITH = 1920;
-const int WINDOW_HEIGHT = 1440;
 const float OVERLAPTIME = 200;
 
 class Noncopyable

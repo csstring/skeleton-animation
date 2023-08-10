@@ -14,6 +14,16 @@
 #include "include/AnimationBlend/IBlendNode.h"
 #include "include/Body/Ground.h"
 #include "include/Body/CollisionCylinder.h"
+
+void Character::setTestLegIK(glm::vec3 position)
+{
+    if (_footIK->_targetOn == false && _footIK->_blendingRatio == 0)
+    {
+        _footIK->setTestOption(position, glm::vec3(0,1,0), _worldTrans*_worldRotation);
+        std::cout << "test call" << std::endl;
+    }
+}
+
 void Character::rotationY(float radian)
 {
     _worldRotation = glm::rotate(_worldRotation, radian, glm::vec3(0,1,0));
@@ -73,16 +83,10 @@ void Character::worldPositionUpdate(float deltaTime)
 {
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
-    if (t.y > _groundHight)//fix me lastcall
-    {
-        // t.y -= _yError * deltaTime;
-        root.y -= _yError * deltaTime;
-    }
-    else if (t.y < _groundHight)
-    {
-        // t.y += _yError * deltaTime;
-        root.y += _yError * deltaTime;
-    }
+    // if (t.y > _groundHight)//fix me lastcall
+    //     root.y -= _yError * deltaTime;
+    // else if (t.y < _groundHight)
+    //     root.y += _yError * deltaTime;
     // UpdateCylinderPosition(root);//physx
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }

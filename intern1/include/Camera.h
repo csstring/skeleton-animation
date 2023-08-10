@@ -8,9 +8,14 @@ class Camera
     public:
         Camera() : _yaw(-90.0f), _pitch(0.0f), _movementSpeed(2.5f), _mouseSensitivity(0.1f), _zoom(45.0f), _isFirst(true)
         {
+            //+z to -z
             _cameraPos = glm::vec3(0,3,30);
             _cameraUp = glm::vec3(0,1,0);
             _cameraFront = glm::vec3(0,0,-1);
+            //+x to -x
+            // _cameraPos = glm::vec3(30,3,30);
+            // _cameraUp = glm::vec3(0,1,0);
+            // _cameraFront = glm::vec3(0,0,-1);
             updateCameraVectors();
         };
         ~Camera(){};
