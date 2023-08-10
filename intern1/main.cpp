@@ -190,10 +190,10 @@ int main()
     fileLoad(simulator);
     simulator.initialize();
     // camera mouse call
-    glfwSetFramebufferSizeCallback(window._window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window._window, mouse_callback);
-    glfwSetScrollCallback(window._window, scroll_callback);
-    glfwSetInputMode(window._window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetFramebufferSizeCallback(window._window, framebuffer_size_callback);
+    // glfwSetCursorPosCallback(window._window, mouse_callback);
+    // glfwSetScrollCallback(window._window, scroll_callback);
+    // glfwSetInputMode(window._window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     //비슷한 지점 찾기
     //simulator._animations[4].findSameFrame(10);
     while (window.isWindowClose() == false)

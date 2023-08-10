@@ -34,7 +34,7 @@ void Simulator::initialize(void)
     _cube.initialize(_physx.gPhysics, _physx.gScene);
     _ground.initialize();
     _controller.setPlayer(_players.front());
-    // _scene.initialize(_physx.gPhysics, _physx.gScene);
+    _scene.initialize(_physx.gPhysics, _physx.gScene);
 
     //tmp
     // physx::PxMaterial* material = _physx.gPhysics->createMaterial(0.5f, 0.5f, 0.5f);
@@ -48,8 +48,8 @@ void Simulator::draw(void)
         player->draw();
     // _cube.draw();
     _controller.draw();
-    // _scene.draw();
-    _ground.draw();
+    _scene.draw();
+    // _ground.draw();
 }
 
 void Simulator::update(void)
@@ -57,7 +57,7 @@ void Simulator::update(void)
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
     _cube.update();
     _controller.update();
-    // _scene.update();
+    _scene.update();
     _ground.update();
     for (Character* player : _players)
     {

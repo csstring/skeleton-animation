@@ -21,6 +21,8 @@ class FootIK : public IKInterface
    
     private:
         bool      _isSaveAnimation = false;
+        float     _rootRatio = 1;
+        bool      _isRootAnimationOn = false;
         glm::vec3 _groundNormal;
         bool      _isOffGround;
         float     _groundHight = -10;

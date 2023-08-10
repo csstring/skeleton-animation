@@ -3,11 +3,12 @@
 #include "../include/GL/glew.h"
 #include "../include/EnumHeader.h"
 #include "../include/Body/Cube.h"
+#include "../include/GLM/gtx/quaternion.hpp"
 void CollisionCube::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScene)
 {
 
     _cube.initialize();
-
+    _cube._pos = glm::toMat4(_rot);
     physx::PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
     // Create box geometry
     physx::PxBoxGeometry box(_dimensions.x / 2, _dimensions.y / 2, _dimensions.z / 2);
@@ -17,8 +18,10 @@ void CollisionCube::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScen
     physx::PxFilterData filterData;
     filterData.word0 = 1; // You can choose the value based on your filtering requirements
     shape->setSimulationFilterData(filterData);
-    
-    gCubeActor = gPhysics->createRigidStatic(physx::PxTransform(_position.x, _position.y, _position.z));
+
+    physx::PxQuat rotation(_rot.x, _rot.y, _rot.z, _rot.w);
+    gCubeActor = gPhysics->createRigidStatic(physx::PxTransform(_position.x, _position.y, _position.z, rotation));
+
     gCubeActor->attachShape(*shape);
     gScene->addActor(*gCubeActor);
 }

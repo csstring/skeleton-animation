@@ -114,7 +114,9 @@ void Window::processInput(Simulator& simulator, Camera& camera)
 
     //test ik fix me
     if (glfwGetKey(_window, GLFW_KEY_1) == GLFW_PRESS)
-        simulator.changeAnimation(KeyInput::FOOTIK);
+        simulator.changeAnimation(KeyInput::FOOTIKUP);
+    if (glfwGetKey(_window, GLFW_KEY_2) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::FOOTIKDOWN);
 
     if (currentAddCharState == GLFW_PRESS && previousAddCharState == GLFW_RELEASE)
     {

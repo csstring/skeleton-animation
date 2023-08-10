@@ -63,10 +63,10 @@ bool FootIK::isOffGroundCheck(
     physx::PxRaycastHit hitBuffer[MAX_HITS];
     physx::PxRaycastBuffer hitInfo(hitBuffer, MAX_HITS);
     
-    bool tibiaHit = gScene->raycast(pxTibiaPos, lightDir,maxDistance, hitInfo);
     physx::PxRaycastHit *tibiaHitActor = nullptr;
     physx::PxRaycastHit *footHitActor = nullptr;
     
+    bool tibiaHit = gScene->raycast(pxTibiaPos, lightDir,maxDistance, hitInfo);
     for (physx::PxU32 i = 0; i < hitInfo.nbTouches; i++)
     {
         if (_curTouchBody == hitInfo.touches[i].actor)
@@ -86,14 +86,14 @@ bool FootIK::isOffGroundCheck(
         }
     }
 
-    if (tibiaHitActor == nullptr && footHitActor == nullptr)
+    if (tibiaHitActor == nullptr || footHitActor == nullptr)
         curIsOffGround = true;
     else
         curIsOffGround = false;
 
     _isOffGround = curIsOffGround;
     //발이 땅에서 떨어짐
-    if (beforeIsOffGround == false && curIsOffGround == true)
+    if (curIsOffGround == true)
     {
         std::cout << "foot off start" << std::endl;
         return true;
@@ -122,7 +122,7 @@ void FootIK::findTargetObject(
     targetPos.y += 30;//fix
 
     physx::PxVec3 lightDir(0, -1, 0);
-    physx::PxReal maxDistance = 100;
+    physx::PxReal maxDistance = 1000;
 
     physx::PxRaycastHit hitBuffer[MAX_HITS];
     physx::PxRaycastBuffer hitInfo(hitBuffer, MAX_HITS);
@@ -164,6 +164,7 @@ void FootIK::findTargetObject(
         _targetOn = true;
         _groundHight = hit->position.y;
         _curTouchBody = hit->actor;
+        std::cout << "target find" << std::endl;
     }
 }
 /*
@@ -271,6 +272,8 @@ void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::
     if (reachable(inCharLocalPos, distance, footPosInChar) == false)
         return ;
 
+    toRootDir = -inCharLocalPos[2];
+    
     glm::vec3 start = inCharLocalPos.front();
     uint32 iterCount = 0;
     inCharLocalPos[3] = _targetPosition;
@@ -334,7 +337,8 @@ void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::
     _boneRot[1] = glm::quat(glm::inverse(trans0) * inCharLocalRot[1]);
 
     //root pos
-    _bonePos[0] = _bonePos[1] + toRootDir;
+
+    _bonePos[0] = inCharLocalPos[2] + toRootDir;
     _isSaveAnimation = true;
 }
 
@@ -374,9 +378,11 @@ void FootIK::solveIK(
     //     glm::vec3 moveDir = glm::normalize(rootPos - origin);
     //     findTargetObject(inCharLocalPos, gScene, charLocalToWorld, moveDir);
     // }
+    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _callTime);
+    float tmpRatio = static_cast<float>(millisecond.count()) / 300.0f;
 
     blendingRatioUpdate(curTime);
-    if (_blendingRatio <= 0.0f && _targetOn == false)
+    if (_blendingRatio <= 0.0f && _targetOn == false && _isRootAnimationOn == false)
     {
         return ;
     }
@@ -390,24 +396,32 @@ void FootIK::solveIK(
     if (_isSaveAnimation == false)
         return;
 
-    _boneLocalVector[BONEID::ROOT].translationInBoneLocal = glm::mix(_boneLocalVector[BONEID::ROOT].translationInBoneLocal,_bonePos[0], _blendingRatio);
-    // _boneLocalVector[_boneIndexVec[3]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[3]].translationInBoneLocal,_bonePos[3], _blendingRatio);
-    // _boneLocalVector[_boneIndexVec[2]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[2]].translationInBoneLocal,_bonePos[2], _blendingRatio);
-    // _boneLocalVector[_boneIndexVec[1]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[1]].translationInBoneLocal,_bonePos[1], _blendingRatio);
+    if (_isRootAnimationOn == true)
+    {
+        _boneLocalVector[BONEID::ROOT].translationInBoneLocal = glm::mix(_boneLocalVector[BONEID::ROOT].translationInBoneLocal,_bonePos[0], tmpRatio);
+        _rootRatio -= tmpRatio;
+    }
+    else
+    {
+    _boneLocalVector[_boneIndexVec[3]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[3]].translationInBoneLocal,_bonePos[3], _blendingRatio);
+    _boneLocalVector[_boneIndexVec[2]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[2]].translationInBoneLocal,_bonePos[2], _blendingRatio);
+    _boneLocalVector[_boneIndexVec[1]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[1]].translationInBoneLocal,_bonePos[1], _blendingRatio);
 
-    // _boneLocalVector[_boneIndexVec[3]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[3]].rotationInBoneLocal, _boneRot[3], _blendingRatio);
-    // _boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal, _boneRot[2], _blendingRatio);
-    // _boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal, _boneRot[1], _blendingRatio);
-    
+    _boneLocalVector[_boneIndexVec[3]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[3]].rotationInBoneLocal, _boneRot[3], _blendingRatio);
+    _boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal, _boneRot[2], _blendingRatio);
+    _boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal = glm::slerp(_boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal, _boneRot[1], _blendingRatio);
+    }
 }
 
 void FootIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime)
 {
     std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _callTime);
-    if (_targetOn == false && _blendingRatio <= 0)
+    if (_targetOn == false && _blendingRatio <= 0 && _rootRatio <= 0)
     {
         _callTime = curTime;
         _isSaveAnimation = false;
+        _isRootAnimationOn = false;
+        _rootRatio = 1;
         return;
     }
     else if (_targetOn == false && _blendingRatio > 0)
@@ -419,8 +433,11 @@ void FootIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& cu
         _blendingRatio = 1;
         _targetOn = false;
     } 
-    else if (_blendingRatio < 0) 
+    else if (_blendingRatio < 0)
+    {
+        _isRootAnimationOn = true;
         _blendingRatio = 0;
+    }
     
     _callTime = curTime;
 }
