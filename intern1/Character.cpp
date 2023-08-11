@@ -15,11 +15,23 @@
 #include "include/Body/Ground.h"
 #include "include/Body/CollisionCylinder.h"
 
-void Character::setTestLegIK(glm::vec3 position)
+void Character::setTestLegIK(bool _isRight)
 {
-    if (_footIK->_targetOn == false && _footIK->_blendingRatio == 0)
+    glm::vec3 t, pos;
+    if (_isRight == true)
     {
-        _footIK->setTestOption(position, glm::vec3(0,1,0), _worldTrans*_worldRotation);
+        t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
+        pos = {t.x + 3, t.y +4, 1};
+    }
+    if (_isRight == false)
+    {
+        t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::LFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
+        pos = {t.x + 3, t.y +4, -1};
+    }
+
+    if (_RfootIK->_targetOn == false && _RfootIK->_blendingRatio == 0)
+    {
+        _RfootIK->setTestOption(pos, glm::vec3(0,1,0), _worldTrans*_worldRotation);
         std::cout << "test call" << std::endl;
     }
 }
@@ -50,8 +62,11 @@ void Character::initialize(void)
     _blender.initialize();
     _eyeIK = new EyeIK(_skeleton.getBoneVector());
     _eyeIK->initialize(BONEID::HEAD, BONEID::UPPERBACK);
-    _footIK = new FootIK(_skeleton.getBoneVector());
-    _footIK->initialize(BONEID::RFOOT, BONEID::ROOT);
+    _RfootIK = new FootIK(_skeleton.getBoneVector());
+    _RfootIK->initialize(BONEID::RFOOT, BONEID::ROOT);
+
+    _LfootIK = new FootIK(_skeleton.getBoneVector());
+    _LfootIK->initialize(BONEID::LFOOT, BONEID::ROOT);
 }
 
 void Character::boneBufferMaping(void)
@@ -83,17 +98,18 @@ void Character::worldPositionUpdate(float deltaTime)
 {
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
-    // if (t.y > _groundHight)//fix me lastcall
-    //     root.y -= _yError * deltaTime;
-    // else if (t.y < _groundHight)
-    //     root.y += _yError * deltaTime;
-    // UpdateCylinderPosition(root);//physx
+
+    if (t.y > _groundHight)//fix me lastcall
+        root.y -= _yError * deltaTime;
+    else if (t.y < _groundHight)
+        root.y += _yError * deltaTime;
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }
 
 void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, physx::PxScene* gScene)
 {
     std::chrono::milliseconds delta;
+    static int i = 0;
     if (_isFirst == true)
     {
         _isFirst = false;
@@ -112,8 +128,48 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
-    _footIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    _footIK->setCharGroundHight(_groundHight);
+    // if (_RfootIK->isAnimationBlendingOn() == true){
+    //     _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    //     _RfootIK->setCharGroundHight(_groundHight);
+    // } else if (_LfootIK->isAnimationBlendingOn() == true) {
+    //     _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    //     _LfootIK->setCharGroundHight(_groundHight);
+    // } else{
+    //     if (i % 2)
+    //     {
+    //         if (_RfootIK->isAnimationBlendingOn() == false)
+    //         {
+    //             _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    //             _LfootIK->setCharGroundHight(_groundHight);
+    //             i = 0;
+    //         }
+    //         if (_LfootIK->isAnimationBlendingOn() == false)
+    //         {
+    //             _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    //             _RfootIK->setCharGroundHight(_groundHight);
+    //             i = 1;
+    //         }
+    //     }
+    //     else
+    //     {
+    //         if (_LfootIK->isAnimationBlendingOn() == false)
+    //         {
+    //             _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    //             _RfootIK->setCharGroundHight(_groundHight);
+    //             i = 1;
+    //         }
+    //         if (_RfootIK->isAnimationBlendingOn() == false)
+    //         {
+    //             _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    //             _LfootIK->setCharGroundHight(_groundHight);
+    //             i = 0;
+    //         }
+    //     }
+    // }
+    _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    _RfootIK->setCharGroundHight(_groundHight);
+    _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    _LfootIK->setCharGroundHight(_groundHight);
     _lastCallTime = curTime;
 }
 

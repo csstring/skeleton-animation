@@ -20,7 +20,7 @@ enum class KeyInput
     RUN, ATTACK,JUMP,STOP,CUBEFRONT,
     CUBEBACK,CUBERIGHT,CUBELEFT,
     CUBEUP, CUBEDOWN, DRINK, ROLL, GOLF,
-    FOOTIKUP, FOOTIKDOWN
+    RFOOTIK, LFOOTIK
 };
 
 enum BlendNode // index 접근할지 순회 돌지 고민

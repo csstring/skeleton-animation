@@ -47,6 +47,7 @@ class FootIK : public IKInterface
             const std::chrono::steady_clock::time_point& curTime,
             physx::PxScene* gScene
         ) override final;
+        bool isAnimationBlendingOn(void);
         void setCharGroundHight(float& charGroundHight);
         void setTestOption(glm::vec3 position, glm::vec3 normal, glm::mat4 charLocalToWorld);
 };

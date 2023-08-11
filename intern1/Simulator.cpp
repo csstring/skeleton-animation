@@ -46,7 +46,7 @@ void Simulator::draw(void)
 {
     for (Character* player : _players)
         player->draw();
-    // _cube.draw();
+    _cube.draw();
     _controller.draw();
     _scene.draw();
     // _ground.draw();

@@ -126,8 +126,8 @@ void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _ani
         this->pushAnimation("golf", _animations, BlendNode::UPPER);
         this->pushAnimation("golf", _animations, BlendNode::LOWER);
     }
-    else if (key == KeyInput::FOOTIKUP)
-        _player->setTestLegIK(glm::vec3(3.0, -6, 1));
-    else if (key == KeyInput::FOOTIKDOWN)
-        _player->setTestLegIK(glm::vec3(0.0, -10, 1));
+    else if (key == KeyInput::RFOOTIK)
+        _player->setTestLegIK(true);
+    else if (key == KeyInput::LFOOTIK)
+        _player->setTestLegIK(false);
 }

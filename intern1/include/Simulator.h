@@ -27,7 +27,7 @@ class Simulator : Noncopyable
         BodyFactory _factory;
         Physx _physx;
     public:
-        Simulator(): _cube(glm::vec3(1.0f), glm::vec3(0.0f)){}
+        Simulator(): _cube({50,1,50}, {0,-10.5,0},glm::angleAxis(glm::radians(-8.0f), glm::vec3(0.0f, 0.0f, 1.0f))){}
         ~Simulator(){}
         
         void initialize(void);

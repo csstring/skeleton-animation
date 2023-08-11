@@ -27,11 +27,13 @@ class Character
         CollisionCylinder* _collisionMesh;
         Blender _blender;
         EyeIK* _eyeIK;
-        FootIK* _footIK;
+        FootIK* _RfootIK;
+        FootIK* _LfootIK;
         UpperState _upState;
         LowerState _lowerState;
         float      _yError = 0.001;
         float      _groundHight = -10;
+
     private :
         void boneBufferMaping(void);  
         void worldPositionUpdate(float deltaTime);
@@ -52,5 +54,5 @@ class Character
         void rotationY(float radian);
         glm::mat4 getCharacterWorldPosition(void) const;
         const std::vector<BoneLocal>& getCharLocalVector(void) const {return _boneLocalVector;};
-        void setTestLegIK(glm::vec3 position);
+        void setTestLegIK(bool _isRight);
 };
