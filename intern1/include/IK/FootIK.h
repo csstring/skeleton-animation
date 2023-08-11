@@ -12,17 +12,15 @@ class FootIK : public IKInterface
         void findTargetObject(
             const std::vector<glm::vec3>& inCharLocalPos, 
             physx::PxScene* gScene, 
-            glm::mat4 charLocalToWorld,
-            glm::vec3 tmpMoveDir
+            glm::mat4 charLocalToWorld
         );
         void blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime);
         void fixBendingAngle(glm::vec3& start, glm::vec3& mid, glm::vec3& end);
-        void saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot, glm::vec3 toRootDir);
+        bool saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot);
    
     private:
         bool      _isSaveAnimation = false;
-        float     _rootRatio = 1;
-        bool      _isRootAnimationOn = false;
+
         glm::vec3 _groundNormal;
         bool      _isOffGround;
         float     _groundHight = -10;
