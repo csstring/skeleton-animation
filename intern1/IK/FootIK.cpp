@@ -59,7 +59,7 @@ bool FootIK::isOffGroundCheck(
     glm::vec3 Dir =  glm::normalize(glm::cross(childDir, axis));
 
     physx::PxVec3 lightDir(Dir.x, Dir.y, Dir.z);
-    physx::PxReal maxDistance = 1;
+    physx::PxReal maxDistance = 0.6;
     physx::PxRaycastBuffer hitTibia, hitFoot;
     const float Epsilon = 0;
     glm::vec3 epsilonDir = Dir * Epsilon;
@@ -107,11 +107,6 @@ bool FootIK::isOffGroundCheck(
     }
     return false;
 }
-//root trans -> 진행 방향
-//왼발 오른발의 거리 차이 : 보폭
-//대각선 거리라 내적으로 직선거리구하기?
-//발바닥 위치 + 거리*방향 *2 구하고 레이케스트
-//타겟 위치 노발 구하고 캐릭터 로컬로 들고오기
 
 void FootIK::findTargetObject(
     const std::vector<glm::vec3>& inCharLocalPos, 
@@ -125,9 +120,8 @@ void FootIK::findTargetObject(
 
     glm::vec3 moveDir = glm::normalize(footPos - tibiaPos);//fix, normal 
     float moveDistance = glm::length(footPos - tibiaPos);
-    // glm::vec3 targetPos = footPos + 3.5f * moveDistance * tmpMoveDir;//fix
-    glm::vec3 targetPos = footPos;
-    targetPos.y += 2;//fix
+    glm::vec3 targetPos = footPos + 2.0f * moveDistance * tmpMoveDir;//fix
+    targetPos.y += 4;//fix
 
     physx::PxVec3 lightDir(0, -1, 0);
     physx::PxReal maxDistance = 10;
@@ -149,14 +143,6 @@ void FootIK::findTargetObject(
                 hit = &hitInfo.touches[i];
             }
         }
-        // std::cout << "inchar move dir " << glm::to_string(glm::vec4(tmpMoveDir,0)) << std::endl;
-        // std::cout << "world foot pos : " << glm::to_string(glm::inverse(charLocalToWorld) * glm::vec4(footPos,1)) << std::endl;
-        // std::cout << "local foot pos : " << glm::to_string(footPos) << std::endl;
-        // std::cout << "world origin pos : " << glm::to_string(targetPos) << std::endl;
-        // std::cout << "target world pos : " << glm::to_string(worldTarget) << std::endl;
-        // std::cout << "ground world Normal : " << glm::to_string(worldNormal) << std::endl;
-        // std::cout << "target local pos : " << glm::to_string(_targetPosition) << std::endl;
-        // std::cout << "ground local Normal : " << glm::to_string(_groundNormal) << std::endl;
     }
 
     if (hit == nullptr)
@@ -177,11 +163,7 @@ void FootIK::findTargetObject(
         _curTouchBody = hit->actor;
     }
 }
-/*
-reach test fail!!
-leg length : 6.65117
-target length : 7.09239
-*/
+
 bool FootIK::reachable(const std::vector<glm::vec3>& inCharacterPos, std::vector<float>& distance, glm::vec3 footPosition)
 {
     glm::vec3 start = inCharacterPos.front();
@@ -428,7 +410,7 @@ void FootIK::solveIK(
 
     if (_isRootAnimationOn == true)
     {
-        // _boneLocalVector[BONEID::ROOT].translationInBoneLocal = glm::mix(_boneLocalVector[BONEID::ROOT].translationInBoneLocal,_bonePos[0], tmpRatio);
+        _boneLocalVector[BONEID::ROOT].translationInBoneLocal = glm::mix(_boneLocalVector[BONEID::ROOT].translationInBoneLocal,_bonePos[0], tmpRatio);
         _rootRatio -= tmpRatio;
     }
     if (_blendingRatio > 0)
