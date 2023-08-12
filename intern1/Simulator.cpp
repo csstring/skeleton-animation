@@ -72,8 +72,10 @@ void Simulator::update(void)
         player->update(curTime, _cube->_position , _physx.gScene);
     }
     _physx.gScene->simulate(delta);
-//onContact
+    //onContact
     _physx.gScene->fetchResults(true);
+
+    _prevTime = curTime;
 }
 //현재 캐릭터가 보고있는 방향?
 void Simulator::changeControllCharacter(void)
