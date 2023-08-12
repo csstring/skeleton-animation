@@ -2,15 +2,22 @@
 #include "include/Animation.h"
 #include "include/TimeNode.h"
 #include "include/Character.h"
-#include "include/Cube.h"
+#include "include/Body/Cube.h"
 #include "include/EnumHeader.h"
 #include "include/GLM/gtx/quaternion.hpp"
 #include "include/GLM/gtx/transform.hpp"
+#include "include/Body/CollisionCylinder.h"
 // #include "include/GLM/gtc/quaternion.hpp"
 // const float compressMul[] = {0 ,10.5, 94.6615, 355.184};
 void Simulator::addPlayer(const std::string initAnimationName)//position, name 같은거 추가하면 될듯
 {
-    Character* newPlayer = _factory.makeCharacter(_skeleton, _controller);
+    float radius = _skeleton.getSkeletonWidth();
+    float height = _skeleton.getSkeletonHeight();
+    glm::vec3 rFoot = _skeleton.getCharLocalPosition(BONEID::RFOOT) - _skeleton.getCharLocalPosition(BONEID::ROOT);
+    //fix me
+    // CollisionCylinder* collisionMesh = _factory.makeCollisionCylinder(_physx.gScene, _physx.gPhysics, 1000, 1000, glm::vec3(0,rFoot.y,0));
+    CollisionCylinder* collisionMesh = nullptr;
+    Character* newPlayer = _factory.makeCharacter(_skeleton, _controller, collisionMesh);
     Character* oldPlayer = _controller.getPlayer();
     
     _players.push_back(newPlayer);
@@ -21,31 +28,45 @@ void Simulator::addPlayer(const std::string initAnimationName)//position, name �
 
 void Simulator::initialize(void)
 {
+    _physx.Initialize();
     addPlayer("idle");
     _controller.initialize();
-    _cube.cubeSizeChange(0.1);
-    _cube.initialize();
+    // _cube.initialize(_physx.gPhysics, _physx.gScene);
     _ground.initialize();
     _controller.setPlayer(_players.front());
+    _scene.initialize(_physx.gPhysics, _physx.gScene);
+
+    //tmp
+    // physx::PxMaterial* material = _physx.gPhysics->createMaterial(0.5f, 0.5f, 0.5f);
+    // physx::PxRigidStatic* plane = PxCreatePlane(*_physx.gPhysics, physx::PxPlane(0,1,0,0), *material);
+    // _physx.gScene->addActor(*plane)
 }
 
 void Simulator::draw(void)
 {
     for (Character* player : _players)
         player->draw();
-    _cube.draw();
+    // _cube.draw();
     _controller.draw();
-    _ground.draw();
+    _scene.draw();
+    // _ground.draw();
 }
 
 void Simulator::update(void)
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
-    _cube.update();
+    // _cube.update();
     _controller.update();
+    _scene.update();
     _ground.update();
     for (Character* player : _players)
-        player->update(curTime, _cube._pos * _cube._vertex[0], _ground);
+    {
+        player->update(curTime, _cube._position , _physx.gScene);
+    }
+
+    _physx.gScene->simulate(1.0f / 60.0f);
+//onContact
+    _physx.gScene->fetchResults(true);
 }
 //현재 캐릭터가 보고있는 방향?
 void Simulator::changeControllCharacter(void)

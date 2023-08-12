@@ -8,9 +8,10 @@ class BoneLocal;
 class IKInterface
 {
     protected :
-        bool                     _targetOn;
+        //test fix me
+        // bool                     _targetOn;
+        // float                    _blendingRatio;
         bool                     _isFirst;
-        float                    _blendingRatio;
         glm::vec3                _targetPosition;
         std::vector<glm::vec3>   _bonedirection;
         std::vector<uint8>       _boneIndexVec;
@@ -18,7 +19,9 @@ class IKInterface
 
     public:
         std::chrono::steady_clock::time_point _callTime;
-    
+        //test fix me
+        float                    _blendingRatio;
+        bool                     _targetOn;
     public:
         explicit IKInterface(const std::vector<Bone>& boneVector) : _boneVector(boneVector)
         {
@@ -35,6 +38,7 @@ class IKInterface
             const glm::mat4& worldRotation, 
             const glm::mat4& worldTranslate,
             const Controller& _controller,
-            const std::chrono::steady_clock::time_point& curTime
+            const std::chrono::steady_clock::time_point& curTime,
+            physx::PxScene* gScene
         ) = 0;
 };

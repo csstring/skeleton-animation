@@ -1,6 +1,6 @@
 #pragma once
 #include "AnimationTreeTraversal.h"
-#include "common.h"
+#include "Common.h"
 
 class AnimationDataResize : public AnimationTreeTraversal
 {

@@ -117,12 +117,12 @@ bool AMCFileParser::loadAMCFile(void)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,1.0f,0.0f)) * matrix; 
             else if (dof == DOF::RZ)
                 matrix = glm::rotate(glm::radians(val), glm::vec3(0.0f,0.0f,1.0f)) * matrix; 
-            // else if (dof == DOF::TX)
-            //     localTransV.x += val;
-            // else if (dof == DOF::TY)
-            //     localTransV.y += val;
-            // else if (dof == DOF::TZ)
-            //     localTransV.z += val;
+            else if (dof == DOF::TX)
+                localTransV.x += val;
+            else if (dof == DOF::TY)
+                localTransV.y += val;
+            else if (dof == DOF::TZ)
+                localTransV.z += val;
         }
         if (moveBoneIndex == 0 && animationTime ==0)
         {

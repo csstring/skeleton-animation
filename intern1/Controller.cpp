@@ -79,8 +79,6 @@ void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _ani
     if (_player == nullptr)
         return;
 
-    const auto& upper = _player->_blender.getBlendNode(BlendNode::UPPER);
-    const auto& lower = _player->_blender.getBlendNode(BlendNode::LOWER);
     if (key == KeyInput::UP)
         this->pushAnimation("walk", _animations, BlendNode::BASE);
     else if (key == KeyInput::LOWERBACK)
@@ -128,4 +126,8 @@ void Controller::controllPlayer(KeyInput key, const std::vector<Animation>& _ani
         this->pushAnimation("golf", _animations, BlendNode::UPPER);
         this->pushAnimation("golf", _animations, BlendNode::LOWER);
     }
+    else if (key == KeyInput::RFOOTIK)
+        _player->setTestLegIK(true);
+    else if (key == KeyInput::LFOOTIK)
+        _player->setTestLegIK(false);
 }

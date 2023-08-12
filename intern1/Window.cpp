@@ -32,7 +32,7 @@ void Window::initialize(void)
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
     glDepthFunc(GL_LESS);
-    // glfwSwapInterval(1);
+    glfwSwapInterval(1);
 
 }
 
@@ -111,6 +111,12 @@ void Window::processInput(Simulator& simulator, Camera& camera)
         simulator.changeAnimation(KeyInput::CUBEUP);
     if (glfwGetKey(_window, GLFW_KEY_I) == GLFW_PRESS)
         simulator.changeAnimation(KeyInput::CUBEDOWN);
+
+    //test ik fix me
+    if (glfwGetKey(_window, GLFW_KEY_1) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::RFOOTIK);
+    if (glfwGetKey(_window, GLFW_KEY_2) == GLFW_PRESS)
+        simulator.changeAnimation(KeyInput::LFOOTIK);
 
     if (currentAddCharState == GLFW_PRESS && previousAddCharState == GLFW_RELEASE)
     {

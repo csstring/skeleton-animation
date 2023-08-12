@@ -47,3 +47,10 @@ glm::quat quatDivideRatio(const glm::quat& quat, float ratio)
     angle *= ratio;
     return glm::angleAxis(angle, axis);
 }
+
+std::string ft_to_string(const physx::PxVec3& vec)
+{
+    std::string oss;
+    oss = "PxVec3(" + std::to_string(vec.x) + ", " + std::to_string(vec.y) + ", " +std::to_string(vec.z) + ")";
+    return oss;
+}
