@@ -31,7 +31,7 @@ void Simulator::initialize(void)
     _physx.Initialize();
     addPlayer("idle");
     _controller.initialize();
-    // _cube.initialize(_physx.gPhysics, _physx.gScene);
+    _cube.initialize(_physx.gPhysics, _physx.gScene);
     _ground.initialize();
     _controller.setPlayer(_players.front());
     _scene.initialize(_physx.gPhysics, _physx.gScene);

@@ -8,7 +8,6 @@
 
 void Controller::initialize(void)
 {
-    _targetCharterCube.cubeSizeChange(0.2);
     _targetCharterCube.initialize();
 }
 
@@ -20,7 +19,7 @@ void Controller::draw(void)
 void Controller::update(void)
 {
     glm::mat4 inCharLocalPosition = getMatrixInCharLocal(BONEID::HEAD, _player->getCharacterSkeleton(), _player->getCharLocalVector());
-    _targetCharterCube._pos = _player->getCharacterWorldPosition() * inCharLocalPosition * glm::translate(glm::mat4(1.0f), glm::vec3(0,0.7,0));
+    _targetCharterCube._translate = _player->getCharacterWorldPosition() * inCharLocalPosition * glm::translate(glm::mat4(1.0f), glm::vec3(0,0.7,0));
     _targetCharterCube.update();
 }
 
