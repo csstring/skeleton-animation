@@ -9,7 +9,7 @@ class Cube
         
     public:
         std::vector<glm::vec4> _vertex;
-        glm::mat4 _pos;
+        glm::quat _rot;
         glm::vec3 _position;
         glm::vec3 _dimenstion;
         glm::vec3 _color;
@@ -20,12 +20,11 @@ class Cube
     public:
         Cube(glm::vec3 dimensions, glm::vec3 position, glm::vec3 color = glm::vec3(0,1,0)) : _dimenstion(dimensions), _position(position), _color(color)
         {
-            _pos = glm::mat4(1.0f);
+            _rot = glm::quat(1.0f, glm::vec3(0.0f));
         };
         ~Cube(){};
         void initialize(void);
         void draw(void);
         void update(void);
-        void cubeSizeChange(float size);
 };
 

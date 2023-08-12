@@ -46,7 +46,7 @@ void Simulator::draw(void)
 {
     for (Character* player : _players)
         player->draw();
-    // _cube.draw();
+    _cube.draw();
     _controller.draw();
     _scene.draw();
     // _ground.draw();
@@ -55,10 +55,11 @@ void Simulator::draw(void)
 void Simulator::update(void)
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
-    // _cube.update();
+    glm::quat groundCubeRot(0.1 ,glm::vec3(0,1,0));
+    _cube.update();
     _controller.update();
     _scene.update();
-    _ground.update();
+    // _ground.update();
     for (Character* player : _players)
     {
         player->update(curTime, _cube._position , _physx.gScene);

@@ -8,26 +8,31 @@ void CollisionCube::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScen
 {
 
     _cube.initialize();
-    _cube._pos = glm::toMat4(_rot);
+    _cube._rot = _rot;
+
     physx::PxMaterial* material = gPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-    // Create box geometry
     physx::PxBoxGeometry box(_dimensions.x / 2, _dimensions.y / 2, _dimensions.z / 2);
-    // Create shape
     physx::PxShape* shape = gPhysics->createShape(box, *material);
-    // Create actor
+    
     physx::PxFilterData filterData;
-    filterData.word0 = 1; // You can choose the value based on your filtering requirements
-    shape->setSimulationFilterData(filterData);
+    {//지워도 될듯
+        filterData.word0 = 1;
+        shape->setSimulationFilterData(filterData);
+    }
 
     physx::PxQuat rotation(_rot.x, _rot.y, _rot.z, _rot.w);
     gCubeActor = gPhysics->createRigidStatic(physx::PxTransform(_position.x, _position.y, _position.z, rotation));
-
     gCubeActor->attachShape(*shape);
     gScene->addActor(*gCubeActor);
 }
 
-void CollisionCube::update()
+void CollisionCube::update(glm::quat quat)
 {
+    auto pos = gCubeActor->getGlobalPose();
+    pos.q.x = quat.x , pos.q.y = quat.y, pos.q.z = quat.z, pos.q.w = quat.w;
+    gCubeActor->setGlobalPose(pos);
+
+    _cube._rot = quat * _cube._rot;
     _cube.update();
 }
 

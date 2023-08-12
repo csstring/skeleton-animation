@@ -20,6 +20,6 @@ class CollisionCube
         };
         ~CollisionCube(){};
         void initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScene);
-        void update(void);
+        void update(glm::quat quat = glm::quat(1.0f, glm::vec3(0.0f)));
         void draw(void);
 };

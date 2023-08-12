@@ -31,7 +31,7 @@ void Cube::update(void)
 {
     for (uint32 i = 0; i < _buffer.size(); ++i)
     {
-        _buffer[i] = _pos * _vertex[i];
+        _buffer[i] = _rot * _vertex[i];
     }
 }
 
@@ -42,16 +42,6 @@ void Cube::draw(void)
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec4) * _buffer.size(), _buffer.data(), GL_DYNAMIC_DRAW);
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
-}
-
-void Cube::cubeSizeChange(float size)
-{
-    for (uint32 i = 0; i < _vertex.size(); ++i)
-    {
-        _vertex[i].x *= size;
-        _vertex[i].y *= size;
-        _vertex[i].z *= size;
-    }
 }
 
 std::vector<glm::vec4> Cube::CreateCubeVertices(const glm::vec3& dimensions, const glm::vec3& position) {
@@ -86,5 +76,5 @@ std::vector<glm::vec4> Cube::CreateCubeVertices(const glm::vec3& dimensions, con
         vertices.push_back(cubeVertices[indices[i]]);
     }
 
-    return vertices;;
+    return vertices;
 }
