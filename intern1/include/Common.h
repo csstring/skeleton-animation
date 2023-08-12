@@ -54,7 +54,7 @@ inline std::chrono::steady_clock::time_point getAfterTimePoint(float time)
 
 std::string ft_to_string(const physx::PxVec3& vec);
 
-float getMilisecondTime(const std::chrono::steady_clock::time_point& curTime, const std::chrono::steady_clock::time_point& _prevTime)
+inline float getMilisecondTime(const std::chrono::steady_clock::time_point& curTime, const std::chrono::steady_clock::time_point& _prevTime)
 {
     std::chrono::milliseconds millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _prevTime);
     return millisecond.count();

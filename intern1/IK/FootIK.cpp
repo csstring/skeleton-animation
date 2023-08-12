@@ -58,42 +58,14 @@ bool FootIK::isOffGroundCheck(
     glm::vec3 axis = glm::normalize(glm::cross(parentDir, childDir));
     glm::vec3 Dir =  glm::normalize(glm::cross(childDir, axis));
 
-    physx::PxVec3 lightDir(Dir.x, Dir.y, Dir.z);
-    physx::PxReal maxDistance = 0.6;
-    physx::PxRaycastBuffer hitTibia, hitFoot;
-    const float Epsilon = 0;
-    glm::vec3 epsilonDir = Dir * Epsilon;
-    physx::PxVec3 pxTibiaPos(tibiaPos.x - epsilonDir.x, tibiaPos.y - epsilonDir.y, tibiaPos.z - epsilonDir.z);
-    physx::PxVec3 pxFootPos(footPos.x - epsilonDir.x, footPos.y - epsilonDir.y, footPos.z - epsilonDir.z);
+    glm::vec3 startPos = glm::mix(footPos, tibiaPos, 0.5f);
+    physx::PxSweepBuffer hit;
+    physx::PxVec3 sweepDirection(0,-1,0);
+    physx::PxTransform initialPose(physx::PxVec3(startPos.x, startPos.y, startPos.z));
+    physx::PxSphereGeometry sphere(glm::length(footPos - tibiaPos) / 5);
+    bool hitFlag = gScene->sweep(sphere, initialPose, sweepDirection, 1, hit);
 
-
-    physx::PxRaycastHit hitBuffer[MAX_HITS];
-    physx::PxRaycastBuffer hitInfo(hitBuffer, MAX_HITS);
-    
-    physx::PxRaycastHit *tibiaHitActor = nullptr;
-    physx::PxRaycastHit *footHitActor = nullptr;
-    
-    bool tibiaHit = gScene->raycast(pxTibiaPos, lightDir,maxDistance, hitInfo);
-    for (physx::PxU32 i = 0; i < hitInfo.nbTouches; i++)
-    {
-        if (_curTouchBody == hitInfo.touches[i].actor)
-        {
-            tibiaHitActor = &hitInfo.touches[i];
-            break;
-        }
-    }
-
-    bool footHit = gScene->raycast(pxFootPos, lightDir,maxDistance, hitInfo);
-    for (physx::PxU32 i = 0; i < hitInfo.nbTouches; i++)
-    {
-        if (_curTouchBody == hitInfo.touches[i].actor)
-        {
-            footHitActor = &hitInfo.touches[i];
-            break;
-        }
-    }
-
-    if (tibiaHitActor == nullptr || footHitActor == nullptr)
+    if (hitFlag == false)
         curIsOffGround = true;
     else
         curIsOffGround = false;
@@ -103,6 +75,7 @@ bool FootIK::isOffGroundCheck(
     if (curIsOffGround == true)
     {
         std::cout << "foot off start" << std::endl;
+        _targetOn = false;
         return true;
     }
     return false;
@@ -130,8 +103,10 @@ void FootIK::findTargetObject(
     physx::PxSphereGeometry sphere(glm::length(footPos - tibiaPos) / 5);
     bool hitFlag = gScene->sweep(sphere, initialPose, sweepDirection, 10, hit);
  
-    if (hitFlag == false || hit.block.distance == 0)
+    if (hitFlag == false)
+    {
         return;
+    }
 
     if (hit.block.actor != _curTouchBody || hit.block.position.y != _groundHight)
     {
@@ -139,7 +114,9 @@ void FootIK::findTargetObject(
         glm::vec3 worldNormal(hit.block.normal.x, hit.block.normal.y, hit.block.normal.z);
         std::vector<float> disVector;
         if (reachable(inCharLocalPos,disVector ,glm::inverse(charLocalToWorld) * glm::vec4(worldTarget,1)) == false)
+        {
             return;
+        }
         _targetPosition = glm::inverse(charLocalToWorld) * glm::vec4(worldTarget,1);
         _groundNormal = glm::inverse(charLocalToWorld) * glm::vec4(worldNormal, 0);
         
@@ -343,7 +320,6 @@ void FootIK::solveIK(
     std::vector<glm::mat4> inCharTrans;
     std::vector<float> distance;
 
-    _blendingRatio = 1;
     for (uint32 i : _boneIndexVec)
     {
         inCharTrans.push_back(controller.getMatrixInCharLocal(i, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector));
@@ -367,8 +343,7 @@ void FootIK::solveIK(
         saveVelocity(beforePos, curPos);
     }
 
-    if (true)
-    // if (isOffGroundCheck(inCharLocalPos, gScene, charLocalToWorld) == true && _targetOn == false && _blendingRatio <= 0 && _isRootAnimationOn == false)
+    if (isOffGroundCheck(inCharLocalPos, gScene, charLocalToWorld) == true)
     {
         glm::vec3 origin = charLocalToWorld * glm::vec4(0,0,0,1);
         glm::mat4 rootTrans = charLocalToWorld * controller.getMatrixInCharLocal(BONEID::ROOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
@@ -376,7 +351,7 @@ void FootIK::solveIK(
         glm::vec3 moveDir;
 
         moveDir = rootTrans * glm::vec4(0,0,1,0);
-        // std::cout << glm::to_string(moveDir) << std::endl;
+
         findTargetObject(inCharLocalPos, gScene, charLocalToWorld, moveDir);
     }
     std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(_curTime - _prevTime);
@@ -397,11 +372,11 @@ void FootIK::solveIK(
     if (_isSaveAnimation == false)
         return;
 
-    // if (_isRootAnimationOn == true)
-    // {
-    //     _boneLocalVector[BONEID::ROOT].translationInBoneLocal = glm::mix(_boneLocalVector[BONEID::ROOT].translationInBoneLocal,_bonePos[0], tmpRatio);
-    //     _rootRatio -= tmpRatio;
-    // }
+    if (_isRootAnimationOn == true)
+    {
+        _boneLocalVector[BONEID::ROOT].translationInBoneLocal = glm::mix(_boneLocalVector[BONEID::ROOT].translationInBoneLocal,_bonePos[0], tmpRatio);
+        _rootRatio -= tmpRatio;
+    }
     if (_blendingRatio > 0)
     {
         _boneLocalVector[_boneIndexVec[3]].translationInBoneLocal = glm::mix(_boneLocalVector[_boneIndexVec[3]].translationInBoneLocal,_bonePos[3], _blendingRatio);
@@ -433,12 +408,12 @@ void FootIK::blendingRatioUpdate(void)
     {
         _blendingRatio = 1;
         _isRootAnimationOn = true;
-        _targetOn = false;
     } 
     else if (_blendingRatio < 0)
     {
         _blendingRatio = 0;
     }
-    
+    if (_rootRatio <= 0)
+       _isRootAnimationOn = false;
     _prevTime = _curTime;
 }
