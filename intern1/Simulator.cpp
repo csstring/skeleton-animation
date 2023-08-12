@@ -39,7 +39,7 @@ void Simulator::initialize(void)
     _ground.initialize();
     _controller.setPlayer(_players.front());
     _scene.initialize(_physx.gPhysics, _physx.gScene);
-
+    _prevTime = getCurTimePoint();
     //tmp
     // physx::PxMaterial* material = _physx.gPhysics->createMaterial(0.5f, 0.5f, 0.5f);
     // physx::PxRigidStatic* plane = PxCreatePlane(*_physx.gPhysics, physx::PxPlane(0,1,0,0), *material);
@@ -59,8 +59,11 @@ void Simulator::draw(void)
 void Simulator::update(void)
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
-    glm::quat groundCubeRot(0.1 ,glm::vec3(0,1,0));
-    _cube->update();
+    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _prevTime);
+    float delta = static_cast<float>(millisecond.count()) / 1000.0f;
+    float radian = PI * delta;
+    glm::quat groundCubeRot(radian ,glm::vec3(0,1,0));
+    _cube->update(groundCubeRot);
     _controller.update();
     _scene.update();
     // _ground.update();
@@ -68,8 +71,7 @@ void Simulator::update(void)
     {
         player->update(curTime, _cube->_position , _physx.gScene);
     }
-
-    _physx.gScene->simulate(1.0f / 60.0f);
+    _physx.gScene->simulate(delta);
 //onContact
     _physx.gScene->fetchResults(true);
 }

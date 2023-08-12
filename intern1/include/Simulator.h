@@ -23,6 +23,7 @@ class Simulator : Noncopyable
 {
     private:
         std::vector<Character*> _players;//shared ptr써야할거 같은데
+        std::chrono::steady_clock::time_point _prevTime;
         Controller _controller;
         BodyFactory _factory;
         Physx _physx;
