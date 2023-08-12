@@ -5,6 +5,14 @@ void IKInterface::setTargetPosition(glm::vec3 targetPosition)
 {
     _targetPosition = targetPosition;
 }
+
+void IKInterface::saveVelocity(glm::vec3 beforePos, glm::vec3 curPos)
+{
+    float moveDistance = glm::length(curPos - beforePos);
+    float second = getMilisecondTime(_curTime, _prevTime) / 1000.0f;
+    _velocity = moveDistance / second;
+}
+
 void IKInterface::initialize(BONEID targetBone, BONEID startBone)
 {
     const Bone* curBone = nullptr;

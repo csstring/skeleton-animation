@@ -15,10 +15,12 @@ class IKInterface
         glm::vec3                _targetPosition;
         std::vector<glm::vec3>   _bonedirection;
         std::vector<uint8>       _boneIndexVec;
+        float                    _velocity;
         const std::vector<Bone>& _boneVector;//지워야 할듯?
 
     public:
-        std::chrono::steady_clock::time_point _callTime;
+        std::chrono::steady_clock::time_point _prevTime;
+        std::chrono::steady_clock::time_point _curTime;
         //test fix me
         float                    _blendingRatio;
         bool                     _targetOn;
@@ -33,6 +35,7 @@ class IKInterface
 
         void initialize(BONEID targetBone, BONEID startBone);
         void setTargetPosition(glm::vec3 targetPosition);
+        void saveVelocity(glm::vec3 beforePos, glm::vec3 curPos);
         virtual void solveIK(
             std::vector<BoneLocal>& _boneLocalVector, 
             const glm::mat4& worldRotation, 

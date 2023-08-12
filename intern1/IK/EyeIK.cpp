@@ -19,10 +19,10 @@ glm::vec3 EyeIK::moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end
 
 void EyeIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime)
 {
-    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _callTime);
+    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _prevTime);
     if (_targetOn == false && _blendingRatio <= 0)
     {
-        _callTime = curTime;
+        _prevTime = curTime;
         return;
     }
     else if (_targetOn == false && _blendingRatio > 0)
@@ -34,7 +34,7 @@ void EyeIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& cur
     else if (_blendingRatio < 0) 
         _blendingRatio = 0;
     
-    _callTime = curTime;
+    _prevTime = curTime;
 }
 
 void EyeIK::solveIK(
@@ -59,7 +59,7 @@ void EyeIK::solveIK(
     if (_isFirst == true)
     {
         _isFirst = false;
-        _callTime = curTime;
+        _prevTime = curTime;
     }
 
     glm::mat4 charLocalToWorld = worldTranslate * worldRotation;

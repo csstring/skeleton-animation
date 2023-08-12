@@ -15,7 +15,7 @@ class FootIK : public IKInterface
             glm::mat4 charLocalToWorld,
             glm::vec3 tmpMoveDir
         );
-        void blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime);
+        void blendingRatioUpdate();
         void fixBendingAngle(glm::vec3& start, glm::vec3& mid, glm::vec3& end);
         void saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot, glm::vec3 toRootDir);
    
