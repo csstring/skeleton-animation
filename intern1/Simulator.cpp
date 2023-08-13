@@ -32,8 +32,8 @@ void Simulator::initialize(void)
     addPlayer("idle");
     _controller.initialize();
 
-    glm::quat rot = glm::angleAxis(glm::radians(8.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    _cube = new CollisionCube({50,1,50}, {0,-10.5,0}, rot);
+    glm::quat rot = glm::angleAxis(glm::radians(5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    _cube = new CollisionCube({1,1,1}, {0,-10.5,0}, rot);
     _cube->initialize(_physx.gPhysics, _physx.gScene);
 
     _ground.initialize();
@@ -61,6 +61,11 @@ void Simulator::update(void)
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
     std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _prevTime);
     float delta = static_cast<float>(millisecond.count()) / 1000.0f;
+    if (delta == 0)
+    {
+        std::cout << "delta check\n";
+        delta = 1.0f/60.0f;
+    }
     float radian = PI * delta * 0.25f;
     glm::quat groundCubeRot = glm::angleAxis(radian, glm::vec3(0,1,0));
     _cube->update(groundCubeRot);

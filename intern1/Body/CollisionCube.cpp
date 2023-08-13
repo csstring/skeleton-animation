@@ -29,7 +29,10 @@ void CollisionCube::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScen
 void CollisionCube::update(glm::quat quat)
 {
     auto pos = gCubeActor->getGlobalPose();
-    pos.q.x = quat.x , pos.q.y = quat.y, pos.q.z = quat.z, pos.q.w = quat.w;
+    physx::PxQuat currentRotation(pos.q.x, pos.q.y, pos.q.z, pos.q.w);
+    physx::PxQuat newRotation = currentRotation * physx::PxQuat(quat.x, quat.y, quat.z, quat.w);
+    pos.q = newRotation;
+
     gCubeActor->setGlobalPose(pos);
 
     _cube._rot = quat * _cube._rot;

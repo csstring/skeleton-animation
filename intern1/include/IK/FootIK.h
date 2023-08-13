@@ -9,7 +9,7 @@ class FootIK : public IKInterface
         void positionFixLimitAngleForWard(glm::vec3& start, glm::vec3& end, glm::vec3 startBoneDir,const Bone& endBone);
         void positionFixLimitAngleBackWard(glm::vec3& start, glm::vec3& end, glm::vec3 endBoneDir,const Bone& endBone);
         bool isOffGroundCheck(const std::vector<glm::vec3>& inCharLocalPos, physx::PxScene* gScene, glm::mat4 charLocalToWorld);
-        void findTargetObject(
+        bool findTargetObject(
             const std::vector<glm::vec3>& inCharLocalPos, 
             physx::PxScene* gScene, 
             glm::mat4 charLocalToWorld,
@@ -17,7 +17,7 @@ class FootIK : public IKInterface
         );
         void blendingRatioUpdate();
         void fixBendingAngle(glm::vec3& start, glm::vec3& mid, glm::vec3& end);
-        void saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot, glm::vec3 toRootDir);
+        void saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot);
    
     private:
         bool      _isSaveAnimation = false;
@@ -28,6 +28,7 @@ class FootIK : public IKInterface
         float     _groundHight = -10;
         std::vector<glm::vec3> _bonePos;
         std::vector<glm::quat> _boneRot;
+        std::vector<glm::vec3> _inCharLocalPrevPos;
         physx::PxRigidActor* _curTouchBody = nullptr;
 
     public:

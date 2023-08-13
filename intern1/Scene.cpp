@@ -16,12 +16,12 @@ void Scene::update(void)
 void Scene::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScene)
 {
     glm::vec3 pos(0.0f,-10.0f, 0.0f);
-    glm::vec3 dimension(4.0f, 0.2f,8.0f);
+    glm::vec3 dimension(10.0f, 0.2f,12.0f);
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     for (int i=0; i <30; ++i)
     {
-        pos.x += 5;
-        pos.y += 1.0;
+        pos.x += 10;
+        pos.y += 0.5;
         if (i % 2)
             pos.z = 0;
         else

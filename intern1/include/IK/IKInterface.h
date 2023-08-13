@@ -16,6 +16,7 @@ class IKInterface
         std::vector<glm::vec3>   _bonedirection;
         std::vector<uint8>       _boneIndexVec;
         float                    _velocity;
+        uint32                   _retargetTime;
         const std::vector<Bone>& _boneVector;//지워야 할듯?
 
     public:
