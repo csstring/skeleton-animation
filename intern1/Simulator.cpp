@@ -32,8 +32,8 @@ void Simulator::initialize(void)
     addPlayer("idle");
     _controller.initialize();
 
-    glm::quat rot = glm::angleAxis(glm::radians(5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    _cube = new CollisionCube({1,1,1}, {0,-10.5,0}, rot);
+    glm::quat rot = glm::angleAxis(glm::radians(10.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    _cube = new CollisionCube({50,1,50}, {0,-10.5,0}, rot);
     _cube->initialize(_physx.gPhysics, _physx.gScene);
 
     _ground.initialize();

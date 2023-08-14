@@ -18,7 +18,7 @@ class FootIK : public IKInterface
         void blendingRatioUpdate();
         void fixBendingAngle(glm::vec3& start, glm::vec3& mid, glm::vec3& end);
         void saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot);
-   
+        bool isStartFindTarget(const std::vector<glm::vec3>& inCharLocalPos);
     private:
         bool      _isSaveAnimation = false;
         float     _rootRatio = 1;
@@ -29,6 +29,7 @@ class FootIK : public IKInterface
         std::vector<glm::vec3> _bonePos;
         std::vector<glm::quat> _boneRot;
         std::vector<glm::vec3> _inCharLocalPrevPos;
+        std::vector<glm::mat4> _inCharLocalPrevRot;
         physx::PxRigidActor* _curTouchBody = nullptr;
 
     public:

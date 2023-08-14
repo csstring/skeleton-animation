@@ -21,7 +21,7 @@ void Scene::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScene)
     for (int i=0; i <30; ++i)
     {
         pos.x += 10;
-        pos.y += 0.5;
+        pos.y += 1;
         if (i % 2)
             pos.z = 0;
         else

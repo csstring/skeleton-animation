@@ -99,10 +99,10 @@ void Character::worldPositionUpdate(float deltaTime)
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
 
-    if (t.y > _groundHight)//fix me lastcall
-        root.y -= _yError * deltaTime;
-    else if (t.y < _groundHight)
-        root.y += _yError * deltaTime;
+    // if (t.y > _groundHight)//fix me lastcall
+    //     root.y -= _yError * deltaTime;
+    // else if (t.y < _groundHight)
+    //     root.y += _yError * deltaTime;
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }
 
