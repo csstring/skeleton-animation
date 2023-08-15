@@ -166,8 +166,11 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     //         }
     //     }
     // }
+    _RfootIK->_characterState = _lowerState;
     _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, physx);
     _RfootIK->setCharGroundHight(_groundHight);
+
+    _LfootIK->_characterState = _lowerState;
     _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, physx);
     _LfootIK->setCharGroundHight(_groundHight);
     _lastCallTime = curTime;

@@ -2,6 +2,7 @@
 #include "../Common.h"
 #include "../BoneLocal.h"
 #include "IKInterface.h"
+#include "../EnumHeader.h"
 
 class Physx;
 
@@ -57,4 +58,7 @@ class FootIK : public IKInterface
         bool isAnimationBlendingOn(void);
         void setCharGroundHight(float& charGroundHight);
         void setTestOption(glm::vec3 position, glm::vec3 normal, glm::mat4 charLocalToWorld);
+
+    public :
+        LowerState _characterState;
 };

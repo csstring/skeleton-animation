@@ -442,8 +442,11 @@ void FootIK::blendingRatioUpdate(void)
     if (_blendingRatio >= 1.0f)
     {
         _blendingRatio = 1;
-        _targetOn = false;
-        _isRootAnimationOn = true;
+        if (_characterState != LowerState::IDLE)
+        {
+            _targetOn = false;
+            _isRootAnimationOn = true;
+        }
     } 
     else if (_blendingRatio < 0)
     {
