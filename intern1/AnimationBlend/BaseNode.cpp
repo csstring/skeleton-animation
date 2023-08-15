@@ -38,6 +38,8 @@ void BaseNode::update(
     if (_animations.size() >= 2)
     {
         animation = _animations[1].first;
+        changeUpperState(upperState, animation->_name);
+        changeLowerState(lowerState, animation->_name);//fixme
         millisecondFromBegin = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _animations[1].second._startTime);
         interpolVal = static_cast<float>(millisecondFromBegin.count()) / OVERLAPTIME;
 

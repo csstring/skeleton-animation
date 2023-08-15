@@ -347,7 +347,11 @@ void FootIK::solveIK(
         _isFirst = false;
         _prevTime = _curTime;
     }
-
+    //get delta time, prevTime update
+    {
+        _deltaMilisecond = getMilisecondTime(_curTime ,_prevTime);
+        _prevTime = _curTime;
+    }
     //save velocity
     {
         glm::vec3 beforePos = charLocalToWorld * glm::vec4(0,0,0,1);
@@ -374,30 +378,41 @@ void FootIK::solveIK(
     }
     if (_retargetTime >= 1000)
         _retargetTime = 0;
-    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(_curTime - _prevTime);
-    float tmpRatio = static_cast<float>(millisecond.count()) / 200.0f;
-    _retargetTime += millisecond.count();
 
-    blendingRatioUpdate();
+    float tmpRatio = _deltaMilisecond / 200.0f;
+    _retargetTime += _deltaMilisecond;
+
     if (_blendingRatio <= 0.0f && _targetOn == false && _isRootAnimationOn == false)
     {
         return ;
     }
 
-    _firstHitHight = getFirstHitHight(charLocalToWorld, inCharLocalPos[3], physx);
-    saveBlendingAnimation(inCharLocalPos, inCharLocalRot);
+    
+    std::vector<glm::vec3> copytmp = _bonePos;
+    {
+        _firstHitHight = getFirstHitHight(charLocalToWorld, inCharLocalPos[3], physx);
+        saveBlendingAnimation(inCharLocalPos, inCharLocalRot);
+        std::cout <<"not idle state" << std::endl;
+    }
+    
+    if (_characterState == LowerState::IDLE && isOffGroundCheck(inCharLocalPos, physx, charLocalToWorld) == false)
+    {
+        _bonePos = copytmp;
+        std::cout << "idle state" << std::endl;
+    }
+    else
+        blendingRatioUpdate();
     // if (_isSaveAnimation == false)
     //     return;
 
-    if (_isRootAnimationOn == true)
+    if (_isRootAnimationOn == true && _characterState != LowerState::IDLE)
     {
         _boneLocalVector[BONEID::ROOT].translationInBoneLocal = glm::mix(_boneLocalVector[BONEID::ROOT].translationInBoneLocal,_bonePos[0], tmpRatio);
         _rootRatio -= tmpRatio;
     }
     if (_blendingRatio > 0)
     {
-        // inCharLocalPos = inCharLocalPos;
-        // inCharLocalRot = inCharLocalRot;
+
         _boneLocalVector[_boneIndexVec[3]].translationInBoneLocal = _bonePos[3];
         _boneLocalVector[_boneIndexVec[2]].translationInBoneLocal = _bonePos[2];
         _boneLocalVector[_boneIndexVec[1]].translationInBoneLocal = _bonePos[1];
@@ -426,27 +441,22 @@ float FootIK::getFirstHitHight(const glm::mat4& charLocalToWorld, const glm::vec
 
 void FootIK::blendingRatioUpdate(void)
 {
-    float millisecond = getMilisecondTime(_curTime ,_prevTime);
     if (_targetOn == false && _blendingRatio <= 0 && _rootRatio <= 0)
     {
-        _prevTime = _curTime;
         _isSaveAnimation = false;
         _isRootAnimationOn = false;
         _rootRatio = 1;
         return;
     }
     else if (_targetOn == false && _blendingRatio > 0)
-        _blendingRatio -= millisecond / 150.0f;
+        _blendingRatio -= _deltaMilisecond / 150.0f;
     else if (_targetOn == true && _blendingRatio < 1.0f)
-        _blendingRatio += millisecond / 150.0f;
+        _blendingRatio += _deltaMilisecond / 150.0f;
     if (_blendingRatio >= 1.0f)
     {
         _blendingRatio = 1;
-        if (_characterState != LowerState::IDLE)
-        {
-            _targetOn = false;
-            _isRootAnimationOn = true;
-        }
+        _targetOn = false;
+        _isRootAnimationOn = true;
     } 
     else if (_blendingRatio < 0)
     {
@@ -454,5 +464,4 @@ void FootIK::blendingRatioUpdate(void)
     }
     if (_rootRatio <= 0)
        _isRootAnimationOn = false;
-    _prevTime = _curTime;
 }

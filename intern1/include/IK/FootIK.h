@@ -32,6 +32,7 @@ class FootIK : public IKInterface
         bool      _isOffGround;
         float     _groundHight = -10;
         float     _firstHitHight;
+        float     _deltaMilisecond;
         std::vector<glm::vec3> _bonePos;
         std::vector<glm::quat> _boneRot;
         std::vector<glm::vec3> _inCharLocalPrevPos;

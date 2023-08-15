@@ -128,44 +128,6 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
-    // if (_RfootIK->isAnimationBlendingOn() == true){
-    //     _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //     _RfootIK->setCharGroundHight(_groundHight);
-    // } else if (_LfootIK->isAnimationBlendingOn() == true) {
-    //     _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //     _LfootIK->setCharGroundHight(_groundHight);
-    // } else{
-    //     if (i % 2)
-    //     {
-    //         if (_RfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _LfootIK->setCharGroundHight(_groundHight);
-    //             i = 0;
-    //         }
-    //         if (_LfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _RfootIK->setCharGroundHight(_groundHight);
-    //             i = 1;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         if (_LfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _RfootIK->setCharGroundHight(_groundHight);
-    //             i = 1;
-    //         }
-    //         if (_RfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _LfootIK->setCharGroundHight(_groundHight);
-    //             i = 0;
-    //         }
-    //     }
-    // }
     _RfootIK->_characterState = _lowerState;
     _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, physx);
     _RfootIK->setCharGroundHight(_groundHight);
