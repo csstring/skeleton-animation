@@ -4,6 +4,7 @@
 class Bone;
 class Controller;
 class BoneLocal;
+class Physx;
 
 class IKInterface
 {

@@ -6,6 +6,7 @@
 #include "../include/Character.h"
 #include "../include/Bone.h"
 #include "../include/IK/IKUtility.h"
+#include "../include/Physx.h"
 //init HEAD, UPPERBACK
 
 glm::vec3 EyeIK::moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end, const glm::quat& toTargetDir, const glm::vec3& endBoneDir, float ratio)//비율
@@ -43,7 +44,7 @@ void EyeIK::solveIK(
     const glm::mat4& worldTranslate, 
     const Controller& controller,
     const std::chrono::steady_clock::time_point& curTime,
-    physx::PxScene* gScene
+    Physx* gScene
 )
 {
     std::vector<glm::vec3> inCharLocalPos;

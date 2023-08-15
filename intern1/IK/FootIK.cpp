@@ -237,7 +237,9 @@ void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::
     {
         tmpTarget.y = glm::mix(tmpTarget.y, _firstHitHight, _blendingRatio);
     }
-
+    // std::cout << "first hight : " << _firstHitHight << std::endl;
+    // std::cout << "target hight : " << _targetPosition.y << std::endl;
+    // tmpTarget.y = glm::mix(tmpTarget.y, _targetPosition.y, _blendingRatio);
     if (parentDir.y > 0.75)//normal 방향이랑 거의 같아지면 휙 돌아버림 fix me 40도는 너무 큰데
     {
         groundDir = parentDir;
@@ -411,8 +413,9 @@ float FootIK::getFirstHitHight(const glm::mat4& charLocalToWorld, const glm::vec
     physx::PxSweepBuffer hit;
     glm::vec3 sweepDirection(0,-1,0);
     glm::vec4 inWorldPos = charLocalToWorld * glm::vec4(inCharPos, 1);
+    inWorldPos.y += 5;
     bool hitFlag = physx->sweepTestUseSphere(100, 0.3, inWorldPos, sweepDirection, hit);
-    inWorldPos = {hit.block.position.x, hit.block.position.y, hit.block.position.z};
+    inWorldPos = glm::vec4(hit.block.position.x, hit.block.position.y, hit.block.position.z,1);
 
     glm::vec3 inCharHitPos = glm::inverse(charLocalToWorld) * inWorldPos;
     if (hitFlag == false)

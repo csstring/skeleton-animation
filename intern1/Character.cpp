@@ -106,7 +106,7 @@ void Character::worldPositionUpdate(float deltaTime)
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }
 
-void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, physx::PxScene* gScene)
+void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, Physx* physx)
 {
     std::chrono::milliseconds delta;
     static int i = 0;
@@ -166,9 +166,9 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     //         }
     //     }
     // }
-    _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, physx);
     _RfootIK->setCharGroundHight(_groundHight);
-    _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, physx);
     _LfootIK->setCharGroundHight(_groundHight);
     _lastCallTime = curTime;
 }

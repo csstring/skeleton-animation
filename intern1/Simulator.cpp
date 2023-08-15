@@ -33,7 +33,7 @@ void Simulator::initialize(void)
     _controller.initialize();
 
     glm::quat rot = glm::angleAxis(glm::radians(10.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    _cube = new CollisionCube({50,1,50}, {0,-10.5,0}, rot);
+    _cube = new CollisionCube({0.001,0.001,0.001}, {0,-10.5,0}, rot);
     _cube->initialize(_physx.gPhysics, _physx.gScene);
 
     _ground.initialize();
@@ -74,7 +74,7 @@ void Simulator::update(void)
     // _ground.update();
     for (Character* player : _players)
     {
-        player->update(curTime, _cube->_position , _physx.gScene);
+        player->update(curTime, _cube->_position , &_physx);
     }
     _physx.gScene->simulate(delta);
     //onContact

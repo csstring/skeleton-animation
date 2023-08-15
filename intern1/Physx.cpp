@@ -53,10 +53,10 @@ void Physx::SimulateAndCheckCollisions() {
     // }
 }
 
-bool Physx::sweepTestUseSphere(float radius, glm::vec3 initPose, glm::vec3 direction, physx::PxSweepBuffer &hit)
+bool Physx::sweepTestUseSphere(float maxDistance, float radius, glm::vec3 initPose, glm::vec3 direction, physx::PxSweepBuffer &hit)
 {
     physx::PxVec3 sweepDirection(direction.x,direction.y,direction.z);
     physx::PxTransform initialPose(physx::PxVec3(initPose.x, initPose.y, initPose.z));
     physx::PxSphereGeometry sphere(radius);
-    return (gScene->sweep(sphere, initialPose, sweepDirection, 10, hit));
+    return (gScene->sweep(sphere, initialPose, sweepDirection, maxDistance, hit));
 }

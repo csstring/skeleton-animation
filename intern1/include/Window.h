@@ -1,8 +1,8 @@
 #pragma once
 #include "Common.h"
 
-const int WINDOW_WITH = 960;
-const int WINDOW_HEIGHT = 540;
+const int WINDOW_WITH = 1440;
+const int WINDOW_HEIGHT = 960;
 struct GLFWwindow;
 class Simulator;
 class Camera;
