@@ -3,15 +3,17 @@
 #include "../BoneLocal.h"
 #include "IKInterface.h"
 
+class Physx;
+
 class FootIK : public IKInterface
 {
     private:
         void positionFixLimitAngleForWard(glm::vec3& start, glm::vec3& end, glm::vec3 startBoneDir,const Bone& endBone);
         void positionFixLimitAngleBackWard(glm::vec3& start, glm::vec3& end, glm::vec3 endBoneDir,const Bone& endBone);
-        bool isOffGroundCheck(const std::vector<glm::vec3>& inCharLocalPos, physx::PxScene* gScene, glm::mat4 charLocalToWorld);
+        bool isOffGroundCheck(const std::vector<glm::vec3>& inCharLocalPos, Physx* gScene, glm::mat4 charLocalToWorld);
         bool findTargetObject(
             const std::vector<glm::vec3>& inCharLocalPos, 
-            physx::PxScene* gScene, 
+            Physx* gScene, 
             glm::mat4 charLocalToWorld,
             glm::vec3 tmpMoveDir
         );
@@ -19,6 +21,8 @@ class FootIK : public IKInterface
         void fixBendingAngle(glm::vec3& start, glm::vec3& mid, glm::vec3& end);
         void saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot);
         bool isStartFindTarget(const std::vector<glm::vec3>& inCharLocalPos);
+        float getFirstHitHight(const glm::mat4& charLocalToWorld, const glm::vec3& inCharPos, Physx* physx);
+        
     private:
         bool      _isSaveAnimation = false;
         float     _rootRatio = 1;
@@ -26,6 +30,7 @@ class FootIK : public IKInterface
         glm::vec3 _groundNormal;
         bool      _isOffGround;
         float     _groundHight = -10;
+        float     _firstHitHight;
         std::vector<glm::vec3> _bonePos;
         std::vector<glm::quat> _boneRot;
         std::vector<glm::vec3> _inCharLocalPrevPos;
@@ -47,7 +52,7 @@ class FootIK : public IKInterface
             const glm::mat4& worldTranslate,
             const Controller& _controller,
             const std::chrono::steady_clock::time_point& curTime,
-            physx::PxScene* gScene
+            Physx* gScene
         ) override final;
         bool isAnimationBlendingOn(void);
         void setCharGroundHight(float& charGroundHight);

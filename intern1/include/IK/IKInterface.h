@@ -43,6 +43,6 @@ class IKInterface
             const glm::mat4& worldTranslate,
             const Controller& _controller,
             const std::chrono::steady_clock::time_point& curTime,
-            physx::PxScene* gScene
+            Physx* gScene
         ) = 0;
 };

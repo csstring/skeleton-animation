@@ -53,70 +53,10 @@ void Physx::SimulateAndCheckCollisions() {
     // }
 }
 
-/*
-PxFilterFlags MyCustomFilterShader(PxFilterObjectAttributes attributes0,
-                                   PxFilterData filterData0,
-                                   PxFilterObjectAttributes attributes1,
-                                   PxFilterData filterData1,
-                                   PxPairFlags& pairFlags,
-                                   const void* constantBlock,
-                                   PxU32 constantBlockSize)
+bool Physx::sweepTestUseSphere(float radius, glm::vec3 initPose, glm::vec3 direction, physx::PxSweepBuffer &hit)
 {
-    // Enable resolved collision and trigger the contact callback
-    pairFlags = PxPairFlag::eCONTACT_DEFAULT | PxPairFlag::eNOTIFY_CONTACT_POINTS;
-
-    return PxFilterFlag::eDEFAULT; // Or you can return other filter flags depending on your needs
+    physx::PxVec3 sweepDirection(direction.x,direction.y,direction.z);
+    physx::PxTransform initialPose(physx::PxVec3(initPose.x, initPose.y, initPose.z));
+    physx::PxSphereGeometry sphere(radius);
+    return (gScene->sweep(sphere, initialPose, sweepDirection, 10, hit));
 }
-*/
-
-// void FootIK::positionFixLimitAngleBackWard(glm::vec3& start, glm::vec3& end, glm::vec3 endBoneDir,const Bone& endBone)
-// {
-//     glm::vec3 initialDirection = glm::normalize(end - start);
-//     glm::vec3 targetDirection = glm::normalize(endBoneDir);
-//     glm::quat rotation = glm::rotation(initialDirection, targetDirection);
-//     glm::vec3 eulerAngle = glm::eulerAngles(rotation);
-
-//     for (auto& limit : endBone._limits)
-//     {
-//         DOF dof;
-//         float min, max;
-//         std::tie(dof, min, max) = limit;
-//         if (dof == DOF::RX)
-//             eulerAngle.x = glm::clamp(eulerAngle.x, min, max);
-//         else if (dof == DOF::RY)
-//             eulerAngle.y = glm::clamp(eulerAngle.y, min, max);
-//         else if (dof == DOF::RZ)
-//             eulerAngle.z = glm::clamp(eulerAngle.z, min, max);
-//     }
-//     rotation = glm::quat(eulerAngle);
-
-//     glm::vec3 correctPos = glm::inverse(rotation) * targetDirection * glm::length(end - start);
-
-//     start = end - correctPos;
-
-// }
-
-// void FootIK::positionFixLimitAngleForWard(glm::vec3& start, glm::vec3& end, glm::vec3 startBoneDir,const Bone& endBone)
-// {
-//     glm::vec3 initialDirection = glm::normalize(startBoneDir);
-//     glm::vec3 targetDirection = glm::normalize(end - start);
-//     glm::quat rotation = glm::rotation(initialDirection, targetDirection);
-//     glm::vec3 eulerAngle = glm::eulerAngles(rotation);
-
-//     for (auto& limit : endBone._limits)
-//     {
-//         DOF dof;
-//         float min, max;
-//         std::tie(dof, min, max) = limit;
-//         if (dof == DOF::RX)
-//             eulerAngle.x = glm::clamp(eulerAngle.x, min, max);
-//         else if (dof == DOF::RY)
-//             eulerAngle.y = glm::clamp(eulerAngle.y, min, max);
-//         else if (dof == DOF::RZ)
-//             eulerAngle.z = glm::clamp(eulerAngle.z, min, max);
-//     }
-//     rotation = glm::quat(eulerAngle);
-
-//     glm::vec3 correctPos = rotation * initialDirection * glm::length(end - start);
-//     end = start + correctPos;
-// }
