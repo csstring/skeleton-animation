@@ -22,6 +22,7 @@ class EyeIK : public IKInterface
             const glm::mat4& worldTranslate,
             const Controller& _controller,
             const std::chrono::steady_clock::time_point& curTime,
+            LowerState beforeState = LowerState::IDLE,
             Physx* physx = nullptr
         ) override final;
 };

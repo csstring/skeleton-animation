@@ -128,13 +128,13 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
-    _RfootIK->_characterState = _lowerState;
-    _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, physx);
+    _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, _lowerState, physx);
     _RfootIK->setCharGroundHight(_groundHight);
+    _LfootIK->_isOffGroundOther = _RfootIK->_isOffGround;
 
-    _LfootIK->_characterState = _lowerState;
-    _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, physx);
+    _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, _lowerState, physx);
     _LfootIK->setCharGroundHight(_groundHight);
+    _RfootIK->_isOffGroundOther = _LfootIK->_isOffGround;
     _lastCallTime = curTime;
 }
 

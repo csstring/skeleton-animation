@@ -44,6 +44,7 @@ void EyeIK::solveIK(
     const glm::mat4& worldTranslate, 
     const Controller& controller,
     const std::chrono::steady_clock::time_point& curTime,
+    LowerState beforeState,
     Physx* gScene
 )
 {
