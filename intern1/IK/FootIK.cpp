@@ -48,7 +48,9 @@ void FootIK::isOffGroundCheck(
     if (hitFlag == false || glm::abs(5 - hit.block.distance) >= 0.3)
     {
         _isOffGround = true;
-        std::cout << "off ground" << std::endl;
+        // std::cout << hit.block.distance << std::endl;
+        // std::cout << glm::to_string(startPos) << std::endl;
+        // std::cout << "off ground" << std::endl;
     }
     else
     {
@@ -102,9 +104,9 @@ bool FootIK::findTargetObject(
         std::vector<float> disVector;
         stairDir tmpDir;
         
-        if (worldTarget.y > tibiaPos.y + 1)
+        if (worldTarget.y > tibiaPos.y + 0.1)
             tmpDir = stairDir::UPSTAIR;
-        else if (worldTarget.y < tibiaPos.y - 1)
+        else if (worldTarget.y < tibiaPos.y - 0.1)
             tmpDir = stairDir::DOWNSTAIR;
         else
             tmpDir = stairDir::NORMAL;
@@ -229,7 +231,7 @@ void FootIK::fixBendingAngle(glm::vec3& start, glm::vec3& mid, glm::vec3& end)
     }
 }
 
-void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot, glm::vec3 curFootPos)
+bool FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot, glm::vec3 curFootPos)
 {
     std::vector<float> distance;
     glm::vec3 parentDir = glm::normalize(inCharLocalPos[2] - inCharLocalPos[3]);
@@ -255,7 +257,10 @@ void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::
     // {
     //     groundDir = parentDir;
     // }
-
+    if (_bonePos[0].y == 0)
+    {
+        _bonePos[0].y = _targetPosition.y - inCharLocalPos[3].y;
+    }
     glm::vec3 footPosInChar = tmpTarget + groundDir * glm::length(inCharLocalPos[2] - inCharLocalPos[3]);
     if (reachable(inCharLocalPos, distance, footPosInChar) == false)//fix me 
     {
@@ -264,14 +269,13 @@ void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::
     
     glm::vec3 start = inCharLocalPos.front();
     uint32 iterCount = 0;
-    inCharLocalPos[3] = tmpTarget;
-    while (glm::length(footPosInChar - inCharLocalPos[2]) > 0.01)
+    while (glm::length(footPosInChar - inCharLocalPos[2]) > 0.1)
     {
         iterCount++;
         if (iterCount >= 30)
         {
-            // std::cout << "Fook ik length val : " << glm::length(footPosInChar - inCharLocalPos[2]) << std::endl;
-            break;
+            std::cout << "Fook ik length val : " << glm::length(footPosInChar - inCharLocalPos[2]) << std::endl;
+            return false;
         }
             
         inCharLocalPos[2] = footPosInChar;
@@ -302,6 +306,7 @@ void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::
             positionFixLimitAngleForWard(inCharLocalPos[i], inCharLocalPos[i+1], BoneDir, _boneVector[_boneIndexVec[i+1]]);
         }
     }
+    inCharLocalPos[3] = tmpTarget;
 
     for (int i = 3; i >= 1; --i)
     {
@@ -318,11 +323,7 @@ void FootIK::saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::
     // std::cout << "blendint ratio : " << _blendingRatio << std::endl;
     // std::cout << "blending target : " << tmpTarget.y << std::endl;
     //root pos
-    if (_bonePos[0].y == 0)
-    {
-        _bonePos[0].y = _targetPosition.y - inCharLocalPos[3].y;
-    }
-
+    return true;
     //fix me
 }
 
@@ -379,59 +380,95 @@ void FootIK::solveIK(
     if (isStartFindTarget(inCharLocalPos) && _isRootAnimationOn == false && _rootRatio <= 0)// || _retargetTime >= 1000)
     {   
         // std::cout << _velocity << std::endl;
-        _isMoveAnimation = true;
-        _bonePos[0].y = 0;
         glm::mat4 rootTrans = charLocalToWorld * controller.getMatrixInCharLocal(BONEID::ROOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector);
         glm::vec3 moveDir;
-        _rootRatio = 1;
-        _isRootAnimationOn = false;
         moveDir = glm::normalize(rootTrans * glm::vec4(0,0,1,0));
         glm::vec3 foot1Pos = controller.getMatrixInCharLocal(BONEID::RFOOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector) * glm::vec4(0,0,0,1);
         glm::vec3 foot2Pos = controller.getMatrixInCharLocal(BONEID::LFOOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector) * glm::vec4(0,0,0,1);
-        moveDir = glm::length(foot1Pos - foot2Pos) * 1.8f * moveDir;
+        moveDir = glm::length(foot1Pos - foot2Pos) * 1.4f * moveDir;
         if (findTargetObject(inCharLocalPos, physx, charLocalToWorld, moveDir) == true)
         {
+            _isMoveAnimation = true;
+            _bonePos[0].y = 0;
+            _rootRatio = 1;
+            _blendingRatio = 0;
+            _isRootAnimationOn = false;
+        }
+        // std::cout <<"find move target "<<std::endl;
+    }
+    else if (_isMoveAnimation == false)
+    {
+        // std::cout <<"find stop target "<<std::endl;
+        if (findTargetObject(inCharLocalPos, physx, charLocalToWorld, glm::vec3(0.0f)) == true)
+        {
+            _bonePos[0].y = 0;
+            _rootRatio = 0;
+            _isRootAnimationOn = false;
+            if (moveState == false)
+            {
+                _rootRatio = 1;
+                _isRootAnimationOn = true;
+            }
+        }else{
 
         }
     }
-    else if (_isMoveAnimation == false && (moveState == false || findTargetObject(inCharLocalPos, physx, charLocalToWorld, glm::vec3(0.0f)) == true))
+    else
     {
-        _rootRatio = 0;
-        _isRootAnimationOn = false;
-    }
 
+
+    }
     if (_retargetTime >= 1000)
         _retargetTime = 0;
 
     float tmpRatio = _deltaMilisecond / 200.0f;
     _retargetTime += _deltaMilisecond;
 
-    if (_blendingRatio <= 0.0f && _targetOn == false && _isRootAnimationOn == false)
+    if (_blendingRatio <= 0.0f && _targetOn == false && _isRootAnimationOn == false && _rootRatio <= 0)
     {
-        _characterState = beforeState;
         return ;
     }
 
     blendingRatioUpdate(moveState);
-    if (moveState == true)
-    {
-        _firstHitHight = getFirstHitHight(charLocalToWorld, inCharLocalPos[3], physx);
-        saveBlendingAnimation(inCharLocalPos, inCharLocalRot, inCharLocalPos[3]);
-        _characterState = beforeState;
+    bool saveAnimation;
 
+        _firstHitHight = getFirstHitHight(charLocalToWorld, inCharLocalPos[3], physx);
+        saveAnimation = saveBlendingAnimation(inCharLocalPos, inCharLocalRot, inCharLocalPos[3]);
+        if (saveAnimation == false)
+        {
+
+            // std::cout <<"save fail" << std::endl;
+            // std::cout << _bonePos[0].y << std::endl;
+            // std::cout << "_stairDir " << (uint32)_stairDir << std::endl;
+            // std::cout << "target pos" << glm::to_string(_targetPosition) << std::endl;
+            // std::cout <<"is root animation " << _isRootAnimationOn << std::endl;
+            // std::cout <<"rootRatio " << _rootRatio << std::endl;
+            // std::cout <<"_blendingRatio" << _blendingRatio << std::endl;
+            // std::cout <<"_isMoveAnimation" << _isMoveAnimation << std::endl;
+            // std::cout <<"_targetOn " << _targetOn << std::endl;
+            // std::cout <<"tmpRatio " << tmpRatio << std::endl;
+        }
         // std::cout << "move" << std::endl;
-    } 
-    else
-    {
-        saveBlendingAnimation(inCharLocalPos, inCharLocalRot, inCharLocalPos[3]);
-        // _isRootAnimationOn = false;
-        // if (_rootRatio != 0.0f)
-        //     std::cout << _rootRatio << std::endl;
-    }
+/*
+find stop target
+Fook ik length val : 0.232732
+save fail
+0.0803595
+_stairDir 0
+is root animation 1
+rootRatio 1
+_blendingRatio1
+_isMoveAnimation0
+_targetOn 0
+tmpRatio 0.08
+*/
+
     // if (_isSaveAnimation == false)
     //     return;
-    isOffGroundCheck(inCharLocalPos, physx, charLocalToWorld);
+    // isOffGroundCheck(inCharLocalPos, physx, charLocalToWorld);
     _prevTibiaPos = inCharLocalPos[3];
+    // std::cout << (int32)_stairDir << std::endl;
+    std::cout << _rootRatio << std::endl;
     if (_isRootAnimationOn == true || (_stairDir == stairDir::DOWNSTAIR && _rootRatio > 0))
     {
         if (tmpRatio > _rootRatio)
@@ -440,9 +477,8 @@ void FootIK::solveIK(
         _rootRatio -= tmpRatio;
     }
 
-    if (_blendingRatio > 0)
+    if (saveAnimation == true)
     {
-
         _boneLocalVector[_boneIndexVec[3]].translationInBoneLocal = _bonePos[3];
         _boneLocalVector[_boneIndexVec[2]].translationInBoneLocal = _bonePos[2];
         _boneLocalVector[_boneIndexVec[1]].translationInBoneLocal = _bonePos[1];
@@ -451,6 +487,7 @@ void FootIK::solveIK(
         _boneLocalVector[_boneIndexVec[2]].rotationInBoneLocal = _boneRot[2];
         _boneLocalVector[_boneIndexVec[1]].rotationInBoneLocal = _boneRot[1];
     }
+
     if (_isMoveAnimation == true && _blendingRatio == 0 && _rootRatio == 0 && _targetOn == false && _isRootAnimationOn == false)
     {
         std::cout << "is move change" << std::endl;

@@ -46,8 +46,8 @@ void Scene::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScene)
         glm::vec3 randomColor = glm::linearRand(glm::vec3(0.0f), glm::vec3(1.0f));
         _objects.push_back(CollisionCube(dimension, pos2));
     }
-    // glm::quat rot = glm::angleAxis(glm::radians(20.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    // _objects.push_back(CollisionCube({30,0.1,30}, {-0,0,0}, rot));
+    // glm::quat rot = glm::angleAxis(glm::radians(10.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    // _objects.push_back(CollisionCube({60,0.1,30}, {-0,0,0}, rot));
     // rot = glm::angleAxis(glm::radians(-30.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     // _objects.push_back(CollisionCube({15,1,30}, {10,0,0}, rot));
     // glm::quat rot = glm::angleAxis(glm::radians(8.0f), glm::vec3(0.0f, 0.0f, 1.0f));

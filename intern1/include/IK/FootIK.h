@@ -23,7 +23,7 @@ class FootIK : public IKInterface
         );
         void blendingRatioUpdate(bool moveState);
         void fixBendingAngle(glm::vec3& start, glm::vec3& mid, glm::vec3& end);
-        void saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot, glm::vec3 curFootPos);
+        bool saveBlendingAnimation(std::vector<glm::vec3>& inCharLocalPos, std::vector<glm::mat4>& inCharLocalRot, glm::vec3 curFootPos);
         bool isStartFindTarget(const std::vector<glm::vec3>& inCharLocalPos);
         float getFirstHitHight(const glm::mat4& charLocalToWorld, const glm::vec3& inCharPos, Physx* physx);
         
