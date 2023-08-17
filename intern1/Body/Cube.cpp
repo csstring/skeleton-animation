@@ -3,7 +3,7 @@
 #include "../include/GLM/gtx/quaternion.hpp"
 void Cube::initialize(void)
 {
-    _vertex = CreateCubeVertices(_dimenstion, _position);
+    _vertex = CreateCubeVertices(_dimenstion, glm::vec3(0.0f));
     glGenVertexArrays(1, &_VAO);
     glBindVertexArray(_VAO);
 

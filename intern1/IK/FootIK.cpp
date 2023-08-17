@@ -385,7 +385,7 @@ void FootIK::solveIK(
         moveDir = glm::normalize(rootTrans * glm::vec4(0,0,1,0));
         glm::vec3 foot1Pos = controller.getMatrixInCharLocal(BONEID::RFOOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector) * glm::vec4(0,0,0,1);
         glm::vec3 foot2Pos = controller.getMatrixInCharLocal(BONEID::LFOOT, controller.getPlayer()->getCharacterSkeleton(), _boneLocalVector) * glm::vec4(0,0,0,1);
-        moveDir = glm::length(foot1Pos - foot2Pos) * 1.4f * moveDir;
+        moveDir = glm::length(foot1Pos - foot2Pos) * 1.6f * moveDir;
         if (findTargetObject(inCharLocalPos, physx, charLocalToWorld, moveDir) == true)
         {
             _isMoveAnimation = true;
