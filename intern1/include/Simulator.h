@@ -23,11 +23,12 @@ class Simulator : Noncopyable
 {
     private:
         std::vector<Character*> _players;//shared ptr써야할거 같은데
+        std::chrono::steady_clock::time_point _prevTime;
         Controller _controller;
         BodyFactory _factory;
         Physx _physx;
     public:
-        Simulator(): _cube(glm::vec3(1.0f), glm::vec3(0.0f)){}
+        Simulator(){}
         ~Simulator(){}
         
         void initialize(void);
@@ -39,7 +40,7 @@ class Simulator : Noncopyable
     public : 
         Skeleton               _skeleton;
         std::vector<Animation> _animations;
-        CollisionCube          _cube;
+        CollisionCube*          _cube;
         Ground                 _ground;
         Scene                  _scene;
 };

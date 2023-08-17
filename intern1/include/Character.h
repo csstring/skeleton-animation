@@ -11,6 +11,7 @@ class EyeIK;
 class FootIK;
 class Ground;
 class CollisionCylinder;
+class Physx;
 class Character
 {   
     private:
@@ -49,7 +50,7 @@ class Character
         };
         void initialize(void);
         const Skeleton& getCharacterSkeleton(void) const {return _skeleton;};
-        void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, physx::PxScene* gScene);
+        void update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, Physx* physx);
         void draw(void);
         void rotationY(float radian);
         glm::mat4 getCharacterWorldPosition(void) const;

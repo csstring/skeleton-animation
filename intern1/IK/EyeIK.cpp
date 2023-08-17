@@ -6,6 +6,7 @@
 #include "../include/Character.h"
 #include "../include/Bone.h"
 #include "../include/IK/IKUtility.h"
+#include "../include/Physx.h"
 //init HEAD, UPPERBACK
 
 glm::vec3 EyeIK::moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end, const glm::quat& toTargetDir, const glm::vec3& endBoneDir, float ratio)//비율
@@ -19,10 +20,10 @@ glm::vec3 EyeIK::moveInBoneLocalPos(const glm::vec3& start, const glm::vec3& end
 
 void EyeIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& curTime)
 {
-    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _callTime);
+    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _prevTime);
     if (_targetOn == false && _blendingRatio <= 0)
     {
-        _callTime = curTime;
+        _prevTime = curTime;
         return;
     }
     else if (_targetOn == false && _blendingRatio > 0)
@@ -34,7 +35,7 @@ void EyeIK::blendingRatioUpdate(const std::chrono::steady_clock::time_point& cur
     else if (_blendingRatio < 0) 
         _blendingRatio = 0;
     
-    _callTime = curTime;
+    _prevTime = curTime;
 }
 
 void EyeIK::solveIK(
@@ -43,7 +44,8 @@ void EyeIK::solveIK(
     const glm::mat4& worldTranslate, 
     const Controller& controller,
     const std::chrono::steady_clock::time_point& curTime,
-    physx::PxScene* gScene
+    LowerState beforeState,
+    Physx* gScene
 )
 {
     std::vector<glm::vec3> inCharLocalPos;
@@ -59,7 +61,7 @@ void EyeIK::solveIK(
     if (_isFirst == true)
     {
         _isFirst = false;
-        _callTime = curTime;
+        _prevTime = curTime;
     }
 
     glm::mat4 charLocalToWorld = worldTranslate * worldRotation;

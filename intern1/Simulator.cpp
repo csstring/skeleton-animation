@@ -31,11 +31,15 @@ void Simulator::initialize(void)
     _physx.Initialize();
     addPlayer("idle");
     _controller.initialize();
-    // _cube.initialize(_physx.gPhysics, _physx.gScene);
+
+    glm::quat rot = glm::angleAxis(glm::radians(10.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    _cube = new CollisionCube({0.001,0.001,0.001}, {0,-10.5,0}, rot);
+    _cube->initialize(_physx.gPhysics, _physx.gScene);
+
     _ground.initialize();
     _controller.setPlayer(_players.front());
     _scene.initialize(_physx.gPhysics, _physx.gScene);
-
+    _prevTime = getCurTimePoint();
     //tmp
     // physx::PxMaterial* material = _physx.gPhysics->createMaterial(0.5f, 0.5f, 0.5f);
     // physx::PxRigidStatic* plane = PxCreatePlane(*_physx.gPhysics, physx::PxPlane(0,1,0,0), *material);
@@ -46,7 +50,7 @@ void Simulator::draw(void)
 {
     for (Character* player : _players)
         player->draw();
-    _cube.draw();
+    _cube->draw();
     _controller.draw();
     _scene.draw();
     // _ground.draw();
@@ -55,19 +59,28 @@ void Simulator::draw(void)
 void Simulator::update(void)
 {
     std::chrono::steady_clock::time_point curTime = getCurTimePoint();
-    glm::quat groundCubeRot(0.1 ,glm::vec3(0,1,0));
-    _cube.update();
+    std::chrono::milliseconds  millisecond = std::chrono::duration_cast<std::chrono::milliseconds>(curTime - _prevTime);
+    float delta = static_cast<float>(millisecond.count()) / 1000.0f;
+    if (delta == 0)
+    {
+        std::cout << "delta check\n";
+        delta = 1.0f/60.0f;
+    }
+    float radian = PI * delta * 0.25f;
+    glm::quat groundCubeRot = glm::angleAxis(radian, glm::vec3(0,1,0));
+    _cube->update(groundCubeRot);
     _controller.update();
     _scene.update();
     // _ground.update();
     for (Character* player : _players)
     {
-        player->update(curTime, _cube._position , _physx.gScene);
+        player->update(curTime, _cube->_position , &_physx);
     }
-
-    _physx.gScene->simulate(1.0f / 60.0f);
-//onContact
+    _physx.gScene->simulate(delta);
+    //onContact
     _physx.gScene->fetchResults(true);
+
+    _prevTime = curTime;
 }
 //현재 캐릭터가 보고있는 방향?
 void Simulator::changeControllCharacter(void)

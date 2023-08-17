@@ -99,14 +99,14 @@ void Character::worldPositionUpdate(float deltaTime)
     glm::vec3 t = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::RFOOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
     glm::vec3 root = _worldTrans * _worldRotation * _controller.getMatrixInCharLocal(BONEID::ROOT, _skeleton, _boneLocalVector) * glm::vec4(0,0,0,1);
 
-    if (t.y > _groundHight)//fix me lastcall
-        root.y -= _yError * deltaTime;
-    else if (t.y < _groundHight)
-        root.y += _yError * deltaTime;
+    // if (t.y > _groundHight)//fix me lastcall
+    //     root.y -= _yError * deltaTime;
+    // else if (t.y < _groundHight)
+    //     root.y += _yError * deltaTime;
     _worldTrans = glm::translate(glm::mat4(1.0f), root);
 }
 
-void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, physx::PxScene* gScene)
+void Character::update(const std::chrono::steady_clock::time_point& curTime, glm::vec3 eyeTarget, Physx* physx)
 {
     std::chrono::milliseconds delta;
     static int i = 0;
@@ -128,47 +128,10 @@ void Character::update(const std::chrono::steady_clock::time_point& curTime, glm
     // _eyeIK->setTargetPosition(eyeTarget);
     // _eyeIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime);
 
-    // if (_RfootIK->isAnimationBlendingOn() == true){
-    //     _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //     _RfootIK->setCharGroundHight(_groundHight);
-    // } else if (_LfootIK->isAnimationBlendingOn() == true) {
-    //     _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //     _LfootIK->setCharGroundHight(_groundHight);
-    // } else{
-    //     if (i % 2)
-    //     {
-    //         if (_RfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _LfootIK->setCharGroundHight(_groundHight);
-    //             i = 0;
-    //         }
-    //         if (_LfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _RfootIK->setCharGroundHight(_groundHight);
-    //             i = 1;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         if (_LfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _RfootIK->setCharGroundHight(_groundHight);
-    //             i = 1;
-    //         }
-    //         if (_RfootIK->isAnimationBlendingOn() == false)
-    //         {
-    //             _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
-    //             _LfootIK->setCharGroundHight(_groundHight);
-    //             i = 0;
-    //         }
-    //     }
-    // }
-    _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+    _RfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, _lowerState, physx);
     _RfootIK->setCharGroundHight(_groundHight);
-    _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, gScene);
+
+    _LfootIK->solveIK(_boneLocalVector, _worldRotation, _worldTrans, _controller, curTime, _lowerState, physx);
     _LfootIK->setCharGroundHight(_groundHight);
     _lastCallTime = curTime;
 }

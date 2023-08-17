@@ -4,6 +4,7 @@
 class Bone;
 class Controller;
 class BoneLocal;
+class Physx;
 
 class IKInterface
 {
@@ -15,13 +16,17 @@ class IKInterface
         glm::vec3                _targetPosition;
         std::vector<glm::vec3>   _bonedirection;
         std::vector<uint8>       _boneIndexVec;
+        float                    _velocity;
+        uint32                   _retargetTime;
         const std::vector<Bone>& _boneVector;//지워야 할듯?
 
     public:
-        std::chrono::steady_clock::time_point _callTime;
+        std::chrono::steady_clock::time_point _prevTime;
+        std::chrono::steady_clock::time_point _curTime;
         //test fix me
         float                    _blendingRatio;
         bool                     _targetOn;
+
     public:
         explicit IKInterface(const std::vector<Bone>& boneVector) : _boneVector(boneVector)
         {
@@ -33,12 +38,14 @@ class IKInterface
 
         void initialize(BONEID targetBone, BONEID startBone);
         void setTargetPosition(glm::vec3 targetPosition);
+        void saveVelocity(glm::vec3 beforePos, glm::vec3 curPos);
         virtual void solveIK(
             std::vector<BoneLocal>& _boneLocalVector, 
             const glm::mat4& worldRotation, 
             const glm::mat4& worldTranslate,
             const Controller& _controller,
             const std::chrono::steady_clock::time_point& curTime,
-            physx::PxScene* gScene
+            LowerState beforeState,
+            Physx* gScene
         ) = 0;
 };

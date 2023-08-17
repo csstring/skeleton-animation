@@ -1,9 +1,9 @@
 #include "../include/Body/Cube.h"
 #include "../include/GL/glew.h"
-
+#include "../include/GLM/gtx/quaternion.hpp"
 void Cube::initialize(void)
 {
-    _vertex = CreateCubeVertices(_dimenstion, _position);
+    _vertex = CreateCubeVertices(_dimenstion, glm::vec3(0.0f));
     glGenVertexArrays(1, &_VAO);
     glBindVertexArray(_VAO);
 
@@ -31,7 +31,7 @@ void Cube::update(void)
 {
     for (uint32 i = 0; i < _buffer.size(); ++i)
     {
-        _buffer[i] = _rot * _vertex[i];
+        _buffer[i] = _translate * glm::toMat4(_rot) * _vertex[i];
     }
 }
 

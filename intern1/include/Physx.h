@@ -1,7 +1,7 @@
 #pragma once
 #include "Common.h"
 
-class Physx
+class Physx : Noncopyable
 {
     public:
         physx::PxDefaultAllocator gAllocator;
@@ -20,5 +20,5 @@ class Physx
             gFoundation->release();
         };
         void Initialize(void);
-        void SimulateAndCheckCollisions(void);
+        bool sweepTestUseSphere(float maxDistance,float radius, glm::vec3 initPose, glm::vec3 direction, physx::PxSweepBuffer &hit);
 };
