@@ -31,28 +31,6 @@ void Physx::Initialize(void)
 
 }
 
-void Physx::SimulateAndCheckCollisions() {
-    // Step simulation
-    gScene->simulate(1.0f / 60.0f);
-    gScene->fetchResults(true);
-
-    // Check for collisions
-    PxContactPairHeader pairsHeader;
-    PxContactPair pairs;
-    // PxU32 nbPairs = gScene->getNpContactPairHeaderStreamCount();
-    // PxContactStreamIterator iter(gScene->getNpContactPairHeaderStream());
-
-    // while(iter.hasNextPair()) {
-    //     iter.nextPair(pairsHeader);
-    //     if((pairsHeader.actors[0] == gCylinderActor && pairsHeader.actors[1] == gBoxActor) ||
-    //        (pairsHeader.actors[0] == gBoxActor && pairsHeader.actors[1] == gCylinderActor)) {
-    //         // Collision between cylinder and box detected
-    //         std::cout << "Collision detected between cylinder and box!" << std::endl;
-    //         break;
-    //     }
-    // }
-}
-
 bool Physx::sweepTestUseSphere(float maxDistance, float radius, glm::vec3 initPose, glm::vec3 direction, physx::PxSweepBuffer &hit)
 {
     physx::PxVec3 sweepDirection(direction.x,direction.y,direction.z);

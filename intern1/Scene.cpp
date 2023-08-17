@@ -51,7 +51,9 @@ void Scene::initialize(physx::PxPhysics* gPhysics, physx::PxScene* gScene)
     _objects.push_back(CollisionCube({60,0.1,30}, {-30,0,-20}, rot));
     rot = glm::angleAxis(glm::radians(-12.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     _objects.push_back(CollisionCube({60,0.1,30}, {30,0,-20}, rot));
-
+    
+    _objects.push_back(CollisionCube({5,0.1,60}, {2.5,-9,0}));
+    _objects.push_back(CollisionCube({5,0.1,60}, {-2.5,-10,0}));
     // rot = glm::angleAxis(glm::radians(-8.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     // _objects.push_back(CollisionCube({50,1,50}, {0,-10.5,0}, rot, glm::vec3(1,0,0)));
     for(CollisionCube& cube: _objects)

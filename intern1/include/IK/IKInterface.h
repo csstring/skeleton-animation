@@ -26,6 +26,7 @@ class IKInterface
         //test fix me
         float                    _blendingRatio;
         bool                     _targetOn;
+
     public:
         explicit IKInterface(const std::vector<Bone>& boneVector) : _boneVector(boneVector)
         {
