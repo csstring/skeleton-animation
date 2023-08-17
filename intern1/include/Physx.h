@@ -1,7 +1,7 @@
 #pragma once
 #include "Common.h"
 
-class Physx
+class Physx : Noncopyable
 {
     public:
         physx::PxDefaultAllocator gAllocator;

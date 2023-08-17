@@ -59,7 +59,6 @@ class FootIK : public IKInterface
             LowerState beforeState,
             Physx* gScene
         ) override final;
-        bool isAnimationBlendingOn(void);
         void setCharGroundHight(float& charGroundHight);
         void setTestOption(glm::vec3 position, glm::vec3 normal, glm::mat4 charLocalToWorld);
 
